@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>体育祭まで(ベータ）</title>
+ <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<h1>
+体育祭まで</h1>
+<h2>残り
+</h2>
+
+<!-- ボタンたち（中央放射状配置） -->
+<div class="btn-container">
+  <a href="#" class="btn" onclick="changeIcon('./html.png')">
+    <img src="./html.png" alt="HTML" />
+  </a>
+  <a href="#" class="btn" onclick="changeIcon('./css.png')">
+    <img src="./css.png" alt="CSS" />
+  </a>
+  <a href="#" class="btn" onclick="changeIcon('./js.png')">
+    <img src="./js.png" alt="JS" />
+  </a>
+  <a href="#" class="btn" onclick="changeIcon('./py.png')">
+    <img src="./py.png" alt="Python" />
+  </a>
+  <a href="#" class="btn" onclick="changeIcon('./txt.png')">
+    <img src="./txt.png" alt="Text" />
+  </a>
+  <a href="#" class="btn" onclick="changeIcon('./json.png')">
+    <img src="./json.png" alt="JSON" />
+  </a>
+</div>
+
+<script>
+  const menuIcon = document.getElementById("menuIcon");
+
+  function changeIcon(src) {
+    menuIcon.src = src;
+  }
+</script>
+
+</body>
+</html>

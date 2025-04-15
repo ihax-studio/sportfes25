@@ -1,0 +1,62 @@
+html, body {
+    margin: 0;
+    padding: 0;
+    text-align:center;
+    height: 100%;
+    overflow: hidden;
+  }
+h1{
+  margin-top:7%;
+}
+h2{
+  margin-top:-23px;
+  font-size:90px;
+}
+  /* ボタン全体を中央に固定 */
+  .btn-container {
+    position: fixed;
+    top: 80%;
+    left: 45%;
+    transform: translate(-50%, -50%);
+    width: 0;
+    height: 0;
+    pointer-events: none;
+  }
+
+  .btn {
+    position: absolute;
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.2);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 5px 25px #00000024;
+    transition: all 0.5s ease;
+    pointer-events: auto;
+    opacity: 1;
+  }
+
+  .btn img {
+    width: 107px;
+    height: 107px;
+    border-radius: 50%;
+    object-fit: cover;
+    transition: transform 0.4s ease;
+  }
+
+  .btn img:hover {
+    transform: scale(0.88);
+  }
+
+  .btn img:active {
+    transform: scale(1.01);
+  }
+/* 放射状配置（距離だけ10px広く＝230px、角度そのまま） */
+.btn:nth-child(1) { transform: rotate(0deg) translateX(-230px) rotate(0deg); }
+.btn:nth-child(2) { transform: rotate(36deg) translateX(-230px) rotate(-36deg); }
+.btn:nth-child(3) { transform: rotate(72deg) translateX(-230px) rotate(-72deg); }
+.btn:nth-child(4) { transform: rotate(108deg) translateX(-230px) rotate(-108deg); }
+.btn:nth-child(5) { transform: rotate(144deg) translateX(-230px) rotate(-144deg); }
+.btn:nth-child(6) { transform: rotate(180deg) translateX(-230px) rotate(-180deg); }

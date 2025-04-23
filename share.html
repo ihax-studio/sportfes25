@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QRシェア画面</title>
+  <link rel="stylesheet" href="share.css">
+</head>
+<body>
+<!-- カーテン -->
+<div class="curtain"></div> <!-- ←クラス名に最初から .show をつけない -->
+  <!-- シェアコンテンツ -->
+  <div class="share-container">
+<img src="QR.png" alt="QRコード" class="qr-image fade-in">
+<div class="share-text fade-in">
+  1-E特設サイトを<br>シェアしよう。
+</div>
+
+    <div class="close-button"></div>
+  </div>
+  <script>
+    window.addEventListener('DOMContentLoaded', () => {
+      const curtain = document.querySelector('.curtain');
+      const closeBtn = document.querySelector('.close-button');
+  
+      // 最初に curtain を drop（降ろす）だけ！開かない
+      curtain.classList.add('drop');
+  
+      // close ボタンを押したときに open（開く）→ ページ遷移
+      closeBtn.addEventListener('click', () => {
+        curtain.classList.remove('drop');
+        curtain.classList.add('open');
+  
+        curtain.addEventListener('animationend', (e) => {
+          if (e.animationName === 'curtainUp') {
+            window.location.href = 'index.html';
+          }
+        }, { once: true });
+      });
+    });
+  </script>  
+
+<script>
+  window.addEventListener("load", () => {
+    // フェードイン（初期表示用）
+    setTimeout(() => {
+      document.querySelectorAll('.fade-in').forEach(el => {
+        el.classList.add('visible');
+      });
+    }, 300);
+
+    // フェードアウト（閉じるボタン押下時）
+    document.querySelector('.close-button').addEventListener('click', () => {
+      document.querySelectorAll('.fade-in').forEach(el => {
+        el.classList.remove('visible'); // opacity: 1 → 0 に
+        el.classList.add('hidden');
+
+        // 完全に消えた後に非表示にしたい場合（任意）
+        setTimeout(() => {
+          el.style.display = "none";
+        }, 300);
+      });
+    });
+  });
+</script>
+<!--フェードアニメーションの環境設定-->
+
+</body>
+</html>

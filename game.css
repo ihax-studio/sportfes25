@@ -1,0 +1,292 @@
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-image: 
+    radial-gradient(at 46% 54%, rgb(182, 250, 232) 0px, transparent 50%),
+    radial-gradient(at 30% 94%, rgb(88, 80, 247) 0px, transparent 50%),
+    radial-gradient(at 90% 5%, rgb(182, 198, 255) 0px, transparent 50%),
+    radial-gradient(at 24% 60%, rgb(90, 186, 246) 0px, transparent 50%),
+    radial-gradient(at 64% 7%, rgb(255, 51, 204) 0px, transparent 50%),
+    radial-gradient(at 63% 5%, rgb(169, 234, 189) 0px, transparent 50%),
+    radial-gradient(at 6% 40%, rgb(171, 255, 245) 0px, transparent 50%);
+background-size: cover;
+    background-size: cover;
+    overflow: hidden;
+    margin: 0;
+    position: relative;
+    color: white;
+font-weight:10;
+        font-family: -apple-system, BlinkMacSystemFont, "San Francisco", "Helvetica Neue", "Helvetica", sans-serif;
+}
+
+.ball {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background-color: #000;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
+.dynamic-island {
+    width: 166px;
+    height: 42px;
+    background-color: rgba(0, 0, 0, 0.88);
+    border-radius: 32px;
+    position: absolute;
+    cursor:none;
+    box-shadow: 0 4px 25px rgba(0, 0, 0, 0.2);
+    transition: transform 0.33s ease;
+}
+
+.dynamic-island.top {
+    top: 25px;
+    left: calc(45% - 50px);
+}
+
+
+.dynamic-island.top:active{
+    transform: scale(1.1);
+}
+
+.dynamic-island.bottom {
+    cursor: none;
+    pointer-events: none; /* ← これでクリック無効化 */
+    top: calc(100vh - 68px);
+    left: calc(50% - 50px);
+}
+
+
+.score {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    color: black;
+    font-size: 44px;
+    text-shadow: 1px 1px 15px rgba(0, 0, 0, 0.3);
+}
+
+@keyframes curtainUp {
+    to {
+      transform: translateY(0);
+    }
+  }
+  
+  .curtainUp {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+  
+    /* 🎨 グラデーション背景（あなたの指定） */
+    background-image:
+              radial-gradient(at 64% 7%, rgb(255 134 225) 0px, transparent 50%),
+      radial-gradient(at 68% 85%, hsl(180, 45%, 36%) 0px, transparent 50%),
+              radial-gradient(at 63% 5%, hsl(180deg 100% 70.88%) 0px, transparent 50%),
+      radial-gradient(at 6% 46%, rgb(0, 110, 255) 0px, transparent 50%),
+      radial-gradient(at 6% 84%, rgb(146 75 202) 0px, transparent 50%);
+    background-color: #000000; /* fallback */
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+  
+    /* アニメーション */
+    transform: translateY(100%);
+    animation: curtainUp 2s forwards;
+  
+
+    will-change: transform;
+  }
+  
+
+@keyframes curtainUp {
+    to { transform: translateY(0); }
+}
+
+.message {
+    display:flex;
+    position: absolute;
+    text-align: left;
+    color: #ffffff;
+    font-weight: bold;
+    text-shadow: 2px 2px 52px rgba(0, 0, 0, 0.7);
+    opacity: 0;
+    transition: opacity 1.8s;
+    font-size: 55px;
+    margin: 0;
+    left: 28px;
+    margin-top: -200px;
+}
+
+.score-text {
+        display:flex;
+    position: absolute;
+    color: rgb(255 255 255);
+      text-shadow: 22px 2px 32px rgb(0 0 0 / 33%);
+    font-weight: bold;
+    font-size: 55px;
+    text-align: left;
+    left: 28px;
+    opacity: 0;
+    transform: translateY(50px);
+    transition: opacity 1s, transform 1s;
+    margin-top: 0px;
+}
+
+.congratulations {
+    position: absolute;
+  /* 既存のスタイルに加えて以下を追加・変更 */
+    background: linear-gradient(90deg, #d2fff8, #c7ffd0,#d8fdc0); /* 好みのグラデーションにしてね */
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text; /* モダンブラウザ用 */
+    font-weight: bold;
+    font-size: 55px;
+    text-align: left;
+    left: 28px;
+    opacity: 0;
+    transform: translateY(50px);
+    transition: opacity 1s, transform 1s;
+    margin-top: 200px;
+}
+
+/* ぼかし効果 */
+.blurred {
+    filter: blur(5px);
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1; /* 背面に配置 */
+}
+
+/* "やり直す"ボタン */
+.retry-button {
+    position: absolute;
+    font-size: 20px;
+    padding: 15px 36px;
+ backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px); /* Safari 対応 */
+    background-color: rgba(255, 255, 255, 0.66); /* 少し透明な背景でblurを見せる */
+    color: rgb(0, 0, 0);
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    opacity: 0;
+    transition: all 0.3s ease;
+    z-index: 100000;
+    top: calc(93vh - 50px);
+    left: calc(45% - 50px);
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.retry-button span::after {
+    content: '';
+        transform:scale(0.1);
+    transition:all 0.3s ease;
+
+}
+
+.retry-button:hover {
+      background-color: rgba(255, 255, 255, 0.8); /* 少し透明な背景でblurを見せる */
+     font-family: -apple-system, BlinkMacSystemFont, "San Francisco", "Helvetica Neue", "Helvetica", sans-serif;
+    padding-left: 56px;
+    padding-right: 56px; /* ←ここで20px広げる（元が36px） */
+}
+
+.retry-button:hover span::after {
+    transform:scale(1.1);
+    content: '→'; /* ホバー時に矢印を追加 */
+    margin-left: 8px;
+    transition: all 0.3s ease;
+    display: inline-block;
+}
+
+
+.retry-button:hover {
+    transform: translateY(-5px);
+}
+
+.retry-button.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+.back-button {
+    position: absolute;
+    font-size: 20px;
+    padding: 15px 18px;
+    background-color: rgb(0 0 0 / 80%);
+    color: rgb(255 255 255);
+    border: NONE; /* 初期状態では透明 */
+    border-radius: 50px;
+    cursor: pointer;
+    opacity: 0;
+    transition: all 0.5s ease; /* borderにtransition追加 */
+    z-index: 100000;
+    top: calc(vh - 50px); /* 修正: vh → 100vh */
+    left: 14px;
+    overflow: hidden;
+    white-space: nowrap;
+    font-family: -apple-system, BlinkMacSystemFont, "San Francisco", "Helvetica Neue", "Helvetica", sans-serif;
+}
+
+.back-button:hover {
+       transition: all 0.2s ease;
+    color:#000000;
+ backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px); /* Safari 対応 */
+    background-color: rgb(255 255 255 / 50%); /* 少し透明な背景でblurを見せる */
+}
+
+.back-button .back-text::after {
+    content: '';
+    transition: all 0.5s ease;
+    opacity: 0;
+    margin-left: 0;
+}
+
+/* ホバー時に「戻る」を表示 */
+.back-button:hover .back-text::after {
+    content: '戻る';
+    opacity: 1;
+    margin-left: 20px;
+}
+
+
+
+.back-button.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.retry-button:active {
+    transform: translateY(-5px) scale(0.88);
+}
+
+.back-button:active {
+    transform: scale(0.88);
+}
+
+
+
+.black-curtain {
+    position: fixed;
+    top: -100%;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: black;
+    z-index: 9999;
+    transition: all 0.8s ease;
+    pointer-events: none;
+}
+.black-curtain.show {
+    top: 0;
+}

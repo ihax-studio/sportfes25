@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ピンボールゲーム</title>
+<link rel="stylesheet" href="game.css">
+</head>
+<body>
+    <div class="ball"></div>
+    <div class="dynamic-island top"></div>
+    <div class="dynamic-island bottom"></div>
+    <div class="score"> <span id="score">0</span></div>
+
+    <div class="curtainUp" id="curtain" style="display: none;"></div>
+    <div class="message" id="message">　お疲れさま！</div>
+    <div class="score-text" id="scoreText"></div>
+    <div class="congratulations" id="congratulations">　やりましたね。</div>
+    
+    <button class="back-button" id="backButton"><span class="back-text">←</span></button>
+
+<!-- "やり直す" ボタン -->
+<button class="retry-button" id="retryButton"><span>やり直す</span></button>
+
+    <script>
+        const ball = document.querySelector('.ball');
+        const bottomIsland = document.querySelector('.dynamic-island.bottom');
+        const topIsland = document.querySelector('.dynamic-island.top');
+        const scoreDisplay = document.getElementById('score');
+        const curtain = document.getElementById('curtain');
+        const message = document.getElementById('message');
+        const scoreText = document.getElementById('scoreText');
+        const congratulations = document.getElementById('congratulations');
+        const retryButton = document.getElementById('retryButton');
+        const body = document.body;
+    
+        let ballSpeedX = 5;
+        let ballSpeedY = 5;
+        let ballPositionX = window.innerWidth / 2;
+        let ballPositionY = window.innerHeight / 2;
+        let score = 0;
+        let isGameOver = false; // ゲームオーバーフラグ
+    
+        function updateBallPosition() {
+            if (isGameOver) return; // ゲームオーバーなら処理を止める
+    
+            ballPositionX += ballSpeedX;
+            ballPositionY += ballSpeedY;
+    
+            // 左右の壁にぶつかったら反転
+            if (ballPositionX < 15 || ballPositionX > window.innerWidth - 15) {
+                ballSpeedX *= -1;
+            }
+    
+            // 上の壁にぶつかったら反転
+            if (ballPositionY < 15) {
+                ballSpeedY *= -1;
+            }
+    
+            // 下に落ちたらゲームオーバー
+            if (ballPositionY > window.innerHeight - 15) {
+                endGame(); // スコアが上がらないようにする
+                return;
+            }
+    
+            // 下のDynamic Islandに当たったか判定
+            if (
+                ballPositionY > window.innerHeight - 60 &&
+                ballPositionX > bottomIsland.offsetLeft &&
+                ballPositionX < bottomIsland.offsetLeft + bottomIsland.offsetWidth
+            ) {
+                ballSpeedY *= -1;
+                bounceDynamicIsland(bottomIsland);
+                updateScore();
+            }
+    
+            // 上のDynamic Islandに当たったか判定
+            if (
+                ballPositionY < 40 &&
+                ballPositionX > topIsland.offsetLeft &&
+                ballPositionX < topIsland.offsetLeft + topIsland.offsetWidth
+            ) {
+                ballSpeedY *= -1;
+                bounceDynamicIsland(topIsland);
+                updateScore();
+            }
+    
+            // ボールの位置を更新
+            ball.style.left = `${ballPositionX}px`;
+            ball.style.top = `${ballPositionY}px`;
+        }
+    
+        function updateScore() {
+            if (isGameOver) return; // 終了後はスコアを増やさない
+            score += 1;
+            scoreDisplay.textContent = score;
+    
+            // 5の倍数でスピードアップ
+            if (score % 5 === 0) {
+                ballSpeedX *= 1.1;
+                ballSpeedY *= 1.1;
+            }
+        }
+    
+        function bounceDynamicIsland(island) {
+            island.style.transform = 'scale(1.1)';
+            setTimeout(() => {
+                island.style.transform = 'scale(1)';
+            }, 50);
+        }
+    
+        function endGame() {
+            isGameOver = true;
+            ballSpeedX = 0;
+            ballSpeedY = 0;
+            showCurtainAndScore();
+        }
+    
+        function showCurtainAndScore() {
+            curtain.style.display = 'block';
+            setTimeout(() => {
+                curtain.style.animation = 'curtainUp 0.8s forwards';
+            }, 0);
+    
+            // 「よくがんばりました」表示
+            message.style.opacity = 1;
+    
+            // スコア表示
+            setTimeout(() => {
+                const scoreTextContent = `　スコアは ${score}。`;
+                scoreText.textContent = scoreTextContent;
+                scoreText.style.opacity = 1;
+                scoreText.style.transform = 'translateY(0)';
+    
+                // お祝いメッセージ表示
+                setTimeout(() => {
+                    congratulations.style.opacity = 1;
+                    congratulations.style.transform = 'translateY(0)';
+                }, 230);
+            }, 250);
+            const backButton = document.getElementById('backButton'); // ←戻るボタン
+
+// リトライボタン表示の直後に追加
+setTimeout(() => {
+    retryButton.classList.add('show');
+    backButton.classList.add('show'); // ←戻るボタンも表示
+}, 1000);
+
+
+        }
+    
+        function updateBottomIslandPosition(event) {
+            const islandX = event.clientX - bottomIsland.offsetWidth / 2;
+            bottomIsland.style.left = `${Math.min(Math.max(islandX, 0), window.innerWidth - bottomIsland.offsetWidth)}px`;
+        }
+    
+        document.addEventListener('mousemove', updateBottomIslandPosition);
+    
+        // ボール移動を20ms間隔で実行
+        setInterval(updateBallPosition, 20);
+    
+        // やり直すボタンでページをリロード
+        retryButton.addEventListener('click', () => {
+            location.reload();
+        });
+    </script>
+
+    <!--メインメニューに戻るための環境設定。-->
+    <div class="black-curtain" id="blackCurtain"></div>
+
+    <script>
+        document.getElementById("backButton").addEventListener("click", function () {
+            const curtain = document.getElementById("blackCurtain");
+            curtain.classList.add("show");
+        
+            // ページ遷移は1秒後（カーテンが降り終わってから）
+            setTimeout(() => {
+                window.location.href = "index.html";
+            }, 1000);
+        });
+        </script>
+        
+</body>
+</html>

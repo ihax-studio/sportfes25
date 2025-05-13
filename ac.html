@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ロック画面風UI</title>
+  <style>
+    /*—— リセット ——*/
+    * { margin:0; padding:0; box-sizing:border-box; }
+
+    /*—— 背景グラデーション + アニメ ——*/
+    body {
+      font-family:'San Francisco',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;
+      height:100vh; display:flex; justify-content:center; align-items:center;
+      overflow:hidden; position:relative;
+      background-color:#ffffff;
+      background-image:
+        radial-gradient(at 46% 5%, rgba(0,186,137,0.616) 0, transparent 50%),
+        radial-gradient(at 30% 94%, rgb(88,80,247) 0, transparent 50%),
+        radial-gradient(at 90% 5%, rgb(182,198,255) 0, transparent 50%),
+        radial-gradient(at 24% 60%, rgba(241,90,246,0.622) 0, transparent 50%),
+        radial-gradient(at 64% 7%, rgb(255,51,204) 0, transparent 50%),
+        radial-gradient(at 63% 25%, rgb(169,234,189) 0, transparent 50%),
+        radial-gradient(at 6% 40%, rgb(15,182,162) 0, transparent 50%);
+      background-size:cover; background-repeat:no-repeat;
+      animation: moveGradients 20s ease-in-out infinite;
+    }
+
+
+
+    /*—— カーテン ——*/
+    .curtain {
+      position:absolute; inset:0;
+      background-color:#000;
+      background-image:
+        radial-gradient(at 46% 54%, rgba(41, 45, 115, 0.854) 0, transparent 50%),
+        radial-gradient(at 50% 94%, rgb(23, 155, 133) 0, transparent 50%),
+        radial-gradient(at 24% 60%, rgba(126, 51, 128, 0.622) 0, transparent 50%),
+        radial-gradient(at 64% 7%, rgb(100, 11, 129) 0, transparent 50%),
+        radial-gradient(at 90% 5%, rgb(60, 30, 141) 0, transparent 50%);
+      background-size:cover; background-repeat:no-repeat; background-position:center;
+      transform:translateY(-100%); opacity:0; z-index:0;
+    }
+    .curtain.drop { animation: curtainDrop 0.8s forwards ease-in-out; }
+    .curtain.open { animation: curtainUp   0.5s forwards ease-in-out; }
+    @keyframes curtainDrop { to { transform:translateY(0);   opacity:1; } }
+
+    /*—— 閉じるボタン ——*/
+    .close-button {
+      position:absolute; bottom:7%; left:50%;
+      transform:translateX(-50%) scale(1.2);
+      width:50px; height:50px; border-radius:50%;
+      background-color:rgba(255,255,255,0.63);
+      box-shadow:
+        inset 1px 1px 2px rgba(135,206,235,0.6),
+        2px 0    4px rgba(133,0,255,0.6),
+        0   3px  6px rgba(135,206,235,0.6),
+        7px  0    8px rgba(184,106,255,0.6);
+      display:flex; align-items:center; justify-content:center;
+      cursor:pointer; opacity:0; transition:opacity .6s ease scale 0.3s ease;
+      z-index:2; font-size:28px; color:#000; font-weight:100;
+    }
+    .close-button.visible { opacity:1; transition :all 0.22s ease;}
+    .close-button:active {
+      transform:translateX(-50%) scale(0.88);
+      background-color:rgba(255,255,255,0.73);
+      box-shadow:
+        inset 1px 1px 2px rgba(104,0,244,0.4),
+        -3px 3px 4px rgba(0,169,255,0.44),
+        2px 7px 6px rgba(119,0,255,0.45),
+        7px 6px 8px rgba(106,255,129,0.37);
+    }
+    .close-button::before { content:'×'; margin-top:-3px; }
+
+    /*—— 時計 & コンテンツ ——*/
+    #clock-container {
+      position:absolute; top:377px; left:50%;
+      transform:translate(-50%,-50%);
+      display:flex; flex-direction:column; align-items:center;
+      text-align:center; color:#fff;
+      transition:color 1s ease,text-shadow 1s ease;
+      z-index:1;
+    }
+    .small-text {
+      font-size:32px; font-weight:220; opacity:.88;
+      text-shadow:2px 3px 8px rgba(0,0,0,0.22);
+      margin-bottom:-11px;
+    }
+    .large-text {
+      font-size:100px; font-weight:15; opacity:.9;
+      text-shadow:1px 2px 12px rgba(0,0,0,0.25);
+      margin:1px 0 -12px;
+      transition:transform 0.33s ease,text-shadow 0.33s ease;
+    }
+    .large-text:hover {
+      transform:scale(1.1);
+      text-shadow:1px 2px 12px rgba(0,0,0,0.2);
+    }
+
+    /*—— カリキュラム表示 ——*/
+    .event-info {
+      display:flex; flex-direction:column; align-items:center;
+      text-align:center; margin-top:40px; font-weight:300;
+      text-shadow:1px 1px 8px rgba(0,0,0,0.3);
+    }
+    .event-info h2 { font-size:28px; font-weight:440; margin-bottom:12px; }
+    .event-info h1 { font-size:28.8px; font-weight:280; margin-bottom:1px; }
+    .event-info p  { font-size:25px; margin-bottom:1px; }
+    hr { width:80%; margin:12px auto; border:0.1px solid #fff; }
+
+/* ——— もともとの設定はそのまま ——— */
+.fade-up {
+  opacity: 0;
+  transform: translateY(42px);
+  /* ここで直接アニメーションを指定 */
+  animation: fadeUp 0.52s ease forwards;
+}
+
+/* hr要素は0.33秒で一斉スライドアップ */
+hr {
+  opacity: 0;
+  transform: translateY(20px);
+  animation: fadeUp 0.7s ease forwards;
+}
+
+/* ——— アニメーション定義 ——— */
+@keyframes fadeUp {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+  </style>
+</head>
+<body>
+
+  <!-- カーテン -->
+  <div class="curtain"></div>
+  <!-- 閉じるボタン -->
+  <div class="close-button"></div>
+
+  <!-- 時計＋カリキュラム -->
+  <div id="clock-container">
+    <div id="date" class="small-text"></div>
+    <div id="time" class="large-text"></div>
+    <div class="event-info">
+      <h2 class="fade-up" style="animation-delay:.2s">カリキュラム</h2>
+      <hr>
+      <h1 class="fade-up" style="animation-delay:.27s">午前8時 開会式</h1> <hr>
+      <p class="fade-up" style="animation-delay:.3s">今から始まる</p>
+      <hr>
+      <h1 class="fade-up" style="animation-delay:.34s">午前9時30分 準備体操</h1> <hr>
+      <p class="fade-up" style="animation-delay:.37s">今から始まる</p>
+      <hr>
+      <h1 class="fade-up" style="animation-delay:.40s">午後3時 閉会式</h1> <hr>
+      <p class="fade-up" style="animation-delay:.42s">今から始まる</p>
+    </div>
+  </div>
+  <script>
+    // 時計更新関数などはそのまま
+    function updateClock() {
+      const now = new Date();
+      document.getElementById('time').textContent =
+        now.getHours().toString().padStart(2,'0') + ':' +
+        now.getMinutes().toString().padStart(2,'0');
+      document.getElementById('date').textContent =
+        now.toLocaleDateString('ja-JP',{ weekday:'long', month:'short', day:'numeric' });
+      // （色反転処理などもそのまま…）
+    }
+  
+    window.addEventListener('DOMContentLoaded', () => {
+      const curtain = document.querySelector('.curtain');
+      const btn     = document.querySelector('.close-button');
+  
+      // 初回ドロップ（0.8s）
+      requestAnimationFrame(() => curtain.classList.add('drop'));
+      // ボタン表示
+      setTimeout(() => btn.classList.add('visible'), 10);
+  
+      // ——— ここだけ変更 ———
+      btn.addEventListener('click', () => {
+        // カーテンの開閉アニメーションはそのまま起こしつつ…
+        curtain.classList.add('open');
+        // すぐに index.html へリダイレクト
+        window.location.href = 'index.html';
+      });
+    });
+  
+    // 時計スタート
+    updateClock();
+    setInterval(updateClock, 1000);
+  </script>
+  
+</body>
+</html>

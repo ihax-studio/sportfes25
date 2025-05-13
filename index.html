@@ -4,181 +4,170 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>体育祭まで(ベータ）</title>
- <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .fade-in {
+      animation: fadeIn 0.6s ease forwards;
+    }
+
+    .show {
+      animation: fadeIn 0.6s ease forwards;
+    }
+
+    @keyframes fadeIn {
+      0% { opacity: 0; transform: scale(0.9); }
+      100% { opacity: 1; transform: scale(1); }
+    }
+  </style>
 </head>
 <body id="body">
   <div class="curtainUp" id="curtain"></div>
 
+  <h1>体育祭</h1>
+  <h2>体育祭まで</h2>
+  <div id="countdown" class="large-text"></div>
+  <div id="time" class="large-text" style="display: none;"></div>
 
+  <div class="btn-container" id="btnContainer">
+    <a href="#" class="btn" onclick="handleClick('./html.png')"><img src="./html.png" alt="HTML" /></a>
+    <a href="#" class="btn" onclick="handleClick('./css.png')"><img src="./css.png" alt="CSS" /></a>
+    <a href="#" class="btn" onclick="handleClick('./js.png')"><img src="./js.png" alt="JS" /></a>
+    <a href="#" class="btn" onclick="handleClick('./py.png')"><img src="./py.png" alt="Python" /></a>
+    <a href="#" class="btn" onclick="handleClick('./txt.png')"><img src="./txt.png" alt="Text" /></a>
+    <a href="#" class="btn" onclick="handleClick('./json.png')"><img src="./json.png" alt="JSON" /></a>
+  </div>
 
-<h1>
-体育祭まで</h1>
-<h2>残り</h2>
-<div id="countdown" class="large-text"></div>
-<div id="time" class="large-text" style="display: none;"></div>
-
-<div class="btn-container" id="btnContainer">
- 
-  <a href="#" class="btn" onclick="handleClick('./py.png')">
-    <img src="./py.png" alt="Python" />
-  </a>
-  <a href="#" class="btn" onclick="handleClick('./txt.png')">
-    <img src="./txt.png" alt="Text" />
-  </a>
-  <a href="#" class="btn" onclick="handleClick('./json.png')">
-    <img src="./json.png" alt="JSON" />
-  </a>
-</div>
-
-
-<a href="game.html" class="start-button" id="startButton" style="display: none;">はじめる</a>
-
-<script>
-  function showStartButton() {
-    const btn = document.getElementById('startButton');
-    btn.style.display = 'inline-block'; // 表示する
-    btn.offsetHeight; // 再描画を強制してから
-    btn.classList.add('fade-in'); // フェードイン開始
-  }
-</script>
-
+  <a href="game.html" class="start-button" id="startButton" style="display: none;">はじめる</a>
+  <button class="back-button" id="backButton" style="display: none;"><span class="back-text">←</span></button>
 
   <script>
-    // ページ読み込み時：ボタンを下から上に移動
+    document.getElementById('backButton').addEventListener('click', () => {
+      location.href = 'index.html';
+    });
+  </script>
+
+  <script>
     document.addEventListener('DOMContentLoaded', () => {
       const btnContainer = document.getElementById("btnContainer");
-    
-      // 最初の表示位置はCSSで translateY(440px)
       setTimeout(() => {
         btnContainer.style.transition = 'transform 0.88s ease';
         btnContainer.style.transform = 'translate(-50%, -50%) translateY(0)';
       }, 220);
     });
-    
+
     function handleClick(imgSrc) {
       const body = document.getElementById("body");
       const btnContainer = document.getElementById("btnContainer");
       const startButton = document.getElementById("startButton");
-    
-      // 最初に transition 用意
+      const backButton = document.getElementById("backButton");
+
       body.style.transition = 'background-color 0.4s ease';
-    
+      btnContainer.style.transition = 'transform 0.55s ease';
+      btnContainer.style.transform = 'translate(-50%, -50%) translateY(440px)';
+
       if (imgSrc === './html.png') {
         body.style.backgroundColor = 'black';
-        setTimeout(() => {
-          window.location.href = 'html.html';
-        }, 300);
-    
+        setTimeout(() => { window.location.href = 'html.html'; }, 400);
       } else if (imgSrc === './py.png') {
         body.style.backgroundColor = 'black';
-        setTimeout(() => {
-          window.location.href = 'https://www.apple.com';
-        }, 400);
-    
+        setTimeout(() => { window.location.href = 'https://www.metro.ed.jp/arakawakoka-h/'; }, 500);
       } else {
-        // 白背景系の処理
         if (imgSrc === './txt.png') {
           body.style.backgroundColor = 'skyblue';
-          setTimeout(() => {
-            window.location.href = 'share.html';
-          }, 800);
+          setTimeout(() => { window.location.href = 'share.html'; }, 400);
+        } else if (imgSrc === './css.png') {
+          body.style.backgroundColor = 'white';
+          setTimeout(() => { window.location.href = 'ac.html'; }, 400);
+        } else if (imgSrc === './js.png') {
+          body.style.backgroundColor = 'white';
+          setTimeout(() => { window.location.href = 'acssees.html'; }, 400);
         } else {
           body.style.backgroundColor = 'white';
         }
-    
-        // ✅ ボタンを下に移動（クリック時）
-        setTimeout(() => {
-          btnContainer.style.transition = 'transform 0.55s ease';
-          btnContainer.style.transform = 'translate(-50%, -50%) translateY(440px)';
-        }, 300);
-        setTimeout(() => {
-  // 背景グラデーション変更（0.5秒で遷移）
-  body.style.transition = 'background 0.3s ease';
-  body.style.backgroundColor = 'skyblue';
-  body.style.background = `
-    radial-gradient(at 46% 54%, rgb(182, 250, 232) 0px, transparent 50%),
-    radial-gradient(at 30% 94%, rgb(88, 80, 247) 0px, transparent 50%),
-    radial-gradient(at 90% 5%, rgb(182, 198, 255) 0px, transparent 50%),
-    radial-gradient(at 24% 60%, rgb(90, 186, 246) 0px, transparent 50%),
-    radial-gradient(at 64% 7%, rgb(255, 51, 204) 0px, transparent 50%),
-    radial-gradient(at 63% 5%, rgb(169, 234, 189) 0px, transparent 50%),
-    radial-gradient(at 6% 40%, rgb(171, 255, 245) 0px, transparent 50%)`;
-}, 880);
 
-if (imgSrc === './json.png') {
-  setTimeout(() => {
-    startButton.style.display = 'inline-block'; // ← 先に表示
-    startButton.offsetHeight; // ← 再描画を強制
-    startButton.classList.add('fade-in'); // ← それからクラス追加
-  }, 800);
-}
+        setTimeout(() => {
+          body.style.transition = 'background 0.3s ease';
+          body.style.backgroundColor = 'skyblue';
+          body.style.background = `
+            radial-gradient(at 46% 54%, rgb(182, 250, 232) 0px, transparent 50%),
+            radial-gradient(at 30% 94%, rgb(88, 80, 247) 0px, transparent 50%),
+            radial-gradient(at 90% 5%, rgb(182, 198, 255) 0px, transparent 50%),
+            radial-gradient(at 24% 60%, rgb(90, 186, 246) 0px, transparent 50%),
+            radial-gradient(at 64% 7%, rgb(255, 51, 204) 0px, transparent 50%),
+            radial-gradient(at 63% 5%, rgb(169, 234, 189) 0px, transparent 50%)`;
+        }, 880);
 
-          }
-    }
-    </script>
-    <script>
-      const countdownEl = document.getElementById('countdown');
-      const timeEl = document.getElementById('time');
-      const h2 = document.querySelector('h2');
-    
-      function updateCountdownOrClock() {
-        const now = new Date();
-        const eventDate = new Date('2025-06-05T00:00:00');
-        const timeDiff = eventDate - now;
-    
-        if (timeDiff > 0) {
-          const daysLeft = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
-          countdownEl.textContent = `${daysLeft}日`;
-        } else {
-          // フェード切り替え
-          countdownEl.style.transition = 'opacity 0.3s ease';
-          h2.style.transition = 'opacity 0.3s ease';
-          countdownEl.style.opacity = 0;
-          h2.style.opacity = 0;
-    
+        if (imgSrc === './json.png') {
           setTimeout(() => {
-            countdownEl.style.display = 'none';
-            h2.style.display = 'none';
-            timeEl.style.display = 'block';
-            timeEl.style.opacity = 0;
-            updateClock(); // 初回更新
-            timeEl.style.transition = 'opacity 0.3s ease';
-            setTimeout(() => {
-              timeEl.style.opacity = 1;
-            }, 10);
-          }, 300);
+            startButton.style.display = 'inline-block';
+            startButton.offsetHeight;
+            startButton.classList.add('fade-in');
+
+            backButton.style.display = 'inline-block';
+            backButton.offsetHeight;
+            backButton.classList.add('show');
+          }, 700);
         }
       }
-    
-      function updateClock() {
-        const now = new Date();
-        const hours = String(now.getHours()).padStart(2, '0');
-        const minutes = String(now.getMinutes()).padStart(2, '0');
-        timeEl.textContent = `${hours}:${minutes}`;
+    }
+  </script>
+
+  <script>
+    const countdownEl = document.getElementById('countdown');
+    const timeEl = document.getElementById('time');
+    const h2 = document.querySelector('h2');
+
+    function updateCountdownOrClock() {
+      const now = new Date();
+      const eventDate = new Date('2025-06-05T00:00:00');
+      const timeDiff = eventDate - now;
+
+      if (timeDiff > 0) {
+        const daysLeft = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
+        countdownEl.textContent = `${daysLeft}日`;
+      } else {
+        countdownEl.style.transition = 'opacity 0.3s ease';
+        h2.style.transition = 'opacity 0.3s ease';
+        countdownEl.style.opacity = 0;
+        h2.style.opacity = 0;
+
+        setTimeout(() => {
+          countdownEl.style.display = 'none';
+          h2.style.display = 'none';
+          timeEl.style.display = 'block';
+          timeEl.style.opacity = 0;
+          updateClock();
+          timeEl.style.transition = 'opacity 0.3s ease';
+          setTimeout(() => {
+            timeEl.style.opacity = 1;
+          }, 10);
+        }, 300);
       }
-    
-      // 初回実行
-      updateCountdownOrClock();
-    
-      // 毎分チェックして更新
-      setInterval(() => {
-        const now = new Date();
-        const eventDate = new Date('2025-06-05T00:00:00');
-    
-        if (now >= eventDate) {
-          updateClock();
-        } else {
-          updateCountdownOrClock();
-        }
-      }, 60000); // 毎分チェック
-    
-      // 初回の時計も1秒後に再確認
-      setTimeout(() => {
-        if (new Date() >= new Date('2025-06-05T00:00:00')) {
-          updateClock();
-        }
-      }, 1000);
-    </script>
-    
+    }
+
+    function updateClock() {
+      const now = new Date();
+      const hours = String(now.getHours()).padStart(2, '0');
+      const minutes = String(now.getMinutes()).padStart(2, '0');
+      timeEl.textContent = `${hours}:${minutes}`;
+    }
+
+    updateCountdownOrClock();
+    setInterval(() => {
+      const now = new Date();
+      const eventDate = new Date('2025-06-05T00:00:00');
+      if (now >= eventDate) {
+        updateClock();
+      } else {
+        updateCountdownOrClock();
+      }
+    }, 60000);
+
+    setTimeout(() => {
+      if (new Date() >= new Date('2025-06-05T00:00:00')) {
+        updateClock();
+      }
+    }, 1000);
+  </script>
 </body>
 </html>

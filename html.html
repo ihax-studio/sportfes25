@@ -2,30 +2,60 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <title>AIチャット確認用（Falcon）</title>
+  <title>AI検証</title>
   <style>
-    body { font-family: sans-serif; padding: 20px; background: #f0f0f0; }
-    #chat { background: white; padding: 20px; border-radius: 12px; max-width: 500px; margin: auto; }
-    input, button { font-size: 16px; margin-top: 10px; width: 100%; padding: 10px; }
-    #response { white-space: pre-wrap; background: #eee; padding: 10px; margin-top: 10px; border-radius: 8px; }
+    body {
+      background: #f5f5f5;
+      font-family: "Helvetica", sans-serif;
+      padding: 20px;
+      text-align: center;
+    }
+    #chatBox {
+      max-width: 600px;
+      margin: auto;
+      background: white;
+      padding: 20px;
+      border-radius: 16px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.1);
+    }
+    input, button {
+      font-size: 16px;
+      padding: 10px;
+      margin-top: 10px;
+      width: 90%;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+    #response {
+      margin-top: 15px;
+      white-space: pre-wrap;
+      background: #eee;
+      padding: 15px;
+      border-radius: 10px;
+    }
   </style>
 </head>
 <body>
-  <div id="chat">
-    <h2>Falconチャット（テスト用）</h2>
-    <input type="text" id="prompt" placeholder="こんにちはAI">
-    <button onclick="send()">送信</button>
-    <div id="response">ここに返答が出るゾ</div>
+  <div id="chatBox">
+    <h2>田所「淫夢AIチャット、やりますねぇ‼️」</h2>
+    <input type="text" id="promptInput" placeholder="田所「今夜のおかずは…？」">
+    <button onclick="sendPrompt()">送信→</button>
+    <div id="response">KMR「何か入力してくださいよぉ〜」</div>
   </div>
 
   <script>
-    const HF_TOKEN = "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";  // ← トークンを正しく差し替える
+    const HF_TOKEN = "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"; // ←このままで動くゾ！
     const MODEL_URL = "https://api-inference.huggingface.co/models/tiiuae/falcon-rw-1b";
 
-    async function send() {
-      const input = document.getElementById("prompt").value;
+    async function sendPrompt() {
+      const prompt = document.getElementById("promptInput").value.trim();
       const responseDiv = document.getElementById("response");
-      responseDiv.textContent = "送信中…";
+      if (!prompt) {
+        responseDiv.textContent = "MUR「何も入ってないっすね…」";
+        return;
+      }
+
+      responseDiv.textContent = "ﾝｱｯｰ‼️応答生成中…";
 
       try {
         const res = await fetch(MODEL_URL, {
@@ -34,19 +64,20 @@
             "Authorization": "Bearer " + HF_TOKEN,
             "Content-Type": "application/json"
           },
-          body: JSON.stringify({ inputs: input })
+          body: JSON.stringify({ inputs: prompt })
         });
 
         const data = await res.json();
+
         if (data.error) {
-          responseDiv.textContent = "エラー: " + data.error;
+          responseDiv.textContent = `TDN「エラー出たゾ💢：${data.error}」`;
         } else if (Array.isArray(data) && data[0]?.generated_text) {
-          responseDiv.textContent = data[0].generated_text;
+          responseDiv.textContent = "田所「" + data[0].generated_text + "」";
         } else {
-          responseDiv.textContent = JSON.stringify(data, null, 2);  // 念のため全体表示
+          responseDiv.textContent = "KMR「返ってきたけど何コレ…？」\n\n" + JSON.stringify(data, null, 2);
         }
       } catch (e) {
-        responseDiv.textContent = "ネットワークエラー: " + e.message;
+        responseDiv.textContent = "KMR「ネットワークで事故っすね…」\n" + e.message;
       }
     }
   </script>

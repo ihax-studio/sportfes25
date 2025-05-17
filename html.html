@@ -2,40 +2,49 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <title>GPT-2 ブラウザチャット</title>
+  <title>GPT-2 ブラウザチャット（手動DL）</title>
   <style>
     body { font-family: sans-serif; padding: 1rem; }
     h2   { text-align: center; }
     #status { text-align: center; margin: .5rem 0; color: #555; }
-    #chat { max-width:600px; margin:1rem auto; height:60vh; overflow-y:auto; }
+    #chat { max-width:600px; margin:1rem auto; height:50vh; overflow-y:auto; }
     .msg { padding:8px; border-radius:4px; margin:4px 0; max-width:80%; }
     .user { background:#e0f7ff; margin-left:auto; text-align:right; }
     .bot  { background:#f0f0f0; margin-right:auto; text-align:left;  }
-    #input { width:70%; padding:8px; }
-    #send  { padding:8px 16px; }
     #controls { text-align:center; margin-top:8px; }
-    #controls input, #controls button { vertical-align: middle; }
+    #controls input, #controls button { padding:8px; vertical-align:middle; }
+    #download { margin-top:1rem; padding:8px 16px; }
   </style>
 </head>
 <body>
 
   <h2>GPT-2 ブラウザチャット</h2>
-  <div id="status">「送信」を押すとモデルのダウンロードが始まります</div>
+
+  <!-- モデルDL前にだけ表示 -->
+  <div style="text-align:center;">
+    <button id="download">モデルをダウンロード</button>
+  </div>
+  <div id="status">まずは「モデルをダウンロード」してください</div>
+
+  <!-- チャット欄 -->
   <div id="chat"></div>
+
+  <!-- 入力・送信UI -->
   <div id="controls">
-    <input  id="input"  placeholder="メッセージを入力…" />
-    <button id="send">送信</button>
+    <input  id="input" placeholder="メッセージを入力…" disabled />
+    <button id="send" disabled>送信</button>
   </div>
 
-  <!-- Transformers.js 本体 -->
+  <!-- Transformers.js -->
   <script src="https://cdn.jsdelivr.net/npm/@xenova/transformers@2.2.2/dist/transformers.min.js"></script>
   <script>
     let generator = null;
-    const statusEl = document.getElementById('status');
-    const inputEl  = document.getElementById('input');
-    const sendBtn  = document.getElementById('send');
+    const statusEl   = document.getElementById('status');
+    const downloadBtn= document.getElementById('download');
+    const inputEl    = document.getElementById('input');
+    const sendBtn    = document.getElementById('send');
 
-    // チャット欄をスクロール
+    // チャット欄自動スクロール
     function scrollBottom() {
       const c = document.getElementById('chat');
       c.scrollTop = c.scrollHeight;
@@ -59,41 +68,52 @@
 
     function updateLastBot(text) {
       const bots = document.querySelectorAll('#chat .bot');
+      if (!bots.length) return;
       bots[bots.length - 1].textContent = `AI: ${text}`;
       scrollBottom();
     }
 
-    sendBtn.addEventListener('click', async () => {
-      const text = inputEl.value.trim();
-      if (!text) return;
-
-      // ユーザー表示
-      addUser(text);
-      inputEl.disabled = sendBtn.disabled = true;
-
-      // モデル未ロード時 → ダウンロード＋生成
-      if (!generator) {
-        statusEl.textContent = 'モデルをロード中… 0%';
+    // モデルダウンロードボタン
+    downloadBtn.addEventListener('click', async () => {
+      downloadBtn.disabled = true;
+      statusEl.textContent = 'モデルをロード中…0%';
+      try {
         generator = await transformers.pipeline(
           'text-generation',
           'gpt2',
           {
             progress_callback: (fraction) => {
-              statusEl.textContent = `モデルをロード中… ${Math.floor(fraction*100)}%`;
+              statusEl.textContent = `モデルをロード中…${Math.floor(fraction*100)}%`;
             }
           }
         );
+        statusEl.textContent = 'モデルのロード完了！対話可能です';
+        inputEl.disabled = false;
+        sendBtn.disabled = false;
+        downloadBtn.style.display = 'none';
+      } catch (err) {
+        console.error(err);
+        statusEl.textContent = 'ダウンロード中にエラーが発生しました';
+        downloadBtn.disabled = false;
       }
+    });
 
-      // 生成フェーズ
-      statusEl.textContent = '生成中…';
-      addBot('');  // プレースホルダー
-      const [res] = await generator(text, { max_length: 80 });
-      updateLastBot(res.generated_text);
-
-      // 後片付け
-      statusEl.textContent = '完了';
-      inputEl.disabled = sendBtn.disabled = false;
+    // 送信ボタン
+    sendBtn.addEventListener('click', async () => {
+      const text = inputEl.value.trim();
+      if (!text) return;
+      addUser(text);
+      inputEl.value = '';
+      addBot('生成中…');
+      try {
+        const [res] = await generator(text, { max_length: 80 });
+        updateLastBot(res.generated_text);
+        statusEl.textContent = '完了';
+      } catch (err) {
+        updateLastBot('エラーが発生しました');
+        statusEl.textContent = '対話中にエラー';
+        console.error(err);
+      }
     });
   </script>
 </body>

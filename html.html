@@ -11,30 +11,31 @@
     .msg { padding:8px; border-radius:4px; margin:4px 0; max-width:80%; }
     .user { background:#e0f7ff; margin-left:auto; text-align:right; }
     .bot  { background:#f0f0f0; margin-right:auto; text-align:left;  }
-    #input { width:75%; padding:8px; }
+    #input { width:70%; padding:8px; }
     #send  { padding:8px 16px; }
     #controls { text-align:center; margin-top:8px; }
+    #controls input, #controls button { vertical-align: middle; }
   </style>
 </head>
 <body>
 
   <h2>GPT-2 ブラウザチャット</h2>
-  <div id="status">モデルをロード中…0%</div>
+  <div id="status">「送信」を押すとモデルのダウンロードが始まります</div>
   <div id="chat"></div>
   <div id="controls">
-    <input  id="input" placeholder="メッセージを入力…" disabled />
-    <button id="send" disabled>送信</button>
+    <input  id="input"  placeholder="メッセージを入力…" />
+    <button id="send">送信</button>
   </div>
 
   <!-- Transformers.js 本体 -->
   <script src="https://cdn.jsdelivr.net/npm/@xenova/transformers@2.2.2/dist/transformers.min.js"></script>
   <script>
-    let generator;
+    let generator = null;
     const statusEl = document.getElementById('status');
     const inputEl  = document.getElementById('input');
     const sendBtn  = document.getElementById('send');
 
-    // スクロール補助
+    // チャット欄をスクロール
     function scrollBottom() {
       const c = document.getElementById('chat');
       c.scrollTop = c.scrollHeight;
@@ -43,7 +44,7 @@
     function addUser(text) {
       const d = document.createElement('div');
       d.className = 'msg user';
-      d.textContent = text;
+      d.textContent = `あなた: ${text}`;
       document.getElementById('chat').append(d);
       scrollBottom();
     }
@@ -51,43 +52,48 @@
     function addBot(text) {
       const d = document.createElement('div');
       d.className = 'msg bot';
-      d.textContent = text;
+      d.textContent = `AI: ${text}`;
       document.getElementById('chat').append(d);
       scrollBottom();
     }
 
     function updateLastBot(text) {
       const bots = document.querySelectorAll('#chat .bot');
-      bots[bots.length - 1].textContent = text;
+      bots[bots.length - 1].textContent = `AI: ${text}`;
       scrollBottom();
     }
 
-    window.addEventListener('load', async () => {
-      // pipeline に progress_callback を渡して進捗取得
-      generator = await transformers.pipeline(
-        'text-generation',
-        'gpt2',
-        {
-          progress_callback: (fraction) => {
-            const pct = Math.floor(fraction * 100);
-            statusEl.textContent = `モデルをロード中…${pct}%`;
-          }
-        }
-      );
-
-      statusEl.textContent = '準備完了！話しかけてください';
-      inputEl.disabled = false;
-      sendBtn.disabled = false;
-    });
-
     sendBtn.addEventListener('click', async () => {
       const text = inputEl.value.trim();
-      if (!text || !generator) return;
+      if (!text) return;
+
+      // ユーザー表示
       addUser(text);
-      inputEl.value = '';
-      addBot('生成中…');
+      inputEl.disabled = sendBtn.disabled = true;
+
+      // モデル未ロード時 → ダウンロード＋生成
+      if (!generator) {
+        statusEl.textContent = 'モデルをロード中… 0%';
+        generator = await transformers.pipeline(
+          'text-generation',
+          'gpt2',
+          {
+            progress_callback: (fraction) => {
+              statusEl.textContent = `モデルをロード中… ${Math.floor(fraction*100)}%`;
+            }
+          }
+        );
+      }
+
+      // 生成フェーズ
+      statusEl.textContent = '生成中…';
+      addBot('');  // プレースホルダー
       const [res] = await generator(text, { max_length: 80 });
       updateLastBot(res.generated_text);
+
+      // 後片付け
+      statusEl.textContent = '完了';
+      inputEl.disabled = sendBtn.disabled = false;
     });
   </script>
 </body>

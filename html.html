@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <title>GPT-2 ブラウザチャット（手動DL）</title>
+  <title>GPT-2 ブラウザチャット（手動DL＋エラーダイアログ）</title>
   <style>
     body { font-family: sans-serif; padding: 1rem; }
     h2   { text-align: center; }
@@ -39,17 +39,15 @@
   <script src="https://cdn.jsdelivr.net/npm/@xenova/transformers@2.2.2/dist/transformers.min.js"></script>
   <script>
     let generator = null;
-    const statusEl   = document.getElementById('status');
-    const downloadBtn= document.getElementById('download');
-    const inputEl    = document.getElementById('input');
-    const sendBtn    = document.getElementById('send');
+    const statusEl    = document.getElementById('status');
+    const downloadBtn = document.getElementById('download');
+    const inputEl     = document.getElementById('input');
+    const sendBtn     = document.getElementById('send');
 
-    // チャット欄自動スクロール
     function scrollBottom() {
       const c = document.getElementById('chat');
       c.scrollTop = c.scrollHeight;
     }
-
     function addUser(text) {
       const d = document.createElement('div');
       d.className = 'msg user';
@@ -57,7 +55,6 @@
       document.getElementById('chat').append(d);
       scrollBottom();
     }
-
     function addBot(text) {
       const d = document.createElement('div');
       d.className = 'msg bot';
@@ -65,7 +62,6 @@
       document.getElementById('chat').append(d);
       scrollBottom();
     }
-
     function updateLastBot(text) {
       const bots = document.querySelectorAll('#chat .bot');
       if (!bots.length) return;
@@ -100,15 +96,24 @@
 
     // 送信ボタン
     sendBtn.addEventListener('click', async () => {
+      // モデル未ダウンロードならアラートを出して終了
+      if (!generator) {
+        alert('モデルがまだダウンロードされていません。\n先に「モデルをダウンロード」を押してください。');
+        return;
+      }
+
       const text = inputEl.value.trim();
       if (!text) return;
+
       addUser(text);
       inputEl.value = '';
       addBot('生成中…');
+      statusEl.textContent = '生成中…';
+
       try {
         const [res] = await generator(text, { max_length: 80 });
         updateLastBot(res.generated_text);
-        statusEl.textContent = '完了';
+        statusEl.textContent = '対話完了';
       } catch (err) {
         updateLastBot('エラーが発生しました');
         statusEl.textContent = '対話中にエラー';

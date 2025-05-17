@@ -1,1 +1,76 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>Local GPT-2 Chat (自前モデル)</title>
+  <style>
+    body { font-family: sans-serif; padding: 1rem; }
+    #chat { max-width:600px; margin:1rem auto; }
+    .msg { padding:8px; border-radius:4px; margin:4px 0; }
+    .user { background:#e0f7ff; text-align:right; }
+    .bot  { background:#f0f0f0; text-align:left;  }
+    #input { width:80%; padding:8px; }
+    #send  { padding:8px 16px; }
+  </style>
+</head>
+<body>
+
+  <h2>GPT-2 ローカルチャット</h2>
+  <div id="chat"></div>
+  <input  id="input"  placeholder="メッセージを入力…" />
+  <button id="send">送信</button>
+
+  <!-- Transformers.js を CDN からロード -->
+  <script src="https://cdn.jsdelivr.net/npm/@xenova/transformers@2.2.2/dist/transformers.min.js"></script>
+
+  <script>
+    let generator;
+
+    window.addEventListener('load', async () => {
+      addBot('モデルをロード中…（500MB ダウンロード）');
+      // local model を指定する
+      generator = await window.transformers.pipeline(
+        'text-generation',
+        './models/gpt2/'    // ← ここをローカルパスに
+      );
+      addBot('準備完了！話しかけてみて');
+    });
+
+    document.getElementById('send').addEventListener('click', async () => {
+      const inp = document.getElementById('input');
+      const text = inp.value.trim();
+      if (!text || !generator) return;
+      addUser(text);
+      inp.value = '';
+      addBot('生成中…');
+      const [res] = await generator(text, { max_length: 100 });
+      updateLastBot(res.generated_text);
+    });
+
+    function addUser(text) {
+      const d = document.createElement('div');
+      d.className = 'msg user';
+      d.textContent = `あなた: ${text}`;
+      document.getElementById('chat').append(d);
+      scroll();
+    }
+    function addBot(text) {
+      const d = document.createElement('div');
+      d.className = 'msg bot';
+      d.textContent = `AI: ${text}`;
+      document.getElementById('chat').append(d);
+      scroll();
+    }
+    function updateLastBot(text) {
+      const bots = document.querySelectorAll('#chat .bot');
+      bots[bots.length - 1].textContent = `AI: ${text}`;
+      scroll();
+    }
+    function scroll() {
+      const c = document.getElementById('chat');
+      c.scrollTop = c.scrollHeight;
+    }
+  </script>
+</body>
+</html>
 

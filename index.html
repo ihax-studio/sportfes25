@@ -169,31 +169,19 @@
       }
     }, 1000);
   </script>
-      <div class="panel" id="startPanel">
-      <div class="panel-header">ホモワイプ</div>
-      <div class="panel-section">
-        <div class="panel-item">
-          <span class="label">ホモム数</span>
-          <input type="number" id="bombCountInput" value="5" min="2">
-        </div>
-      </div>
-      <div class="panel-section">
-        <div class="panel-item select" id="difficultyItem">
-          <span class="label">難易度</span>
-          <span class="value" id="difficultyLabel">簡単</span>
-        </div>
-      </div>
-      <button id="startBtn">開始する</button>
-    </div>
-    <div id="game"></div>
-  </div>
-  <div id="overlay">
-    <img id="overlayImg" src="" alt="爆弾画像">
-    <div id="overlayDialog">
-      <p id="scoreText">スコア:</p>
-      <button id="retryBtn">やり直す</button>
-    </div>
-  </div>
-  <div id="retryCenter"><button id="retryBtn2">やり直す</button></div>
+ <script>
+window.addEventListener("DOMContentLoaded", () => {
+  const buttons = document.querySelectorAll("button");
+
+  buttons.forEach(button => {
+    button.addEventListener("click", () => {
+      if (navigator.vibrate) {
+        navigator.vibrate([50]); // ブルッ
+      }
+    }, { passive: true }); // パフォーマンス向上のためpassive
+  });
+});
+</script>
+
 </body>
 </html>

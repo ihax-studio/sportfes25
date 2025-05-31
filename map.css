@@ -111,7 +111,7 @@
           backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
       position: absolute;
-      bottom: 7%;
+      bottom: 10%;
       left: 50%;
       transform: translateX(-50%) scale(1);
       width: 60px;
@@ -189,7 +189,7 @@
     }
 
     .back-text::after {
-      content: ' Back';
+      content: ' 戻る';
       font-size: 20px;
       opacity: 0;
       margin-left: 0;

@@ -4,304 +4,101 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>ロック画面風UI</title>
- <style>
-        /*—— リセット ——*/
-        * { margin:0; padding:0; box-sizing:border-box; }
-span{
-      font-family:
-    -apple-system, /* iOS/macOSならSF Pro Displayが来る */
-    BlinkMacSystemFont, 
-    "Segoe UI", 
-    Roboto, 
-    "Helvetica Neue", 
-    Arial, 
-    sans-serif; 
-}
-    /*—— 背景グラデーション + アニメ ——*/
-    body {
-       font-family:
-    -apple-system, /* iOS/macOSならSF Pro Displayが来る */
-    BlinkMacSystemFont, 
-    "Segoe UI", 
-    Roboto, 
-    "Helvetica Neue", 
-    Arial, 
-    sans-serif;
-      height:100vh; display:flex; justify-content:center; align-items:center;
-      overflow:hidden; position:relative;
-      background-color:#ffffff;
-      background-image:
-        radial-gradient(at 46% 5%, rgba(0,186,137,0.616) 0, transparent 50%),
-        radial-gradient(at 30% 94%, rgb(88,80,247) 0, transparent 50%),
-        radial-gradient(at 90% 5%, rgb(182,198,255) 0, transparent 50%),
-        radial-gradient(at 24% 60%, rgba(241,90,246,0.622) 0, transparent 50%),
-        radial-gradient(at 64% 7%, rgb(255,51,204) 0, transparent 50%),
-        radial-gradient(at 63% 25%, rgb(169,234,189) 0, transparent 50%),
-        radial-gradient(at 6% 40%, rgb(15,182,162) 0, transparent 50%);
-      background-size:cover; background-repeat:no-repeat;
-      animation: moveGradients 20s ease-in-out infinite;
-    }
-
-
-
-    .curtain {
-  position: absolute;
-  inset: 0;
-  background-color: #000;
-  background-image: 
-    radial-gradient(at 46% 54%, rgba(41, 45, 115, 0.854) 0, transparent 50%),
-    radial-gradient(at 50% 94%, rgb(23, 155, 133) 0, transparent 50%),
-    radial-gradient(at 24% 60%, rgba(126, 51, 128, 0.622) 0, transparent 50%),
-    radial-gradient(at 64% 7%, rgb(100, 11, 129) 0, transparent 50%),
-    radial-gradient(at 90% 5%, rgb(60, 30, 141) 0, transparent 50%);
-  background-size: cover;
-  background-repeat: no-repeat;
-  background-position: center;
-  transform: translateY(-100%);
-  opacity: 0;
-  z-index: 0; /* 最背面固定‼️ */
-}
-
-#map-container {
-   transition: all 0.3s ease;
-    transform: translateY(-3%);
-  position: relative; /* 相対配置 */
-  z-index: 1; /* カーテンより上‼️ */
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding:30px;
-  height:700px;
-}
-.back-button {
-    position: absolute;
-    top: 22px;
-    left: 20px;
-    padding: 16px 20px;
-    font-size:22px;
-    border: none;
-    border-radius: 50px;
-     background-color: rgb(255 255 255 / 44%);
-    color: #ffffff;
-    cursor: pointer;
-    opacity: 0;
-    transform: translateY(20px);
-    transition: all 0.5s ease;
-    z-index: 10000; /* 最前面固定‼️ */
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-  }
-  
-  .back-button.show {
-    opacity: 1;
-    transform: translateY(0);
-  }
-  
-  .back-button:hover {
-    background-color: rgb(255 255 255 / 30%);
-    color: #ffffff;
-  }
-
-  .back-button:active{
-    transition:all 0.22s ease;
-  transform: translateY(0)scale(0.88);
-  }
-
-  .back-text::after {
-      font-family:
-    -apple-system, /* iOS/macOSならSF Pro Displayが来る */
-    BlinkMacSystemFont, 
-    "Segoe UI", 
-    Roboto, 
-    "Helvetica Neue", 
-    Arial, 
-    sans-serif;
-    content: '';
-    opacity: 0;
-    margin-left: 0;
-    transition: all 0.5s ease;
-  }
-
-ul {
-   list-style: none;
-  padding-left: 0; /* 必要なら左の余白も消す */
-  font-size:18px;
-  line-height:1.5;
-}
-  .back-button:hover .back-text::after {
-    content: ' 戻る ';
-    font-size:20px;
-    opacity: 1;
-    margin-left: 10px;
-  }
-  
-
-    .curtain.drop { animation: curtainDrop 0.8s forwards ease-in-out; }
-    .curtain.open { animation: curtainUp   0.5s forwards ease-in-out; }
-    @keyframes curtainDrop { to { transform:translateY(0);   opacity:1; } }
-
-
- 
-/* ——— もともとの設定はそのまま ——— */
-.fade-up {
-  opacity: 0;
-  transform: translateY(42px);
-  /* ここで直接アニメーションを指定 */
-  animation: fadeUp 0.52s ease forwards;
-}
-
-/* hr要素は0.33秒で一斉スライドアップ */
-hr {
-  opacity: 0;
-  transform: translateY(20px);
-  animation: fadeUp 0.7s ease forwards;
-}
-
-/* ——— アニメーション定義 ——— */
-@keyframes fadeUp {
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* 閉じるボタン */
-.close-button {
-  position:absolute; bottom:7%; left:50%;
-  transform:translateX(-50%) scale(1.2);
-  width:50px; height:50px; border-radius:50%;
-  background-color:rgba(255, 255, 255, 0.4);
-  box-shadow:
-    inset 1px 1px 2px rgba(135,206,235,0.6),
-    2px 0    4px rgba(133,0,255,0.6),
-    0   3px  6px rgba(135,206,235,0.6),
-    7px  0    8px rgba(184,106,255,0.6);
-  display:flex; align-items:center; justify-content:center;
-  cursor:pointer; opacity:0;
-  transition:opacity .6s ease, transform 0.3s ease;
-  z-index:2; font-size:28px; color:#000; font-weight:200;
-}
-
-.close-button.visible { opacity:1; }
-
-.close-button:active {
-  transform:translateX(-50%) scale(0.88);
-}
-
-.close-button::before {
-  content:'×';
-  margin-top:-4px;
-}
- </style>
+<link rel="stylesheet" href="map.css">
 </head>
 <body>
-    <body>
+  <!-- カーテン -->
+  <div class="curtain"></div>
 
-        <!-- カーテン -->
-        <div class="curtain"></div>
-      
-        <!-- 閉じるボタン -->
-        <div class="close-button"></div>
-      
-        <!-- 戻るボタン -->
-        <button class="back-button"><span class="back-text">←</span></button>
-      
-        <!-- マップと行き方案内 -->
-        <div id="map-container" style="display:flex; flex-direction:column; align-items:center; margin-top:28px; width:80%; max-width:1000px;">
-          <iframe
-            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3241.1370640253003!2d139.7336067759203!3d35.66732667259073!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x60188bf5d4be0bbd%3A0x4e6d58e97017d716!2z5p2-5oi45biC5q2j6YO95bqc5L6h5bO26Zmi5bGx6aeF!5e0!3m2!1sja!2sjp!4v1714288000000!5m2!1sja!2sjp"
-            width="70%" height="600" style="border:0; border-radius:12px; box-shadow:0 4px 16px rgba(0,0,0,0.3);" allowfullscreen="" loading="lazy"
-            referrerpolicy="no-referrer-when-downgrade">
-          </iframe><br>
-      
-          <div id="access-info" style="margin-top:20px; text-align:left; font-size:20px; color:white; text-shadow:1px 1px 6px rgba(0,0,0,0.4);">
-            <h2 style="font-size:25px; margin-bottom:10px;">荒川工科高校まで</h2>
-            <ul style="padding-left:20px;"> <br>
-              <li>・JR「南千住駅」から<br> 徒歩約15分</li><br>
-              <li>・都電荒川線「荒川区役所前」から徒歩8分</li><br>
-              <li>・バス利用も便利<br> （荒川区役所前下車）</li><br>
-              <li>・千住大橋からも近い</li>
-            </ul>
-          </div>
-        </div>
-      
-  
-    <script>
-        window.addEventListener('DOMContentLoaded', () => {
-  const curtain = document.querySelector('.curtain');
-  const closeButton = document.querySelector('.close-button');
-  const backButton = document.querySelector('.back-button');
+  <!-- 閉じるボタン -->
+  <div class="close-button"></div>
 
-  // 初回カーテンドロップ
-  requestAnimationFrame(() => curtain.classList.add('drop'));
+  <!-- 戻るボタン -->
+  <button class="back-button"><span class="back-text">←</span></button>
 
-  // 閉じるボタン表示
-  setTimeout(() => closeButton.classList.add('visible'), 10);
+  <!-- マップと行き方案内 -->
+  <div id="map-container" class="fade-up">
+<iframe
+  src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d1872.722223878165!2d139.7912023480273!3d35.7368078110341!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x60188e60b7192b6d%3A0x969690ab293cf8af!2z5p2x5Lqs6YO956uL6I2S5bed5bel56eR6auY562J5a2m5qCh!5e0!3m2!1sja!2sjp!4v1748657862196!5m2!1sja!2sjp"
+  allowfullscreen=""
+  loading="lazy"
+  referrerpolicy="no-referrer-when-downgrade">
+</iframe>
 
-  // 閉じるボタン押したらカーテンアップ＆リダイレクト
-  closeButton.addEventListener('click', () => {
-    curtain.classList.add('open');
-    setTimeout(() => {
-      window.location.href = 'index.html';
-    }, 0); // カーテンアップ0.5秒待つ
-  });
 
-  // 戻るボタンも表示
-  setTimeout(() => {
-    backButton.classList.add('show');
-  }, 500);
+    <div id="access-info" class="fade-up" style="animation-delay: 0.3s;">
+      <h2>荒川工科高校まで</h2>
+      <ul>
+        <li>・JR「南千住駅」から<br> 徒歩約15分</li>
+        <hr>
+        <li>・都電「荒川区役所前」から<br> 徒歩約8分</li>
+        <hr>
+        <li>・千住大橋からも近い</li>
+        <hr>
+        <li>・バスなら"南千住野球場"</li>
+      </ul>
+    </div>
+  </div>
 
-  // 🛠 戻るボタン押したら「index.html」にリダイレクト‼️ ←ここ変更！
-  backButton.addEventListener('click', () => {
-    curtain.classList.add('open');
-    setTimeout(() => {
-      window.location.href = 'index.html';
-    }, 0); // カーテン演出を0.5秒見せてからジャンプ
-  });
+  <script>
+    window.addEventListener('DOMContentLoaded', () => {
+      const curtain = document.querySelector('.curtain');
+      const closeButton = document.querySelector('.close-button');
+      const backButton = document.querySelector('.back-button');
 
-  // レイアウト調整
-  adjustLayout();
-});
+      // 初回カーテンドロップ
+      requestAnimationFrame(() => {
+        curtain.classList.add('drop');
+      });
 
-window.addEventListener('resize', adjustLayout);
+      // 閉じるボタンをフェードイン
+      setTimeout(() => {
+        closeButton.classList.add('visible');
+      }, 100);
 
-function adjustLayout() {
-  const mapContainer = document.getElementById('map-container');
-  const accessInfo = document.getElementById('access-info');
+      // 閉じるボタンを押したらカーテンを上げてリダイレクト
+      closeButton.addEventListener('click', () => {
+        curtain.classList.add('open');
+        setTimeout(() => {
+          window.location.href = 'index.html';
+        }, 500); // カーテンアップ 0.5秒後に遷移
+      });
 
-  if (window.innerWidth <= 768) {
-    mapContainer.style.flexDirection = 'column';
-    accessInfo.style.marginTop = '20px';
-    accessInfo.style.marginLeft = '0';
-  } else {
-    mapContainer.style.flexDirection = 'row';
-    accessInfo.style.marginTop = '0';
-    accessInfo.style.marginLeft = '30px';
-  }
-}
-tLayout();
+      // 戻るボタンをフェードイン
+      setTimeout(() => {
+        backButton.classList.add('show');
+      }, 500);
 
-        
-        window.addEventListener('resize', adjustLayout);
-        
-        function adjustLayout() {
-          const mapContainer = document.getElementById('map-container');
-          const accessInfo = document.getElementById('access-info');
-        
-          if (window.innerWidth <= 968) {
-            // スマホ：縦並び
-            mapContainer.style.flexDirection = 'column';
-            accessInfo.style.marginTop = '20px';
-            accessInfo.style.marginLeft = '0';
-          } else {
-            // PC：横並び
-            mapContainer.style.flexDirection = 'row';
-            accessInfo.style.marginTop = '0';
-            accessInfo.style.marginLeft = '50px';
-          }
-        }
-        </script>
-        
-  </body>
-  
+      // 戻るボタンを押したらカーテンを上げてリダイレクト
+      backButton.addEventListener('click', () => {
+        curtain.classList.add('open');
+        setTimeout(() => {
+          window.location.href = 'index.html';
+        }, 500); // カーテンアップ 0.5秒後に遷移
+      });
+
+      // レイアウト調整
+      adjustLayout();
+    });
+
+    window.addEventListener('resize', adjustLayout);
+
+    function adjustLayout() {
+      const mapContainer = document.getElementById('map-container');
+      const accessInfo = document.getElementById('access-info');
+
+      if (window.innerWidth <= 968) {
+        // スマホ・タブレット：縦並び
+        mapContainer.style.flexDirection = 'column';
+        accessInfo.style.marginTop = '24px';
+        accessInfo.style.marginLeft = '0';
+      } else {
+        // PC：横並び
+        mapContainer.style.flexDirection = 'row';
+        accessInfo.style.marginTop = '0';
+        accessInfo.style.marginLeft = '30px';
+      }
+    }
+  </script>
+</body>
 </html>

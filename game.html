@@ -1,163 +1,526 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!--
+    ────────────────────────────────────────────────────────────
+    ◆ ドキュメントタイプ宣言とHTMLタグ宣言
+      ・<!DOCTYPE html>：このファイルがHTML5であることを示しています。
+      ・<html lang="ja">：ドキュメントルート。日本語ページであることを lang="ja" で指定。
+    ────────────────────────────────────────────────────────────
+  -->
+  <meta charset="UTF-8" />
+  <!--
+    ・<meta charset="UTF-8">：文字エンコーディングをUTF-8に設定しています。
+      これにより日本語を含むテキストが正しく表示されます。
+  -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <!--
+    ・<meta name="viewport">：モバイル端末でも横幅をデバイス幅に合わせて表示するための設定です。
+      user-scalable=no を入れていないので、ユーザーが拡大縮小できるようになっています。
+  -->
   <title>ピンボールゲーム</title>
-  <link rel="stylesheet" href="game.css">
+  <!--
+    ・<title>：ブラウザのタブやタイトルバーに表示される、このページのタイトルを指定します。
+  -->
+
+  <!--
+    ────────────────────────────────────────────────────────────
+    ◆ 外部CSSファイル読み込み（ゲーム用スタイル）
+    ────────────────────────────────────────────────────────────
+  -->
+  <link rel="stylesheet" href="game.css" />
+  <!--
+    ・game.css：ボール、パドル、スコア表示、黒カーテン、アニメーション等の
+      ピンボールゲーム本体に関するスタイルを定義した外部ファイルです。
+      ここでは読み込むだけで、中身は game.css に記述されている想定です。
+  -->
+
+  <!--
+    ────────────────────────────────────────────────────────────
+    ◆ 追加のCSSを内部に記述
+       「やりましたね。」の「。」部分のクリック演出に必要な最低限のスタイルを定義
+    ────────────────────────────────────────────────────────────
+  -->
+  <style>
+    /*============================================================
+      #period セレクタは、「やりましたね。」の「。」だけを <span id="period"> にしたものです。
+      ここに対して以下を設定します：
+        ・display: inline-block;
+            └ デフォルトの span は inline ですが、拡大・縮小を行うので
+              transform が効きやすいように inline-block にしています。
+        ・cursor: pointer;
+            └ マウスオーバー時にカーソルが「手の形」になるようにして、
+              ユーザーに「クリックできる」ことを視覚的に示します。
+        ・transform-origin: center center;
+            └ scale(拡大) するときの基準点を要素中央にして、
+              自然な拡大効果を与えます。デフォルトは中央ではないため、
+              transform-origin を明示的に設定しています。
+    ============================================================*/
+    #period {
+      display: inline-block;
+      cursor: pointer;
+      transform-origin: center center;
+    }
+  </style>
+  <!-- ここまでが「やりましたね。」操作用の追加CSSです -->
 </head>
+
 <body>
-  <!-- 起動時の黒カーテン -->
+  <!--
+    ────────────────────────────────────────────────────────────
+    ◆ 起動時の黒カーテン
+       ・ゲーム読み込み時に画面全体を覆う黒いフルスクリーンの要素（フェードイン／フェードアウト演出など）。
+       ・ID="blackCurtain" を持つ <div> 要素で、game.css 側で初期表示・アニメーションを制御します。
+       ・ページロード後、少し時間がたつと game.css 内の .hide クラス等でフェードアウトして消える想定です。
+    ────────────────────────────────────────────────────────────
+  -->
   <div class="black-curtain" id="blackCurtain"></div>
 
-  <!-- ゲーム要素 -->
+  <!--
+    ────────────────────────────────────────────────────────────
+    ◆ ゲーム要素：ピンボール部分
+      1) <div class="ball"></div>
+         ・ピンボールの「ボール」そのものを表す要素。
+         ・CSS で円形にし、JavaScript で動かす想定です。
+
+      2) <div class="dynamic-island top"></div>
+         ・画面上側にあるバンパー（跳ね返し用障害物）。
+         ・クラス "dynamic-island top" で、game.css で上部に固定配置している想定。
+
+      3) <div class="dynamic-island bottom"></div>
+         ・画面下側に配置された「パドル（当たり判定, マウスで動かす床板）」。
+         ・クラス "dynamic-island bottom" で、JS により左／右に動かしてボールを跳ね返す役割です。
+
+      4) <div class="score"><span id="score">0</span></div>
+         ・スコア表示用要素。最初は「0」を表示し、ボールがバンパーに当たるたびにスコアを増加させます。
+         ・内部に <span id="score">0</span> があって、JS でテキストを更新します。
+    ────────────────────────────────────────────────────────────
+  -->
   <div class="ball"></div>
   <div class="dynamic-island top"></div>
   <div class="dynamic-island bottom"></div>
   <div class="score"><span id="score">0</span></div>
 
-  <!-- 終了演出 -->
+  <!--
+    ────────────────────────────────────────────────────────────
+    ◆ 終了演出用要素
+      1) <div class="curtainUp" id="curtain" style="display: none;"></div>
+         ・ゲームオーバー時に、下から上へカーテンが開くようなアニメーションを行う要素。
+         ・最初は display:none で非表示。ゲーム終了時に JS で display:block にして
+           CSS アニメーション（curtainUp）を実行します。
+
+      2) <div class="score-text" id="scoreText"></div>
+         ・ゲームオーバー時に「スコアは○○」と表示するテキスト用要素。
+         ・最初は空文字で opacity:0 などになっている想定。JS がスコアを設定し、
+           CSS クラス／スタイルでフェードインします。
+
+      3) <div class="congratulations" id="congratulations">やりましたね。</div>
+         ・ゲームクリア（またはゲームオーバー？）演出時に表示される「やりましたね。」メッセージ。
+         ・この中の「。」だけをクリック可能にするために、後述のとおりタグを分割して
+           <span id="period">。</span> を埋め込んでいます。
+    ────────────────────────────────────────────────────────────
+  -->
   <div class="curtainUp" id="curtain" style="display: none;"></div>
   <div class="score-text" id="scoreText"></div>
-  <div class="congratulations" id="congratulations">　やりましたね。</div>
 
-  <!-- ボタン -->
-  <button class="back-button" id="backButton"><span class="back-text">←</span></button>
-  <button class="retry-button" id="retryButton"><span>やり直す</span></button>
+  <!--
+    ────────────────────────────────────────────────────────────
+    ◆ 「やりましたね。」 → 「やりましたね」と「。」に分割
+       ・ID="congratulations" の <div> で全体を囲む。
+       ・テキスト「やりましたね」はそのまま文字列。
+       ・「。」部分だけを <span id="period">。</span> とし、クリックイベントを付与します。
+       ・これにより、「やりましたね。」の最後の「。」だけを独立要素とし、
+         クリック回数のカウントやアニメーションを行えるようになります。
+    ────────────────────────────────────────────────────────────
+  -->
+  <div class="congratulations" id="congratulations">
+    やりましたね<span id="period">。</span>
+  </div>
 
+  <!--
+    ────────────────────────────────────────────────────────────
+    ◆ ボタン類
+      1) <button class="back-button" id="backButton">←</button>
+         ・「戻る」ボタン。押すとゲーム画面から index.html（トップページ想定）へ戻ります。
+         ・フェードアウト演出のために、まず blackCurtain を再表示してから遷移させます。
+
+      2) <button class="retry-button" id="retryButton">やり直す</button>
+         ・「やり直す」ボタン。押すと location.reload() でページを再読み込みし、
+           ゲームを最初からやり直せるようにします。
+    ────────────────────────────────────────────────────────────
+  -->
+  <button class="back-button" id="backButton">
+    <span class="back-text">←</span>
+  </button>
+  <button class="retry-button" id="retryButton">
+    <span>やり直す</span>
+  </button>
+
+  <!--
+    ────────────────────────────────────────────────────────────
+    ◆ JavaScript 部分（ゲームロジックと「。」クリック演出）
+    ────────────────────────────────────────────────────────────
+  -->
   <script>
+    // ────────────────────────────────────────────────────────────
+    // ◆ 1. 要素の取得
+    //   まず、HTML 内の各要素を document.querySelector / getElementById で取得します。
+    //   これらは後で操作（移動、アニメーション、クリックイベント付与など）を行います。
+    // ────────────────────────────────────────────────────────────
+
+    // ピンボールのボール本体を取得
     const ball = document.querySelector('.ball');
+
+    // 画面下パドル（dynamic-island bottom）を取得
     const bottomIsland = document.querySelector('.dynamic-island.bottom');
+
+    // 画面上バンパー（dynamic-island top）を取得
     const topIsland = document.querySelector('.dynamic-island.top');
+
+    // スコア表示用の <span id="score"> を取得
     const scoreDisplay = document.getElementById('score');
+
+    // ゲーム終了時のカーテン要素（curtainUp）を取得
     const curtain = document.getElementById('curtain');
 
+    // ゲーム終了時に「スコアは○○」と表示するテキスト要素を取得
     const scoreText = document.getElementById('scoreText');
+
+    // ゲーム終了時の「やりましたね。」を表示する要素を取得
     const congratulations = document.getElementById('congratulations');
+
+    // 「やり直す」ボタンを取得
     const retryButton = document.getElementById('retryButton');
+
+    // 「戻る」ボタンを取得
     const backButton = document.getElementById('backButton');
 
-    let ballX = window.innerWidth / 2;
-    let ballY = window.innerHeight / 2;
-    let ballSpeedX = 5;
-    let ballSpeedY = 5;
-    let score = 0;
-    let isGameOver = false;
+    // ────────────────────────────────────────────────────────────
+    // ◆ 2. 「。」通知部分の要素取得とクリックカウント用変数
+    //   ・ID="period" を付けた <span> 要素を取得し、変数 period に代入。
+    //   ・clickCount にはクリック回数を記録する。最初は 0。
+    // ────────────────────────────────────────────────────────────
+
+    let clickCount = 0;  // クリック回数を保持する変数（0からスタート）
+    const period = document.getElementById('period');
+    // ────────────────────────────────────────────────────────────
+
+    // ────────────────────────────────────────────────────────────
+    // ◆ 3. クリックイベントの登録
+    //   period（「。」部分）に対して click イベントを設定します。
+    //   クリックされるたびに clickCount を増やし、19回目で演出を開始します。
+    // ────────────────────────────────────────────────────────────
+
+    period.addEventListener('click', () => {
+      // もし既に clickCount が19以上（既に19回以上押されている）なら、早期リターンして何もしない
+      if (clickCount >= 19) return;
+
+      // クリック回数を1増やす
+      clickCount++;
+
+      // clickCount が19になったら演出開始
+      if (clickCount === 19) {
+        // ここで「。」（period）のスタイルにトランジションを追加する
+        // ・transform 0.5s ease：0.5秒かけて拡大するアニメーション
+        // ・opacity  0.5s ease：0.5秒かけて透明化するアニメーション
+        period.style.transition = 'transform 0.5s ease, opacity 0.5s ease';
+
+        // scale(100) で要素を 100 倍に拡大
+        period.style.transform = 'scale(100)';
+
+        // opacity=0 にしてフェードアウト（透明化）
+        period.style.opacity = '0';
+
+        // 0.5秒（500ms）後に yaju.html へ遷移する
+        setTimeout(() => {
+          window.location.href = 'yaju.html';
+        }, 500);
+      }
+    });
+    // ────────────────────────────────────────────────────────────
+
+    // ────────────────────────────────────────────────────────────
+    // ◆ 4. ボールやスコア、パドル移動などのゲームロジック用の変数
+    //   ・ballX, ballY：ボールの現在位置（画面左上を原点(0,0)とする座標系）
+    //   ・ballSpeedX, ballSpeedY：ボールの移動速度。X方向・Y方向の速さ(px/更新)。
+    //   ・score：スコア数値。バンパーに当たるたびに1増える。
+    //   ・isGameOver：ゲーム終了フラグ。true になると以降の動作を停止する。
+    // ────────────────────────────────────────────────────────────
+
+    let ballX = window.innerWidth / 2;   // 画面横幅中央に初期配置
+    let ballY = window.innerHeight / 2;  // 画面縦幅中央に初期配置
+    let ballSpeedX = 5;                  // X方向の速度（初期値 5px/更新）
+    let ballSpeedY = 5;                  // Y方向の速度（初期値 5px/更新）
+    let score = 0;                       // 最初のスコアは 0
+    let isGameOver = false;              // ゲーム終了フラグは最初は false
+
+    // ────────────────────────────────────────────────────────────
+    // ◆ 5. updateBallPosition 関数（ボール位置更新＆当たり判定）
+    //   ・setInterval で 20ms ごと（約50fps）に呼ばれ、ボールの位置を更新します。
+    //   ・壁（画面端）への反射判定、パドル（bottomIsland）との衝突判定、
+    //     上部バンパー（topIsland）との衝突判定を行い、条件を満たしたら速度ベクトルを反転させます。
+    //   ・ボールが画面下端を超えたら endGame() を呼び出し、ゲームオーバー演出に移ります。
+    // ────────────────────────────────────────────────────────────
 
     function updateBallPosition() {
+      // もしゲーム終了済みなら何もしない
       if (isGameOver) return;
 
+      // ボールの座標を速度分だけ更新
       ballX += ballSpeedX;
       ballY += ballSpeedY;
 
-      const bw = ball.offsetWidth, bh = ball.offsetHeight;
+      // ボール要素の幅・高さを取得（offsetWidth/offsetHeight でピクセル値を得る）
+      const bw = ball.offsetWidth;
+      const bh = ball.offsetHeight;
 
-      // 壁反射
-      if (ballX <= 0 || ballX + bw >= window.innerWidth) ballSpeedX *= -1;
-      if (ballY <= 0) ballSpeedY *= -1;
-      if (ballY + bh >= window.innerHeight) return endGame();
+      // ─── 壁（左右・上）での反射判定 ───
+      // 左右壁：ballX が 0 以下、または ballX + bw が画面幅以上 なら X方向速度を反転
+      if (ballX <= 0 || ballX + bw >= window.innerWidth) {
+        ballSpeedX *= -1;
+      }
+      // 上壁：ballY が 0 以下 なら Y方向速度を反転
+      if (ballY <= 0) {
+        ballSpeedY *= -1;
+      }
+      // 下端：ballY + bh が画面縦幅以上 なら ゲームオーバー（endGame を呼ぶだけ）
+      if (ballY + bh >= window.innerHeight) {
+        return endGame();
+      }
 
-      // Bottom Island 衝突
-      const bT = bottomIsland.offsetTop;
-      const bL = bottomIsland.offsetLeft;
-      const bR = bL + bottomIsland.offsetWidth;
-      if (ballY + bh >= bT && ballX + bw > bL && ballX < bR && ballSpeedY > 0) {
+      // ─── 下側パドル（bottomIsland）との当たり判定 ───
+      // bottomIsland の位置・幅を取得
+      const bT = bottomIsland.offsetTop;                      // top 位置 (px)
+      const bL = bottomIsland.offsetLeft;                     // left 位置 (px)
+      const bR = bL + bottomIsland.offsetWidth;               // right 位置 (px)
+
+      // 当たり判定の条件：
+      // 1) ボールの下端がパドルの top 位置を越えている (ballY + bh >= bT)
+      // 2) ボールの右端がパドルの左端より右 (ballX + bw > bL)
+      // 3) ボールの左端がパドルの右端より左 (ballX < bR)
+      // 4) ボールが下方向に進んでいる (ballSpeedY > 0)
+      if (
+        ballY + bh >= bT &&
+        ballX + bw > bL &&
+        ballX < bR &&
+        ballSpeedY > 0
+      ) {
+        // パドルの上にぴったり合わせる: y座標を bT - bh にセット
         ballY = bT - bh;
+        // Y方向速度を反転させて上方向に跳ね返す
         ballSpeedY *= -1;
+        // パドル本体を一瞬拡大縮小して跳ね返し演出
         bounceDynamicIsland(bottomIsland);
+        // スコアを更新（1点追加、5点ごとに速度アップ）
         updateScore();
       }
 
-      // Top Island 衝突
-      const tT = topIsland.offsetTop + topIsland.offsetHeight;
-      const tL = topIsland.offsetLeft;
-      const tR = tL + topIsland.offsetWidth;
-      if (ballY <= tT && ballX + bw > tL && ballX < tR && ballSpeedY < 0) {
+      // ─── 上側バンパー（topIsland）との当たり判定 ───
+      // topIsland の bottom 座標・左右座標を取得
+      const tT = topIsland.offsetTop + topIsland.offsetHeight;  // バンパー下端 (px)
+      const tL = topIsland.offsetLeft;                          // 左端 (px)
+      const tR = tL + topIsland.offsetWidth;                    // 右端 (px)
+
+      // 当たり判定の条件：
+      // 1) ボールの上端がバンパー下端より上 (ballY <= tT)
+      // 2) ボールの右端がバンパーの左端より右 (ballX + bw > tL)
+      // 3) ボールの左端がバンパーの右端より左 (ballX < tR)
+      // 4) ボールが上方向に進んでいる (ballSpeedY < 0)
+      if (
+        ballY <= tT &&
+        ballX + bw > tL &&
+        ballX < tR &&
+        ballSpeedY < 0
+      ) {
+        // バンパー下端にぴったり合わせる: y座標を tT にセット
         ballY = tT;
+        // Y方向速度を反転させて下方向に跳ね返す
         ballSpeedY *= -1;
+        // バンパー本体を一瞬拡大縮小して跳ね返し演出
         bounceDynamicIsland(topIsland);
+        // スコアを更新（1点追加、5点ごとに速度アップ）
         updateScore();
       }
 
-      // 位置更新
+      // ─── 最終的にボールの位置を要素に反映 ───
+      // CSS の position:absolute と組み合わせて、left/top を直接操作します。
       ball.style.left = `${ballX}px`;
       ball.style.top = `${ballY}px`;
     }
 
+    // ────────────────────────────────────────────────────────────
+    // ◆ 6. updateScore 関数（スコア管理）
+    //   ・score を1増やし、画面上のテキストを更新します。
+    //   ・スコアが5の倍数になったらボール速度を 1.1 倍にして徐々に加速させます。
+    // ────────────────────────────────────────────────────────────
+
     function updateScore() {
-      score++;
-      scoreDisplay.textContent = score;
+      score++;                              // スコアを +1
+      scoreDisplay.textContent = score;    // <span id="score"> に数値を反映
+
+      // 5点ごとに速度を 10% アップさせる
       if (score % 5 === 0) {
         ballSpeedX *= 1.1;
         ballSpeedY *= 1.1;
       }
     }
 
+    // ────────────────────────────────────────────────────────────
+    // ◆ 7. bounceDynamicIsland 関数（バンパーやパドルの「跳ね返し」演出）
+    //   ・引数 island に受け取った要素を一瞬拡大 (scale 1.1) して
+    //     300ms 後に元に戻すことで、跳ね返しの視覚効果を出します。
+    // ────────────────────────────────────────────────────────────
+
     function bounceDynamicIsland(island) {
       island.style.transform = 'scale(1.1)';
-      setTimeout(() => island.style.transform = 'scale(1)', 300);
+      setTimeout(() => {
+        island.style.transform = 'scale(1)';
+      }, 300);
     }
+
+    // ────────────────────────────────────────────────────────────
+    // ◆ 8. endGame 関数（ゲーム終了処理）
+    //   ・ボールの速度を 0 にして停止させ、isGameOver フラグを true にして
+    //     以降の updateBallPosition の呼び出しを無効化します。
+    //   ・その後、showCurtainAndScore() を呼んで終了演出を開始します。
+    // ────────────────────────────────────────────────────────────
 
     function endGame() {
-      isGameOver = true;
-      ballSpeedX = 0;
-      ballSpeedY = 0;
-      showCurtainAndScore();
+      isGameOver = true;   // ゲーム終了フラグを true にする
+      ballSpeedX = 0;      // ボールの X 方向速度を 0 にして止める
+      ballSpeedY = 0;      // ボールの Y 方向速度を 0 にして止める
+      showCurtainAndScore(); // 終了演出を開始
     }
 
+    // ────────────────────────────────────────────────────────────
+    // ◆ 9. showCurtainAndScore 関数（終了演出の実装）
+    //   ・下記の手順でアニメーションを実行し、終了演出を 1.5〜2秒ほどかけて表示します：
+    //     1) <div id="curtain"> を display:block にしてカーテン要素を表示
+    //        → CSS で定義された keyframes(curtainUp) によって下から上へ開く演出が行われる。
+    //     2) 250ms 後にスコアテキストをフェードイン（opacity:1）させる。
+    //     3) さらに 230ms 後に「やりましたね。」をフェードイン（opacity:1）させる。
+    //     4) 1000ms 後に「やり直す」「戻る」ボタンを表示（.show クラスを付与してフェードイン）。
+    // ────────────────────────────────────────────────────────────
+
     function showCurtainAndScore() {
+      // 1) カーテン要素を表示する
       curtain.style.display = 'block';
-      setTimeout(() => curtain.style.animation = 'curtainUp 0.8s forwards', 0);
-
-
+      // style.animation により .curtainUp に keyframes を適用（0.8秒で開く）
       setTimeout(() => {
-        scoreText.textContent = `　スコアは ${score}。`;
-        scoreText.style.opacity = 1;
-        scoreText.style.transform = 'translateY(0)';
+        curtain.style.animation = 'curtainUp 0.8s forwards';
+      }, 0);
+
+      // 2) 250ms 後に「スコアは○○。」を表示
+      setTimeout(() => {
+        scoreText.textContent = `スコアは ${score}。`; // テキストを設定
+        scoreText.style.opacity = 1;                   // 透明度を 1 にしてフェードイン
+        scoreText.style.transform = 'translateY(0)';   // CSS初期状態で translateY(10px) などが設定されている想定
+        // さらに 230ms 後に「やりましたね。」をフェードインさせる
         setTimeout(() => {
-          congratulations.style.opacity = 1;
-          congratulations.style.transform = 'translateY(0)';
+          congratulations.style.opacity = 1;               // 透明度を 1 にしてフェードイン
+          congratulations.style.transform = 'translateY(0)'; // 初期状態で translateY(10px) などの設定想定
         }, 230);
       }, 250);
 
+      // 3) 1000ms 後に「やり直す」「戻る」ボタンを表示
       setTimeout(() => {
-        retryButton.classList.add('show');
+        retryButton.classList.add('show'); // CSSで .show { opacity:1; pointer-events:auto; } 等想定
         backButton.classList.add('show');
       }, 1000);
     }
 
+    // ────────────────────────────────────────────────────────────
+    // ◆ 10. movePaddle 関数（マウスまたは傾き操作でパドルを動かす）
+    //   ・引数 x はマウスカーソルの画面左からの横座標（または端末傾きで計算した値）。
+    //   ・パドル幅の半分を差し引いて、画面内に収まる位置だけを許可する。
+    //   ・その後、bottomIsland.style.left に pos(px) を代入してパドルを移動させる。
+    // ────────────────────────────────────────────────────────────
+
     function movePaddle(x) {
-      const half = bottomIsland.offsetWidth / 2;
-      const pos = Math.min(Math.max(x - half, 0), window.innerWidth - bottomIsland.offsetWidth);
+      const half = bottomIsland.offsetWidth / 2; // パドル幅の半分を計算
+      // x-half が画面左外へはみ出さないように、また x-half+パドル幅 が画面右外へはみ出さないよう制限
+      const pos = Math.min(
+        Math.max(x - half, 0),
+        window.innerWidth - bottomIsland.offsetWidth
+      );
       bottomIsland.style.left = `${pos}px`;
     }
 
-    document.addEventListener('mousemove', e => movePaddle(e.clientX));
-    document.addEventListener('touchmove', e => {
-      e.preventDefault();
-      movePaddle(e.touches[0].clientX);
-    }, { passive: false });
+    // ────────────────────────────────────────────────────────────
+    // ◆ 11. イベントリスナ登録：マウス移動時にパドルを動かす
+    //   ・document.addEventListener('mousemove', e => movePaddle(e.clientX));
+    //     → マウスを動かすと画面上でパドルが追従します。
+    //
+    //   ・タッチ操作（スマホを想定）：
+    //     document.addEventListener('touchmove', e => { ... });
+    //       e.touches[0].clientX を取得し、movePaddle に渡します。
+    //       passive:false にすることでタッチ時のデフォルトのスクロール抑制が可能に。
+    //
+    //   ・deviceorientation イベント：
+    //     端末傾き(γ:横傾き) を取得し、-30°～30°の範囲に制限したうえで
+    //     0～1 の比率(percent) に直し、画面幅に対するパドル位置を算出しています。
+    // ────────────────────────────────────────────────────────────
 
+    document.addEventListener('mousemove', e => movePaddle(e.clientX));
+    document.addEventListener(
+      'touchmove',
+      e => {
+        e.preventDefault(); // タッチ時に画面がスクロールしないようにする
+        movePaddle(e.touches[0].clientX);
+      },
+      { passive: false }
+    );
     window.addEventListener('deviceorientation', e => {
-      const maxTilt = 30;
-      const g = Math.max(-maxTilt, Math.min(maxTilt, e.gamma));
-      const percent = (g + maxTilt) / (2 * maxTilt);
+      const maxTilt = 30; // 左右30度の傾きを想定
+      const g = Math.max(-maxTilt, Math.min(maxTilt, e.gamma)); // e.gamma は -90～90 の傾き
+      const percent = (g + maxTilt) / (2 * maxTilt); // -30→30 の範囲を 0→1 に正規化
       movePaddle(percent * window.innerWidth);
     });
 
+    // ────────────────────────────────────────────────────────────
+    // ◆ 12. window load イベント：読み込み完了後に黒カーテンをフェードアウト
+    //   ・window.addEventListener('load') でページ読み込み終了を検知
+    //   ・setTimeout(() => hide クラス付与, 50) で 50ms 後に黒カーテンに .hide を付け、
+    //     CSSアニメーション（game.css 内で .hide に transition: opacity 0.3s などが設定されている想定）で
+    //     フェードアウトさせます。
+    // ────────────────────────────────────────────────────────────
+
     window.addEventListener('load', () => {
-      const curtain = document.getElementById('blackCurtain');
-      setTimeout(() => curtain.classList.add('hide'), 50);
+      setTimeout(() => {
+        document.getElementById('blackCurtain').classList.add('hide');
+      }, 50);
     });
 
-    retryButton.addEventListener('click', () => location.reload());
-    backButton.addEventListener('click', () => {
-      const curtain = document.getElementById('blackCurtain');
-      curtain.classList.remove('hide');
-      setTimeout(() => window.location.href = 'index.html', 1000);
+    // ────────────────────────────────────────────────────────────
+    // ◆ 13. ボタン操作：リトライ・戻る
+    //
+    //   ・retryButton ('やり直す') をクリックしたとき：location.reload() でページをリロードし、
+    //     ゲームを最初からやり直す。
+    //
+    //   ・backButton ('←戻る') をクリックしたとき：
+    //     1) 黒カーテン #blackCurtain の .hide クラスを外し、再び全画面黒カーテンを表示
+    //     2) 1000ms 後に window.location.href = 'index.html' でトップページに遷移
+    //     （ここでは index.html がトップページ想定。実際は適宜ファイル名を書き換えてください）
+    // ────────────────────────────────────────────────────────────
+
+    retryButton.addEventListener('click', () => {
+      location.reload();
     });
+    backButton.addEventListener('click', () => {
+      document.getElementById('blackCurtain').classList.remove('hide');
+      setTimeout(() => {
+        window.location.href = 'index.html';
+      }, 1000);
+    });
+
+    // ────────────────────────────────────────────────────────────
+    // ◆ 14. メインループ開始：20ms ごとに updateBallPosition を呼び出す
+    //   ・setInterval(updateBallPosition, 20) で約50fps相当の更新を実行し、
+    //     ボールが滑らかに移動するようにします。
+    // ────────────────────────────────────────────────────────────
 
     setInterval(updateBallPosition, 20);
+    // ────────────────────────────────────────────────────────────
   </script>
 </body>
 </html>

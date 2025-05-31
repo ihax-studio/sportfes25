@@ -1,125 +1,219 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8">
-  <title>GPT-2 ブラウザチャット（手動DL＋エラーダイアログ）</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ロック画面風UI</title>
   <style>
-    body { font-family: sans-serif; padding: 1rem; }
-    h2   { text-align: center; }
-    #status { text-align: center; margin: .5rem 0; color: #555; }
-    #chat { max-width:600px; margin:1rem auto; height:50vh; overflow-y:auto; }
-    .msg { padding:8px; border-radius:4px; margin:4px 0; max-width:80%; }
-    .user { background:#e0f7ff; margin-left:auto; text-align:right; }
-    .bot  { background:#f0f0f0; margin-right:auto; text-align:left;  }
-    #controls { text-align:center; margin-top:8px; }
-    #controls input, #controls button { padding:8px; vertical-align:middle; }
-    #download { margin-top:1rem; padding:8px 16px; }
+/* リセット */
+* { margin:0; padding:0; box-sizing:border-box; }
+
+/* フォント統一 */
+body, span {
+  font-family: 
+    -apple-system, 
+    BlinkMacSystemFont, 
+    "Segoe UI", 
+    Roboto, 
+    "Helvetica Neue", 
+    Arial, 
+    sans-serif;
+}
+
+/* 背景グラデーション */
+body {
+  height:100vh; display:flex; flex-direction:column; justify-content:center; align-items:center;
+  overflow:hidden; position:relative;
+  background-color:#ffffff;
+  background-image:
+    radial-gradient(at 46% 5%, rgba(0,186,137,0.616) 0, transparent 50%),
+    radial-gradient(at 30% 94%, rgb(88,80,247) 0, transparent 50%),
+    radial-gradient(at 90% 5%, rgb(182,198,255) 0, transparent 50%),
+    radial-gradient(at 24% 60%, rgba(241,90,246,0.622) 0, transparent 50%),
+    radial-gradient(at 64% 7%, rgb(255,51,204) 0, transparent 50%),
+    radial-gradient(at 63% 25%, rgb(169,234,189) 0, transparent 50%),
+    radial-gradient(at 6% 40%, rgb(15,182,162) 0, transparent 50%);
+  background-size:cover; background-repeat:no-repeat;
+  animation: moveGradients 20s ease-in-out infinite;
+}
+
+/* カーテン */
+.curtain {
+  position: absolute;
+  inset: 0;
+  background-color: #000;
+  background-image: 
+    radial-gradient(at 46% 54%, rgba(41, 45, 115, 0.854) 0, transparent 50%),
+    radial-gradient(at 50% 94%, rgb(23, 155, 133) 0, transparent 50%),
+    radial-gradient(at 24% 60%, rgba(126, 51, 128, 0.622) 0, transparent 50%),
+    radial-gradient(at 64% 7%, rgb(100, 11, 129) 0, transparent 50%),
+    radial-gradient(at 90% 5%, rgb(60, 30, 141) 0, transparent 50%);
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+  transform: translateY(-100%);
+  opacity: 0;
+  z-index: 0;
+}
+
+/* unlock画像 */
+.unlock-img {
+  width: auto;
+  height: 360px;
+  margin-bottom: 20px;
+  opacity: 0;
+  transform: translateY(42px);
+  animation: fadeUp 0.52s ease forwards 1s;
+}
+
+/* テキスト */
+.unlock-text {
+  font-size: 20px;
+  color: white;
+  text-align: center;
+  opacity: 0;
+  transform: translateY(42px);
+  animation: fadeUp 0.7s ease forwards 1.5s;
+}
+
+/* 戻るボタン */
+.back-button {
+  position: absolute;
+  top: 22px;
+  left: 20px;
+  padding: 16px 20px;
+  font-size:22px;
+  border: none;
+  border-radius: 50px;
+  background-color: rgb(255 255 255 / 44%);
+  color: #ffffff;
+  cursor: pointer;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.5s ease;
+  z-index: 10000;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.back-button.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+
+.back-button:active {
+  transform: translateY(0) scale(0.88);
+}
+
+/* 戻るボタンに追加テキスト */
+.back-text::after {
+  content: '';
+  opacity: 0;
+  margin-left: 0;
+  transition: all 0.5s ease;
+}
+
+.back-button:hover .back-text::after {
+  content: ' 戻る ';
+  font-size:20px;
+  opacity: 1;
+  margin-left: 10px;
+}
+
+
+/* 閉じるボタン */
+.close-button {
+  position:absolute; bottom:7%; left:50%;
+  transform:translateX(-50%) scale(1.2);
+  width:50px; height:50px; border-radius:50%;
+  background-color:rgba(255, 255, 255, 0.1);
+  display:flex; align-items:center; justify-content:center;
+  cursor:pointer; opacity:0;
+  transition:opacity .6s ease, transform 0.3s ease;
+  z-index:2; font-size:28px; color:#ffffff; font-weight:200;
+  border:solid 2px white;
+    backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+.close-button.visible { opacity:1; }
+
+.close-button:active {
+  transform:translateX(-50%) scale(0.88);
+}
+
+.close-button::before {
+  content:'×';
+  margin-top:-4px;
+}
+
+/* アニメーション定義 */
+@keyframes fadeUp {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes curtainDrop {
+  to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes curtainUp {
+  to { transform: translateY(-100%); opacity: 0; }
+}
+
+@keyframes moveGradients {
+  0%, 100% { background-position: center; }
+  50% { background-position: top; }
+}
   </style>
 </head>
 <body>
 
-  <h2>GPT-2 ブラウザチャット</h2>
+<!-- カーテン -->
+<div class="curtain"></div>
 
-  <!-- モデルDL前にだけ表示 -->
-  <div style="text-align:center;">
-    <button id="download">モデルをダウンロード</button>
-  </div>
-  <div id="status">まずは「モデルをダウンロード」してください</div>
+<!-- unlock画像 -->
+<img src="unlock.png" alt="アンロック画像" class="unlock-img" oncontextmenu="return false;">
 
-  <!-- チャット欄 -->
-  <div id="chat"></div>
 
-  <!-- 入力・送信UI -->
-  <div id="controls">
-    <input  id="input" placeholder="メッセージを入力…" disabled />
-    <button id="send" disabled>送信</button>
-  </div>
+<!-- テキスト -->
+<p class="unlock-text">詳細は学校のマップをご確認ください。</p>
 
-  <!-- Transformers.js -->
-  <script src="https://cdn.jsdelivr.net/npm/@xenova/transformers@2.2.2/dist/transformers.min.js"></script>
-  <script>
-    let generator = null;
-    const statusEl    = document.getElementById('status');
-    const downloadBtn = document.getElementById('download');
-    const inputEl     = document.getElementById('input');
-    const sendBtn     = document.getElementById('send');
+<!-- 戻るボタン -->
+<button class="back-button"><span class="back-text">←</span></button>
 
-    function scrollBottom() {
-      const c = document.getElementById('chat');
-      c.scrollTop = c.scrollHeight;
-    }
-    function addUser(text) {
-      const d = document.createElement('div');
-      d.className = 'msg user';
-      d.textContent = `あなた: ${text}`;
-      document.getElementById('chat').append(d);
-      scrollBottom();
-    }
-    function addBot(text) {
-      const d = document.createElement('div');
-      d.className = 'msg bot';
-      d.textContent = `AI: ${text}`;
-      document.getElementById('chat').append(d);
-      scrollBottom();
-    }
-    function updateLastBot(text) {
-      const bots = document.querySelectorAll('#chat .bot');
-      if (!bots.length) return;
-      bots[bots.length - 1].textContent = `AI: ${text}`;
-      scrollBottom();
-    }
+<!-- 閉じるボタン -->
+<div class="close-button"></div>
 
-    // モデルダウンロードボタン
-    downloadBtn.addEventListener('click', async () => {
-      downloadBtn.disabled = true;
-      statusEl.textContent = 'モデルをロード中…0%';
-      try {
-        generator = await transformers.pipeline(
-          'text-generation',
-          'gpt2',
-          {
-            progress_callback: (fraction) => {
-              statusEl.textContent = `モデルをロード中…${Math.floor(fraction*100)}%`;
-            }
-          }
-        );
-        statusEl.textContent = 'モデルのロード完了！対話可能です';
-        inputEl.disabled = false;
-        sendBtn.disabled = false;
-        downloadBtn.style.display = 'none';
-      } catch (err) {
-        console.error(err);
-        statusEl.textContent = 'ダウンロード中にエラーが発生しました';
-        downloadBtn.disabled = false;
-      }
-    });
+<script>
+window.addEventListener('DOMContentLoaded', () => {
+  const curtain = document.querySelector('.curtain');
+  const closeButton = document.querySelector('.close-button');
+  const backButton = document.querySelector('.back-button');
 
-    // 送信ボタン
-    sendBtn.addEventListener('click', async () => {
-      // モデル未ダウンロードならアラートを出して終了
-      if (!generator) {
-        alert('モデルがまだダウンロードされていません。\n先に「モデルをダウンロード」を押してください。');
-        return;
-      }
+  // 初回カーテン落下アニメ
+  curtain.style.animation = "curtainDrop 0.7s ease-in-out forwards";
 
-      const text = inputEl.value.trim();
-      if (!text) return;
+  setTimeout(() => closeButton.classList.add('visible'), 400);
+  setTimeout(() => backButton.classList.add('show'), 600);
 
-      addUser(text);
-      inputEl.value = '';
-      addBot('生成中…');
-      statusEl.textContent = '生成中…';
+  // 閉じるボタン押すとカーテン上げ
+  closeButton.addEventListener('click', () => {
+    setTimeout(() => {
+      window.location.href = 'index.html';
+    }, 0);
+  });
 
-      try {
-        const [res] = await generator(text, { max_length: 80 });
-        updateLastBot(res.generated_text);
-        statusEl.textContent = '対話完了';
-      } catch (err) {
-        updateLastBot('エラーが発生しました');
-        statusEl.textContent = '対話中にエラー';
-        console.error(err);
-      }
-    });
-  </script>
+  // 戻るボタン押すとカーテン上げ
+  backButton.addEventListener('click', () => {
+    setTimeout(() => {
+      window.location.href = 'index.html';
+    }, 0);
+  });
+});
+</script>
+
 </body>
 </html>

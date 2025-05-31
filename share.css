@@ -79,13 +79,9 @@ font-family: -apple-system, BlinkMacSystemFont, "San Francisco", "Helvetica Neue
   transform: translateX(-50%) scale(1.2);
   width: 50px;
   height: 50px;
-  background-color: #ffffffa1;
-  box-shadow:
-    inset 1px 1px 2px rgba(135, 206, 235, 0.6),
-    2px 0 4px rgb(133 0 255 / 60%),
-    0 3px 6px rgba(135, 206, 235, 0.6),
-    7px 0 8px rgb(184 106 255 / 60%);
-  color: #000;
+   box-shadow:inset 0 0 12px #ffffff4f;
+      border:solid 2px white;
+  color: #ffffff;
   font-size: 28px;
   border-radius: 50%;
   z-index: 9999;
@@ -105,12 +101,6 @@ font-family: -apple-system, BlinkMacSystemFont, "San Francisco", "Helvetica Neue
 }
 
 .close-button:active {
-      box-shadow:
-    inset 1px 1px 2px rgb(104 0 244 / 40%),
-    -3px 3px 4px rgb(0 169 255 / 44%),
-    2px 7px 6px rgb(119 0 255 / 45%),
-    7px 6px 8px rgb(106 255 129 / 37%);
-background-color:#ffffffba;
   transform: translate(-50%, 0) scale(1);
 }
 

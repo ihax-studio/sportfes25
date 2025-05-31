@@ -8,20 +8,52 @@ html, body {
   transition:all 0.5s ease;
   }
 
-  body {
-    background-image:
-    radial-gradient(at 46% 54%, rgb(182, 250, 232) 0px, transparent 50%),
-    radial-gradient(at 30% 94%, rgb(88, 80, 247) 0px, transparent 50%),
-    radial-gradient(at 90% 5%, rgb(182, 198, 255) 0px, transparent 50%),
-    radial-gradient(at 24% 60%, rgb(90, 186, 246) 0px, transparent 50%),
-    radial-gradient(at 64% 7%, rgb(255, 51, 204) 0px, transparent 50%),
-    radial-gradient(at 63% 5%, rgb(169, 234, 189) 0px, transparent 50%),
-    radial-gradient(at 6% 40%, rgb(171, 255, 245) 0px, transparent 50%);
-    background-color: #ffffff;
-    background-size: cover;
-    background-repeat: no-repeat;
-    background-position: center;
+body {
+  --pos1: 46% 54%;
+  --pos2: 30% 94%;
+  --pos3: 90% 5%;
+  --pos4: 24% 60%;
+  --pos5: 64% 7%;
+  --pos6: 63% 5%;
+  --pos7: 6% 40%;
+
+  background-image:
+    radial-gradient(at var(--pos1), rgb(182, 250, 232) 0px, transparent 50%),
+    radial-gradient(at var(--pos2), rgb(88, 80, 247) 0px, transparent 50%),
+    radial-gradient(at var(--pos3), rgb(182, 198, 255) 0px, transparent 50%),
+    radial-gradient(at var(--pos4), rgb(90, 186, 246) 0px, transparent 50%),
+    radial-gradient(at var(--pos5), rgb(255, 51, 204) 0px, transparent 50%),
+    radial-gradient(at var(--pos6), rgb(169, 234, 189) 0px, transparent 50%),
+    radial-gradient(at var(--pos7), rgb(171, 255, 245) 0px, transparent 50%);
+  background-color: #ffffff;
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+  transition:all 0.3s ease;
+  animation: moveBg 3s linear infinite;
+}
+
+@keyframes moveBg {
+  0% {
+    --pos1: 46% 54%;
+    --pos2: 30% 94%;
+    --pos3: 90% 5%;
+    --pos4: 24% 60%;
+    --pos5: 64% 7%;
+    --pos6: 63% 5%;
+    --pos7: 6% 40%;
   }
+  100% {
+    --pos1: 60% 40%;
+    --pos2: 60% 50%;
+    --pos3: 20% 70%;
+    --pos4: 90% 30%;
+    --pos5: 40% 90%;
+    --pos6: 10% 80%;
+    --pos7: 60% 20%;
+  }
+}
+
   @keyframes curtainUp {
     from {
       transform: translateY(0%);
@@ -69,8 +101,8 @@ h2{
 }
 .btn-container {
   position: fixed;
-  top: 80%;
-  margin-left:44%;
+  top: 85%;
+  margin-left:41%;
   width: 0;
   height: 0;
   pointer-events: none;
@@ -79,8 +111,8 @@ h2{
 
   .btn {
     position: absolute;
-    width: 96px;
-    height: 95px;
+    width: 91px;
+    height: 90px;
     border-radius: 50%;
     background-color: rgba(255, 255, 255, 0.5);
     display: flex;
@@ -91,29 +123,51 @@ h2{
     pointer-events: auto;
     opacity: 1;
   }
-@media (min-width: 1100px) {
+@media (min-width: 584px) {
   h1 {
     margin-top:6%;
   }
   .btn-container {
   position: fixed;
-  top: 80%;
-  margin-left:46.2%;
+  top: 87%;
+  margin-left:42%;
   width: 0;
   height: 0;
   pointer-events: none;
   transition: transform 0.65s ease;
 }
 .btn {
-      width: 106px;
-    height: 105px;
+      width: 99px;
+    height: 98px;
 }
 }
-
+@media (min-width: 930px) {
+  h1 {
+    margin-top:6%;
+  }
+  .btn-container {
+  position: fixed;
+  top: 85%;
+  margin-left:45%;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+  transition: transform 0.65s ease;
+}
+.btn {
+      width: 99px;
+    height: 98px;
+}
+}
+@media (min-width: 1370px){
+    .btn-container {
+  margin-left:47%;
+}
+}
 
   .btn img {
-    width: 107px;
-    height: 107px;
+    width: 100px;
+    height: 100px;
     border-radius: 50%;
     object-fit: cover;
     transition: transform 0.4s ease;
@@ -126,13 +180,22 @@ h2{
   .btn img:active {
     transform: scale(1.01);
   }
-/* 放射状配置（距離だけ10px広く＝230px、角度そのまま） */
-.btn:nth-child(1) { transform: rotate(0deg) translateX(-230px) rotate(0deg); }
-.btn:nth-child(2) { transform: rotate(36deg) translateX(-230px) rotate(-36deg); }
-.btn:nth-child(3) { transform: rotate(72deg) translateX(-230px) rotate(-72deg); }
-.btn:nth-child(4) { transform: rotate(108deg) translateX(-230px) rotate(-108deg); }
-.btn:nth-child(5) { transform: rotate(144deg) translateX(-230px) rotate(-144deg); }
-.btn:nth-child(6) { transform: rotate(180deg) translateX(-230px) rotate(-180deg); }
+.btn:nth-child(1) {
+  transform: rotate(21deg) translateX(-180px) rotate(-21deg);
+}
+.btn:nth-child(2) {
+  transform: rotate(56deg) translateX(-200px) rotate(-56deg);
+}
+.btn:nth-child(3) {
+  transform: rotate(90deg) translateX(-200px) rotate(-90deg);
+}
+.btn:nth-child(4) {
+  transform: rotate(123.25deg) translateX(-180px) rotate(-123.25deg);
+}
+.btn:nth-child(5) {
+  transform: rotate(159deg) translateX(-170px) rotate(-159deg);
+}
+
 
 
 /* はじめるボタン */

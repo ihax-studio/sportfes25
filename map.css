@@ -1,0 +1,334 @@
+    /*—— リセット ——*/
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    /*—— 共通フォント設定 ——*/
+    body, button, span, h2, li {
+      font-family:
+        -apple-system, /* iOS/macOSならSF Pro Displayが来る */
+        BlinkMacSystemFont,
+        "Segoe UI",
+        Roboto,
+        "Helvetica Neue",
+        Arial,
+        sans-serif;
+      color: #000000; /* デフォルトで白文字 */
+    }
+
+    /*—— 背景グラデーション + アニメーション ——*/
+    body {
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+      position: relative;
+      background-color: #00a5f2;
+      background-image:
+        radial-gradient(at 50% 20%, rgba(0, 186, 137, 0.6) 0%, transparent 60%),
+        radial-gradient(at 20% 80%, rgba(88, 80, 247, 0.6) 0%, transparent 60%),
+        radial-gradient(at 90% 10%, rgba(182, 198, 255, 0.6) 0%, transparent 60%),
+        radial-gradient(at 30% 50%, rgba(241, 90, 246, 0.6) 0%, transparent 60%),
+        radial-gradient(at 70% 10%, rgba(255, 51, 204, 0.6) 0%, transparent 60%),
+        radial-gradient(at 65% 30%, rgba(169, 234, 189, 0.6) 0%, transparent 60%),
+        radial-gradient(at 10% 40%, rgba(15, 182, 162, 0.6) 0%, transparent 60%);
+      background-size: cover;
+      background-repeat: no-repeat;
+      animation: moveGradients 25s ease-in-out infinite;
+    }
+
+    @keyframes moveGradients {
+      0% {
+        background-position: 0% 0%, 100% 100%, 50% 10%, 0% 50%, 100% 0%, 80% 30%, 10% 40%;
+      }
+      50% {
+        background-position: 100% 100%, 0% 0%, 50% 90%, 100% 50%, 0% 100%, 20% 70%, 90% 60%;
+      }
+      100% {
+        background-position: 0% 0%, 100% 100%, 50% 10%, 0% 50%, 100% 0%, 80% 30%, 10% 40%;
+      }
+    }
+
+    /*—— カーテン演出 ——*/
+    .curtain {
+      position: absolute;
+      inset: 0;
+      background-color: #53a5e5;
+            background-image:
+        radial-gradient(at 50% 20%, rgb(0 186 137) 0%, transparent 60%),
+        radial-gradient(at 20% 80%, rgb(15 22 37 / 51%) 0%, transparent 60%),
+        radial-gradient(at 90% 10%, rgb(255 0 200 / 60%) 0%, transparent 60%),
+        radial-gradient(at 30% 50%, rgb(85 108 137 / 60%) 0%, transparent 60%),
+        radial-gradient(at 70% 10%, rgb(51 103 255 / 60%) 0%, transparent 60%),
+        radial-gradient(at 65% 30%, rgb(255 255 255 / 60%) 0%, transparent 60%),
+        radial-gradient(at 10% 40%, rgb(255 0 240 / 60%) 0%, transparent 60%);
+      background-size: cover;
+      background-repeat: no-repeat;
+      background-size: cover;
+      background-repeat: no-repeat;
+      background-position: center;
+      transform: translateY(-100%);
+      opacity: 0;
+      z-index: 0; /* 最背面 */
+      transition: transform 0.8s ease-in-out, opacity 0.8s ease-in-out;
+    }
+
+    .curtain.drop {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    .curtain.open {
+      transform: translateY(-100%);
+      opacity: 0;
+    }
+
+    /*—— ガラスモーフィズム風マップコンテナ ——*/
+    #map-container {
+      transition: all 0.3s ease;
+      transform: translateY(-3%);
+      position: relative;
+      z-index: 1; /* カーテンより上 */
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+      width: 80%;
+      max-width: 1000px;
+      background: rgb(255 255 255 / 25%);
+      border-radius: 28px;
+      box-shadow: inset 0 2px 15px rgb(255 255 255 / 35%),
+       0 1px 12px rgb(0 0 0 / 16%);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+
+    /*—— 閉じるボタン (×) ——*/
+    .close-button {
+          backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      position: absolute;
+      bottom: 7%;
+      left: 50%;
+      transform: translateX(-50%) scale(1);
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background-color: rgb(255 255 255 / 2%);
+      box-shadow:inset 0 0 12px #ffffff4f;
+      border:solid 2px white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      opacity: 0;
+      transition: opacity 0.6s ease, transform 0.3s ease;
+      z-index: 3;
+      font-size: 32px;
+      color: #fffefe;
+      font-weight: 300;
+    }
+
+    .close-button.visible {
+      opacity: 1;
+    }
+
+    .close-button:active {
+      transform: translateX(-50%) scale(0.88);
+    }
+
+    .close-button::before {
+      content: '×';
+      margin-top: -4px;
+    }
+
+    /*—— 戻るボタン ——*/
+    .back-button {
+      position: absolute;
+      top: 24px;
+      left: 20px;
+      padding: 14px 18px;
+      font-size: 20px;
+      border: none;
+      border-radius: 30px;
+      background-color: rgb(0 0 0 / 0%);
+      color: #000000;
+      cursor: pointer;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: all 0.5s ease;
+      z-index: 10000; /* 最前面 */
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      display: flex;
+      align-items: center;
+    }
+
+    .back-button.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .back-button:hover {
+      background-color: rgba(255, 255, 255, 0.25);
+    }
+
+    .back-button:active {
+      transition: all 0.2s ease;
+      transform: translateY(0) scale(0.88);
+    }
+
+    .back-text {
+      position: relative;
+      display: inline-block;
+      font-size: 20px;
+      line-height: 1;
+    }
+
+    .back-text::after {
+      content: ' Back';
+      font-size: 20px;
+      opacity: 0;
+      margin-left: 0;
+      transition: all 0.5s ease;
+    }
+
+    .back-button:hover .back-text::after {
+      opacity: 1;
+      margin-left: 8px;
+    }
+
+    /*—— アクセス情報パネル ——*/
+    #access-info {
+      transition:all 0.3s ease;
+      margin-top: 20px;
+      text-align: left;
+      font-size: 18px;
+      color: #000000;
+      width: 100%;
+      max-width: 400px;
+      background: rgb(255 255 255 / 50%);
+      border-radius: 16px;
+      padding: 30px;
+    }
+
+    #access-info h2 {
+      font-size: 28px;
+      margin-bottom: 18px;
+      text-shadow: 1px 1px 8px rgb(0 0 0 / 10%);
+    }
+
+    #access-info ul {
+      list-style: none;
+      padding-left: 16px;
+    }
+
+    #access-info ul li {
+      margin-bottom: 12px;
+      line-height: 1.6;
+    }
+hr{
+    border:solid 1px #00000070;
+  border-radius:55px;
+    margin:13px 0;
+}
+    /* スムーズフェードイン用クラス */
+    .fade-up {
+      opacity: 0;
+      transform: translateY(42px);
+      animation: fadeUp 0.6s ease forwards;
+    }
+
+    hr {
+      opacity: 0;
+      transform: translateY(20px);
+      animation: fadeUp 0.8s ease forwards;
+    }
+
+    @keyframes fadeUp {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /*—— マップ埋め込み iframe ——*/
+    iframe {
+      width: 100%;
+      height: 600px;
+      border: 0;
+      border-radius: 12px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+      transition: filter 0.3s ease;
+    }
+
+    iframe:hover {
+      filter: brightness(1.05);
+    }
+
+
+    @media (min-width: 969px) {
+    #access-info {
+      height:63vh;
+      padding:60px 33px;
+    }
+      h2 {
+        padding-bottom:20px;
+      }
+      hr {
+        margin:22px 0;
+      }
+      ul {
+        margin:12px;
+      }
+    }
+
+
+
+    /*—— レスポンシブ調整 ——*/
+    @media (max-width: 968px) {
+      #map-container {
+        flex-direction: column;
+        padding: 16px;
+      }
+      #access-info {
+        margin-top: 24px;
+        margin-left: 0;
+        max-width: none;
+      }
+      iframe {
+        height: 380px;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .back-button {
+        top: 18px;
+        left: 12px;
+        padding: 12px 14px;
+        font-size: 18px;
+      }
+      .back-text {
+        font-size: 18px;
+      }
+      #access-info {
+        padding: 16px;
+        font-size: 18px;
+      }
+      #access-info h2 {
+        font-size: 24px;
+        margin:8px;
+        margin-bottom:15px;
+      }
+      iframe {
+        height: 300px;
+      }
+      .close-button {
+        width: 55px;
+        height: 55px;
+        font-size: 28px;
+      }
+    }

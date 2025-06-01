@@ -1,0 +1,186 @@
+body {
+  margin: 0;
+  background-image:
+  radial-gradient(at 46% 54%, rgb(182, 250, 232) 0px, transparent 50%),
+  radial-gradient(at 30% 94%, rgb(88, 80, 247) 0px, transparent 50%),
+  radial-gradient(at 90% 5%, rgb(182, 198, 255) 0px, transparent 50%),
+  radial-gradient(at 24% 60%, rgb(90, 186, 246) 0px, transparent 50%),
+  radial-gradient(at 64% 7%, rgb(255, 51, 204) 0px, transparent 50%),
+  radial-gradient(at 63% 5%, rgb(169, 234, 189) 0px, transparent 50%),
+  radial-gradient(at 6% 40%, rgb(171, 255, 245) 0px, transparent 50%);
+  background-color: #ffffff;
+    background-color: rgb(255, 255, 255);
+  background-size: cover;
+  font-family: sans-serif;
+  height: 100vh;
+  overflow: hidden;
+}.share-container {
+transition: background 0.9s ease;
+/* もしくは ↓ でもOK
+transition: background-color 0.3s ease, background-image 0.3s ease;
+*/
+position: relative;
+width: 100%;
+height: 100%;
+display: flex;
+flex-direction: column;
+align-items: center;
+justify-content: flex-start;
+padding-top: 17vh;
+text-align: center;
+}
+
+.share-container:active {
+background-image: 
+  radial-gradient(at 90% 5%, rgb(88 80 247 / 41%) 0px, transparent 50%),
+  radial-gradient(at 0% 60%, hsl(297.17deg 100% 42.33% / 44%) 0px, transparent 50%),
+  radial-gradient(at 6% 7%, rgb(81 0 156 / 40%) 0px, transparent 50%),
+  radial-gradient(at 3% 5%, hsl(197deg 100% 50% / 57%) 0px, transparent 50%),
+  radial-gradient(at 90% 90%, rgb(11 129 101 / 58%) 0px, transparent 50%);
+background-color: rgb(0 0 0);
+}
+.share-container::before {
+content: '';
+position: absolute;
+inset: 0;
+background-image: inherit;
+background-color: inherit;
+opacity: 0;
+transition: opacity 0.88s ease;
+z-index: -1;
+}
+
+.share-container:active::before {
+opacity: 1;
+}
+
+
+.qr-image {
+  max-width: 310px;
+  width: 60%;
+  height: auto;
+  margin-bottom: 5px;
+}
+
+.share-text {
+  margin-top:62px;
+  font-size: 33px;
+  line-height: 1.5;
+  color: rgb(255, 255, 255);
+
+}
+
+.close-button {
+  font-weight:100;
+font-family: -apple-system, BlinkMacSystemFont, "San Francisco", "Helvetica Neue", "Helvetica", sans-serif;
+  position: absolute;
+  left: 50%;
+  top: 73%;
+  transform: translateX(-50%) scale(1.2);
+  width: 50px;
+  height: 50px;
+   box-shadow:inset 0 0 12px #ffffff4f;
+      border:solid 2px white;
+  color: #ffffff;
+  font-size: 28px;
+  border-radius: 50%;
+  z-index: 9999;
+        backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(10px);
+  cursor: pointer;
+  transition:all 0.3s ease;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.close-button::before {
+  content: '×';
+  position: absolute;
+  top: 6px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.close-button:active {
+  transform: translate(-50%, 0) scale(1);
+}
+
+/* スマホ対応 */
+@media screen and (max-width: 855px) {
+  .qr-image {
+    width: 70%;
+  }
+
+  .share-text {
+    font-size: 27px;
+  }
+}
+
+
+@keyframes curtainDrop {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes curtainUp {
+  from {
+    transform: translateY(0%);
+    opacity: 1;
+  }
+  to {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+}
+
+.curtain {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image:
+  radial-gradient(at 46% 54%, rgb(31 40 192 / 51%) 0px, transparent 50%),
+  radial-gradient(at 50% 94%, rgb(182 22 255 / 29%) 0px, transparent 50%),
+  radial-gradient(at 90% 5%, rgb(124 148 154) 0px, transparent 50%),
+  radial-gradient(at 24% 60%, rgb(57 0 142) 0px, transparent 50%),
+  radial-gradient(at 64% 7%, rgb(255 0 192 / 80%) 0px, transparent 50%),
+  radial-gradient(at  83% 95%, rgb(80 206 255 / 42%) 0px, transparent 50%),
+  radial-gradient(at 6% 40%, rgb(89 187 151) 0px, transparent 50%);
+  background-color: #0083ff;
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+  opacity: 0;
+  transform: translateY(-100%);
+  will-change: transform, opacity;
+}
+
+.curtain.drop {
+  animation: curtainDrop 0.8s forwards ease-in-out;
+}
+
+.curtain.open {
+  animation: curtainUp 0.88s forwards ease-in-out;
+}
+
+/*フェード設定*/
+.fade-in {
+  opacity: 0;
+  transition: opacity 0.33s ease;
+}
+
+.visible {
+  opacity: 1;
+}
+
+.hidden {
+  opacity: 0;
+}

@@ -6,14 +6,14 @@
 <link rel="stylesheet" href="tr.css">
 </head>
 <body>
-  <div class="fade-blue"></div>
+
   <!-- 閉じるボタン追加 -->
-  <div class="close-button" id="closeBtn" title="Close"></div>
+ 
 
   <div class="mic-wrapper" id="wrapper" onclick="swapDirection()">
     <div id="mic" class="mic"></div>
   </div>
-
+  <div id="en"></div>
   <div id="jp">
     <input id="inputText" type="text"
     placeholder="ここに入力…"
@@ -24,8 +24,9 @@
     name="no_save" />  
   </div>
 
-  <div id="en"></div>
 
+ <div class="close-button" id="closeBtn" title="Close"></div>
+   <div class="fade-blue"></div>
   <script>
     // 閉じるボタンの処理
     document.getElementById('closeBtn').addEventListener('click', () => {

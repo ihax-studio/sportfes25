@@ -180,10 +180,10 @@ font-family: -apple-system, BlinkMacSystemFont, "San Francisco", "Helvetica Neue
 }
 
 
-@media (max-width: 750px){
+@media (max-width: 650px){
   .mic {
-  width: 202px;
-  height: 202px;
+  width: 252px;
+  height: 252px;
   background: white;
   border-radius: 50%;
   transition: transform 0.1s ease-out;
@@ -192,7 +192,7 @@ font-family: -apple-system, BlinkMacSystemFont, "San Francisco", "Helvetica Neue
 
 #jp, #en {
   position: absolute;
-  font-size: 48px;
+  font-size: 80px;
   width: 85%;
   transition: all 0.5s ease;
   white-space: pre-wrap;   /*white-space: pre-line;*/
@@ -208,7 +208,7 @@ font-family: -apple-system, BlinkMacSystemFont, "San Francisco", "Helvetica Neue
 #en {
   top: 30px;
   right: 30px;
-  font-size: 70px;
+  font-size: 99px;
   font-weight: bold;
   transform: rotate(180deg);
   opacity: 0;
@@ -218,9 +218,9 @@ font-family: -apple-system, BlinkMacSystemFont, "San Francisco", "Helvetica Neue
   .close-button {
   font-weight:100;
   top: 84%;
-      width: 60px;
-  height: 60px;
-    font-size:32px;
+      width: 90px;
+  height: 90px;
+    font-size:55px;
   }
   .close-button::before {
   content: '×';

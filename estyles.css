@@ -70,7 +70,7 @@ h2{
 .btn-container {
   position: fixed;
   top: 80%;
-  margin-left:44%;
+  margin-left:42.5%;
   width: 0;
   height: 0;
   pointer-events: none;
@@ -135,8 +135,23 @@ h2{
 .btn:nth-child(6) { transform: rotate(180deg) translateX(-230px) rotate(-180deg); }
 .btn:nth-child(7) { transform: rotate(0deg) translateY(-10px) rotate(0deg); background:none; border:solid 2px white; }
 @media (max-width: 720px){
+  .btn-container {
+  position: fixed;
+  top: 80%;
+  margin-left:42%;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+  transition: transform 0.65s ease;
+}
+  .btn {
+    position: absolute;  width: 88px; height: 87px;}
+    .btn img {
+    width: 100px;
+    height: 95px;
+  }
   /* 放射状配置（距離だけ10px広く＝230px、角度そのまま） */
-.btn:nth-child(1) { transform: rotate(0deg) translateX(-193px) rotate(0deg); }
+.btn:nth-child(1) { transform: rotate(0deg) translateX(-180px) rotate(0deg); }
 .btn:nth-child(2) { transform: rotate(33deg) translateX(-180px) rotate(-33deg); }
 .btn:nth-child(3) { transform: rotate(69deg) translateX(-180px) rotate(-69deg); }
 .btn:nth-child(4) { transform: rotate(104deg) translateX(-180px) rotate(-104deg); }

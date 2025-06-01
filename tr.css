@@ -178,3 +178,55 @@ font-family: -apple-system, BlinkMacSystemFont, "San Francisco", "Helvetica Neue
   0% { opacity: 1; transform: translateY(0);}
   100% { opacity: 0; transform: translateY(140px);}
 }
+
+
+@media (max-width: 750px){
+  .mic {
+  width: 202px;
+  height: 202px;
+  background: white;
+  border-radius: 50%;
+  transition: transform 0.1s ease-out;
+  box-shadow: 0 0 30px rgba(255, 255, 255, 0.4);
+}
+
+#jp, #en {
+  position: absolute;
+  font-size: 48px;
+  width: 85%;
+  transition: all 0.5s ease;
+  white-space: pre-wrap;   /*white-space: pre-line;*/
+  max-height: 55vh; /* 5行分想定 */
+  overflow-y: auto;
+}
+
+#jp {
+  bottom: 150px;
+  left: 30px;
+}
+
+#en {
+  top: 30px;
+  right: 30px;
+  font-size: 70px;
+  font-weight: bold;
+  transform: rotate(180deg);
+  opacity: 0;
+}
+
+
+  .close-button {
+  font-weight:100;
+  top: 84%;
+      width: 60px;
+  height: 60px;
+    font-size:32px;
+  }
+  .close-button::before {
+  content: '×';
+  position: absolute;
+  top: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+}

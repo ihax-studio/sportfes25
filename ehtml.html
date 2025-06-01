@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ロック画面風UI</title>
+  <style>
+/* リセット */
+* { margin:0; padding:0; box-sizing:border-box; }
+
+/* フォント統一 */
+body, span {
+  font-family: 
+    -apple-system, 
+    BlinkMacSystemFont, 
+    "Segoe UI", 
+    Roboto, 
+    "Helvetica Neue", 
+    Arial, 
+    sans-serif;
+}
+
+/* 背景グラデーション */
+body {
+  height:100vh; display:flex; flex-direction:column; justify-content:center; align-items:center;
+  overflow:hidden; position:relative;
+  background-color:#ffffff;
+  background-image:
+    radial-gradient(at 46% 5%, rgba(0,186,137,0.616) 0, transparent 50%),
+    radial-gradient(at 30% 94%, rgb(88,80,247) 0, transparent 50%),
+    radial-gradient(at 90% 5%, rgb(182,198,255) 0, transparent 50%),
+    radial-gradient(at 24% 60%, rgba(241,90,246,0.622) 0, transparent 50%),
+    radial-gradient(at 64% 7%, rgb(255,51,204) 0, transparent 50%),
+    radial-gradient(at 63% 25%, rgb(169,234,189) 0, transparent 50%),
+    radial-gradient(at 6% 40%, rgb(15,182,162) 0, transparent 50%);
+  background-size:cover; background-repeat:no-repeat;
+  animation: moveGradients 20s ease-in-out infinite;
+}
+
+/* カーテン */
+.curtain {
+  position: absolute;
+  inset: 0;
+  background-color: #008cff;
+  background-repeat: no-repeat;
+  background-position: center;
+  transform: translateY(-100%);
+  opacity: 0;
+  z-index: 0;
+}
+
+/* unlock画像 */
+.unlock-img {
+  width: auto;
+  height: 360px;
+  margin-bottom: 20px;
+  opacity: 0;
+  transform: translateY(42px);
+  animation: fadeUp 0.52s ease forwards 1s;
+}
+
+/* テキスト */
+.unlock-text {
+  font-size: 20px;
+  color: white;
+  text-align: center;
+  opacity: 0;
+  transform: translateY(42px);
+  animation: fadeUp 0.7s ease forwards 1.5s;
+}
+
+
+/* 戻るボタン */
+.back-button {
+  position: absolute;
+  top: 22px;
+  left: 20px;
+  padding: 16px 20px;
+  font-size:22px;
+  border: none;
+  border-radius: 50px;
+  background-color: rgb(255 255 255 / 44%);
+  color: #ffffff;
+  cursor: pointer;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.5s ease;
+  z-index: 10000;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.back-button.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.back-button:hover {
+  background-color: rgb(255 255 255 / 30%);
+  color: #ffffff;
+}
+
+.back-button:active {
+  transform: translateY(0) scale(0.88);
+}
+
+/* 戻るボタンに追加テキスト */
+.back-text::after {
+  content: '';
+  opacity: 0;
+  margin-left: 0;
+  transition: all 0.5s ease;
+}
+
+.back-button:hover .back-text::after {
+  content: ' 戻る ';
+  font-size:20px;
+  opacity: 1;
+  margin-left: 10px;
+}
+
+/* 閉じるボタン */
+.close-button {
+  position:absolute; bottom:7%; left:50%;
+  transform:translateX(-50%) scale(1.2);
+  width:50px; height:50px; border-radius:50%;
+  background-color:rgba(255, 255, 255, 0);
+  display:flex; align-items:center; justify-content:center;
+  cursor:pointer; opacity:0;
+  transition:opacity .6s ease, transform 0.3s ease;
+  z-index:2; font-size:28px; color:#ffffff; font-weight:200;
+  border:solid 2px white;
+}
+
+.close-button.visible { opacity:1; }
+
+.close-button:active {
+  transform:translateX(-50%) scale(0.88);
+}
+
+.close-button::before {
+  content:'×';
+  margin-top:-4px;
+}
+
+/* アニメーション定義 */
+@keyframes fadeUp {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes curtainDrop {
+  to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes curtainUp {
+  to { transform: translateY(-100%); opacity: 0; }
+}
+
+@keyframes moveGradients {
+  0%, 100% { background-position: center; }
+  50% { background-position: top; }
+}
+  </style>
+</head>
+<body>
+
+<!-- カーテン -->
+<div class="curtain"></div>
+
+<!-- unlock画像 -->
+<img src="unlock.png" alt="アンロック画像" class="unlock-img" oncontextmenu="return false;">
+
+
+<!-- テキスト -->
+<p class="unlock-text">Please check the school map for details.</p>
+
+<!-- 戻るボタン -->
+<button class="back-button"><span class="back-text">←</span></button>
+
+<!-- 閉じるボタン -->
+<div class="close-button"></div>
+
+<script>
+window.addEventListener('DOMContentLoaded', () => {
+  const curtain = document.querySelector('.curtain');
+  const closeButton = document.querySelector('.close-button');
+  const backButton = document.querySelector('.back-button');
+
+  // 初回カーテン落下アニメ
+  curtain.style.animation = "curtainDrop 0.7s ease-in-out forwards";
+
+  setTimeout(() => closeButton.classList.add('visible'), 400);
+  setTimeout(() => backButton.classList.add('show'), 600);
+
+  // 閉じるボタン押すとカーテン上げ
+  closeButton.addEventListener('click', () => {
+    setTimeout(() => {
+      window.location.href = 'en.html';
+    }, 0);
+  });
+
+  // 戻るボタン押すとカーテン上げ
+  backButton.addEventListener('click', () => {
+    setTimeout(() => {
+      window.location.href = 'en.html';
+    }, 0);
+  });
+});
+</script>
+
+</body>
+</html>

@@ -89,12 +89,12 @@ body.faded .fade-blue {
 }
 
 #jp {
-  bottom: 30px;
+  bottom: 100px;
   left: 30px;
 }
 
 #en {
-  top: 30px;
+  top: 88px;
   right: 30px;
   font-size: 3.3em;
   font-weight: bold;
@@ -216,16 +216,16 @@ font-family: -apple-system, BlinkMacSystemFont, "San Francisco", "Helvetica Neue
 
 
   .close-button {
+    left:12%;
   font-weight:100;
-  top: 84%;
-      width: 60px;
+  top: 45%;
   height: 60px;
     font-size:32px;
   }
   .close-button::before {
-  content: '×';
+  content: '←';
   position: absolute;
-  top: 8px;
+  top: 11px;
   left: 50%;
   transform: translateX(-50%);
 }

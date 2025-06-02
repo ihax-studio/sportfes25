@@ -2,224 +2,354 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8" />
-  <title>翻訳</title>
-<link rel="stylesheet" href="tr.css">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no">
+  <title>翻訳デモ</title>
+  <style>
+    html, body {
+      margin: 0; padding: 0;
+      height: 100%; width: 100%;
+      font-family: -apple-system, BlinkMacSystemFont, "San Francisco", "Helvetica Neue", "Helvetica", sans-serif;
+      background: #e3ebff;
+      overflow: hidden;
+    }
+    .fade-bg, .fade-color {
+      position: fixed; inset: 0; width: 100vw; height: 100vh;
+      pointer-events: none; z-index: 0;
+    }
+    .fade-bg { opacity: 1; transition: none; }
+    .fade-color { opacity: 0; background: #1484ff; transition: opacity 0.77s cubic-bezier(.77,0,.18,1);}
+    .center-container {
+      position: fixed; inset: 0;
+      display: flex; flex-direction: column; justify-content: center; align-items: center;
+      min-height: 100vh; min-width: 100vw;
+      pointer-events: none;
+      z-index: 30;
+    }
+    .top-text, .bottom-text {
+      font-size: 80px; color: #fff; text-align: center; width: 80vw;
+      margin: 1.7em 0 0.5em 0;
+      letter-spacing: 0.03em; user-select: text; pointer-events: auto;
+    }
+    .mic-wrapper {
+      display: flex; justify-content: center; align-items: center;
+      height: 160px; width: 100vw; min-width: 180px;
+      position: relative; margin: -88px 0 0 0;
+      z-index: 60; pointer-events: auto;
+    }
+    .mic {
+      width: 190px; height: 190px; border-radius: 50%;
+      background: #fff; box-shadow: 0 2px 8px #0001;
+      display: flex; justify-content: center; align-items: center;
+      font-size: 2.3em; font-weight: 700; color: #000;
+      cursor: pointer; user-select: none; pointer-events: auto;
+      transition: transform 0.18s cubic-bezier(.6,2.5,.2,.8);
+      z-index: 9999;
+    }
+    .mic.bounce-anim { animation: micBigBang 1s ease; }
+    @keyframes micBigBang { 0% { transform: scale(1);} 50% { transform: scale(1.5);} 100% { transform: scale(1);} }
+    .mic.boom { animation: boomscale 0.55s ease;}
+    @keyframes boomscale { 0% { transform: scale(1);} 50% { transform: scale(1.5);} 100% { transform: scale(1);} }
+    .slide-up { animation: slideUp 0.5s cubic-bezier(.7,0,.25,1);}
+    @keyframes slideUp { 0% { opacity: 0; transform: translateY(25px);} 100% { opacity: 1; transform: translateY(0);}
+    }
+    .mic.expand-fullscreen {
+      position: fixed !important;
+      left: 50% !important; top: 50% !important;
+      transform: translate(-50%, -50%) scale(22) !important;
+      transition: transform 0.75s cubic-bezier(.77,0,.18,1), box-shadow 0.3s;
+      z-index: 11000 !important;
+      pointer-events: none;
+    }
+    /* 野獣先輩専用: 背景真っ黒＆画像のみ中央で最大化（縦横比維持） */
+    .yajuu-full-bg {
+      position: fixed; inset: 0;
+      width: 100%; height: 100vh;
+      z-index: 20000;
+      background: #000 !important;
+      display: flex; justify-content: center; align-items: center;
+      /* フェードなし */
+    }
+    .yajuu-img {
+      width: auto; height: 100vh;
+      object-fit: contain; /* 縦横比維持して最大 */
+      display: block; margin: auto;
+      filter: drop-shadow(0 0 44px #000a);
+      user-select: none;
+      pointer-events: none;
+      background: #000;
+    }
+    .close-button {
+      position: absolute; left: 18px; top: 20px;
+      width: 56px; height: 56px; border-radius: 50%;
+      background: #ffffff5e; box-shadow: 0 2px 10px #aad3ff23;
+      cursor: pointer; z-index: 10000; pointer-events: auto;
+    }
+    .close-button:after {
+      text-shadow: 0 0 25px #0009;
+      content: "×";
+      font-size: 40px; color: #fff;
+      position: absolute; left: 16px; top: 1px; font-weight: 1; pointer-events: none;
+    }
+    .input-area {
+      width: 100vw; position: fixed; left: 0; right: 0; bottom: 0;
+      display: flex; justify-content: center; align-items: flex-end;
+      background: none; z-index: 9999; padding-bottom: env(safe-area-inset-bottom, 8px);
+      pointer-events: auto;
+    }
+    .input-inner { flex: 1; display: flex; justify-content: center; max-width: 520px;}
+    input[type="text"] {
+      transition: all 0.3s ease; width: 95vw; max-width: 500px;
+      font-size: 1.18em; padding: 18px 25px; border: 0; outline: none;
+      border-radius: 2em; margin: 1em 0 1.1em 0;
+      background: #ffffffdb;
+      box-shadow: 0 2px 16px #ffffff2b, inset 0 0 56px #fff;
+      color: #254166;
+    }
+    input[type="text"]:focus {
+      background: #ffffffab;
+      box-shadow: 0 2px 16px #fff3, inset 0 0 42px #fff;
+    }
+    @media (max-width: 600px) {
+      .top-text, .bottom-text { font-size: 61px;}
+      input[type="text"] {width:80%; font-size: 18px;}
+      .close-button { left: 9px; top: 40%; width: 72px; height: 72px; }
+      .close-button:after { content: "←"; font-size: 40px; left: 17px; top: 12px;}
+    }
+  </style>
 </head>
-<body>
-  <!-- 背景ぼかし -->
-  <div class="fade-blue"></div>
-  <!-- メインUI -->
+<body class="jp-bg">
+  <div class="fade-bg" id="fadeBg"></div>
+  <div class="fade-color" id="fadeColor"></div>
   <div class="center-container">
-    <div class="mic-wrapper" id="wrapper">
-      <div id="mic" class="mic"></div>
+    <div class="top-text" id="topText"></div>
+    <div class="mic-wrapper">
+      <div class="mic" id="mic"></div>
     </div>
-    <div id="jp">
-      <input id="inputText" type="text" placeholder="ここに入力…" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" name="no_save" />
-    </div>
-    <div id="en"></div>
-    <div class="close-button" id="closeBtn" title="Close"></div>
+    <div class="bottom-text" id="bottomText"></div>
+    <div class="close-button" id="closeBtn"></div>
   </div>
-  <script>
-    // 閉じるボタンの処理
-    document.getElementById('closeBtn').addEventListener('click', () => {
-      // 全要素をslide-down
-      document.getElementById('wrapper').classList.add('slide-down');
-      document.getElementById('jp').classList.add('slide-down');
-      document.getElementById('en').classList.add('slide-down');
-      document.getElementById('closeBtn').classList.add('slide-down');
-      setTimeout(() => {
-        location.href = 'en.html';
-      }, 510); // アニメ後に遷移
-    });
+  <div class="input-area">
+    <div class="input-inner">
+      <input id="inputText" type="text" placeholder="ここに入力…" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
+    </div>
+  </div>
+<script>
+const GRADIENT =
+  `radial-gradient(at 46% 5%, rgba(0,186,137,0.616) 0, transparent 50%),
+   radial-gradient(at 30% 94%, rgb(88,80,247) 0, transparent 50%),
+   radial-gradient(at 90% 5%, rgb(182,198,255) 0, transparent 50%),
+   radial-gradient(at 24% 60%, rgba(241,90,246,0.622) 0, transparent 50%),
+   radial-gradient(at 64% 7%, rgb(255,51,204) 0, transparent 50%),
+   radial-gradient(at 63% 25%, rgb(169,234,189) 0, transparent 50%),
+   radial-gradient(at 6% 40%, rgb(15,182,162) 0, transparent 50%)`;
 
-    // micの拡大アニメーション
-    window.addEventListener("DOMContentLoaded", () => {
-      const mic = document.getElementById("mic");
-      mic.style.transform = "scale(0.5)";
-      mic.style.transition = "transform 0.7s cubic-bezier(.6,1.6,.2,1)";
-      setTimeout(() => {
-        mic.style.transform = "scale(1)";
-      }, 80); // slight delay for effect
-    });
-</script>
-  <script>
-    const micEl = document.getElementById("mic");
-    const wrapperEl = document.getElementById("wrapper");
-    const jpEl = document.getElementById("jp");
-    const enEl = document.getElementById("en");
-    const inputEl = document.getElementById("inputText");
-  
-    let isJpToEn = true;
-    let enterCount = 0;
-  
-    async function translate(text) {
-  if (!text) return "";
-  const from = isJpToEn ? "ja" : "en";
-  const to = isJpToEn ? "en" : "ja";
-  const res = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=${from}|${to}&rand=${Date.now()}`);
-  const data = await res.json();
-  return data.responseData.translatedText || "";
-}
+const COLORS = {
+  blue: "#1484ff",
+  red:  "#ff4e7b"
+};
+const fadeBg = document.getElementById('fadeBg');
+const fadeColor = document.getElementById('fadeColor');
+fadeBg.style.background = GRADIENT;
 
-    inputEl.addEventListener("input", async () => {
-      enterCount = 0; // 🔁 Enterカウントリセット
-      const text = inputEl.value;
-      const translated = await translate(text);
-      enEl.textContent = translated;
-  
-      enEl.classList.remove("show");
-      void enEl.offsetWidth;
-      enEl.classList.add("show");
-  
-      micEl.classList.remove("pulse");
-      void micEl.offsetWidth;
-      micEl.classList.add("pulse");
-    });
-  
-    function triggerSlideUp(el) {
-      el.classList.remove("slide-up");
-      void el.offsetWidth;
-      el.classList.add("slide-up");
-    }
-  
-    function swapDirection() {
-      isJpToEn = !isJpToEn;
-  
-      if (isJpToEn) {
-        jpEl.style.bottom = "30px";
-        jpEl.style.top = "";
-        enEl.style.top = "30px";
-        enEl.style.bottom = "";
-        enEl.style.transform = "rotate(180deg)";
-        inputEl.placeholder = "ここに入力…";
-      } else {
-        jpEl.style.bottom = "";
-        jpEl.style.top = "30px";
-        enEl.style.top = "";
-        enEl.style.bottom = "30px";
-        enEl.style.transform = "rotate(0deg)";
-        inputEl.placeholder = "Type here...";
-      }
-  
-      resetAll();
-      triggerSlideUp(jpEl);
-    }
-  
-    // 🧹 全データをクリア
-    function resetAll() {
-      inputEl.value = "";
-      enEl.textContent = "";
-      enEl.classList.remove("show");
-      enterCount = 0;
-      inputEl.focus();
-    }
-  
-    // 🧠 Micクリックでリセット
-    wrapperEl.addEventListener("click", () => {
-      resetAll();
-      micEl.classList.remove("pulse");
-      void micEl.offsetWidth;
-      micEl.classList.add("pulse");
-    });
-  
-    // 💣 Enter2回目でリセット
-    inputEl.addEventListener("keydown", (e) => {
-      if (e.key === "Enter") {
-        enterCount++;
-  
-        const input = inputEl.value.trim().toLowerCase();
-  
-        // 言語切り替えコマンド
-        if (isJpToEn && (input === "english" || input === "change to english" || input === "us" || input === "eigo")) {
-          swapDirection();
-          return;
-        }
-        if (!isJpToEn && (input.includes("日本語") || input.includes("日本") || input.includes("かな") || input.includes("あ") || input.includes("にほん"))) {
-          swapDirection();
-          return;
-        }
-  
-        // 2回目のEnterで全削除
-        if (enterCount >= 2) {
-          resetAll();
-        }
-      }
-    });
-    window.addEventListener("load", () => {
-  // 🚫 自動復元対策
-  inputEl.value = "";
-  enEl.textContent = "";
-  enEl.classList.remove("show");
-});
-window.addEventListener('DOMContentLoaded', () => {
+window.addEventListener("DOMContentLoaded", () => {
+  fadeColor.style.background = COLORS.blue;
+  fadeColor.style.opacity = 0;
   setTimeout(() => {
-    document.body.classList.add('faded');
-  }, 550); // ←ここ好きな秒数で
+    fadeColor.style.transition = "opacity 0.77s cubic-bezier(.77,0,.18,1)";
+    fadeColor.style.opacity = 1;
+    nowColor = "blue";
+    nextColor = "red";
+  }, 50);
 });
 
-
-function adjustUiSizes() {
-  const w = window.innerWidth;
-  const h = window.innerHeight;
-  const shortEdge = Math.min(w, h);
-
-  // --- マイク（白丸） ---
-  const micSize = Math.max(120, shortEdge * 0.53);
-  const mic = document.getElementById('mic');
-  if (mic) {
-    mic.style.width = micSize + 'px';
-    mic.style.height = micSize + 'px';
-  }
-  // --- マイクラッパー（中央に） ---
-  const wrapper = document.getElementById('wrapper');
-  if (wrapper) {
-    wrapper.style.width = micSize + 'px';
-    wrapper.style.height = micSize + 'px';
-    wrapper.style.position = 'absolute';
-    wrapper.style.top = '50%';
-    wrapper.style.left = '50%';
-    wrapper.style.transform = 'translate(-50%, -50%)';
-    wrapper.style.display = 'flex';
-    wrapper.style.alignItems = 'center';
-    wrapper.style.justifyContent = 'center';
-  }
-
-  // --- 入力欄・翻訳欄（文字サイズ&幅） ---
-  const jp = document.getElementById('jp');
-  const en = document.getElementById('en');
-  const textWidth = Math.max(300, shortEdge * 0.92); // 最大幅
-  const fontSize = Math.max(52, Math.min(70, shortEdge * 0.85));
-  if (jp) {
-    jp.style.fontSize = fontSize + 'px';
-    jp.style.width = textWidth + 'px';
-    jp.style.left = (w - textWidth) * 0.5 + 'px';
-    jp.style.right = '';
-  }
-  if (en) {
-    en.style.fontSize = (fontSize * 1.1) + 'px';
-    en.style.width = textWidth + 'px';
-    en.style.right = (w - textWidth) * 0.5 + 'px';
-    en.style.left = '';
-  }
-
-  // --- バツボタン（絶対下中央・サイズのみ調整） ---
-  const closeBtn = document.getElementById('closeBtn');
-  const closeSize = Math.max(46, Math.min(66, shortEdge * 0.13));
-  if (closeBtn) {
-    closeBtn.style.width = closeSize + 'px';
-    closeBtn.style.height = closeSize + 'px';
-    closeBtn.style.fontSize = (closeSize * 0.55) + 'px';
-    // 位置はCSS（position:fixed; left:50%; bottom:●px; transform:translateX(-50%)）で制御！
-  }
+let isFading = false;
+function crossFadeBg(nextColorKey) {
+  if (isFading) return;
+  isFading = true;
+  fadeColor.style.transition = "opacity 0.5s linear";
+  const tmp = document.createElement('div');
+  tmp.className = 'fade-color';
+  tmp.style.background = COLORS[nextColorKey];
+  tmp.style.opacity = 0;
+  tmp.style.zIndex = 1;
+  document.body.appendChild(tmp);
+  setTimeout(() => {
+    tmp.style.transition = "opacity 0.5s linear";
+    tmp.style.opacity = 1;
+    setTimeout(() => {
+      fadeColor.style.transition = 'none';
+      fadeColor.style.background = COLORS[nextColorKey];
+      fadeColor.style.opacity = 1;
+      document.body.removeChild(tmp);
+      [nowColor, nextColor] = [nextColor, nowColor];
+      isFading = false;
+    }, 500);
+  }, 10);
 }
 
-// 初回＆ウィンドウサイズ変更時に実行
-window.addEventListener('DOMContentLoaded', adjustUiSizes);
-window.addEventListener('resize', adjustUiSizes);
-window.addEventListener('orientationchange', adjustUiSizes);
+let isJpToEn = true;
+const mic = document.getElementById('mic');
+const input = document.getElementById('inputText');
+const topText = document.getElementById('topText');
+const bottomText = document.getElementById('bottomText');
+const closeBtn = document.getElementById('closeBtn');
+const body = document.body;
 
+function swapLangBg() {
+  crossFadeBg(isJpToEn ? "blue" : "red");
+  if (isJpToEn) {
+    body.classList.add("jp-bg");
+    body.classList.remove("en-bg");
+  } else {
+    body.classList.add("en-bg");
+    body.classList.remove("jp-bg");
+  }
+}
+function triggerMicBounce() {
+  mic.classList.remove("bounce-anim");
+  void mic.offsetWidth;
+  mic.classList.add("bounce-anim");
+}
+function scrollInputIntoView() {
+  setTimeout(() => {
+    input.scrollIntoView({behavior: 'smooth', block: 'end', inline: 'nearest'});
+  }, 120);
+}
+input.addEventListener('focus', scrollInputIntoView);
 
-  </script>
-  
+mic.style.transform = "scale(0.5)";
+setTimeout(()=>{
+  mic.style.transition="transform 0.95s ease";
+  mic.style.transform="scale(1)";
+}, 100);
+
+let enterCount = 0;
+let yajuuPlaying = false;
+input.addEventListener("input", async e => {
+  if (yajuuPlaying) return;
+  triggerMicBounce();
+  let val = input.value;
+  const txt = val.trim().toLowerCase();
+
+  // ★「野獣先輩」判定
+  if (/^(野獣先輩|やじゅうせんぱい|yajuu ?senpai)$/i.test(txt)) {
+    yajuuPlaying = true;
+    input.blur();
+    playYajuuScene();
+    return;
+  }
+
+  if(["english","eng","en","英語"].includes(txt)){
+    isJpToEn = false;
+    swapLangBg();
+    input.value = "";
+    bottomText.textContent = "";
+    return;
+  }
+  if(["日本語","にほんご","japanese","かな"].includes(txt)){
+    isJpToEn = true;
+    swapLangBg();
+    input.value = "";
+    bottomText.textContent = "";
+    return;
+  }
+  if (!val.trim()) {
+    bottomText.textContent = "";
+    bottomText.classList.remove("slide-up");
+    return;
+  }
+  const from = isJpToEn ? "ja" : "en";
+  const to   = isJpToEn ? "en" : "ja";
+  try {
+    const res = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(val)}&langpair=${from}|${to}&rand=${Date.now()}`);
+    const data = await res.json();
+    let translated = (data && data.responseData && data.responseData.translatedText) ? data.responseData.translatedText : "";
+    bottomText.textContent = translated;
+    bottomText.classList.remove("slide-up");
+    void bottomText.offsetWidth;
+    bottomText.classList.add("slide-up");
+  } catch (e) {
+    bottomText.textContent = "翻訳エラー";
+  }
+});
+
+mic.addEventListener('click', () => {
+  if (yajuuPlaying) return;
+  triggerMicBounce();
+  isJpToEn = !isJpToEn;
+  input.value = "";
+  bottomText.textContent = "";
+  input.placeholder = isJpToEn ? "ここに入力…" : "Type here...";
+  swapLangBg();
+  setTimeout(()=>input.focus(),100);
+});
+input.addEventListener("keydown", e => {
+  if (yajuuPlaying) return;
+  if (e.key === "Enter") {
+    if (input.value.trim() === "") {
+      enterCount++;
+    } else {
+      enterCount = 0;
+    }
+    if (enterCount >= 2) {
+      bottomText.textContent = "";
+      input.value = "";
+      enterCount = 0;
+    }
+    scrollInputIntoView();
+  } else {
+    enterCount = 0;
+  }
+});
+
+closeBtn.addEventListener('click', () => {
+  if (yajuuPlaying) return;
+  body.style.transition = "opacity 0.88s ease";
+  body.style.opacity = 0.98;
+  mic.classList.add("expand-fullscreen");
+  setTimeout(()=>{
+    body.style.opacity = 0;
+    setTimeout(()=>location.href="en.html", 800);
+  }, 20);
+});
+
+window.addEventListener("load", () => {
+  input.value = "";
+  bottomText.textContent = "";
+  bottomText.classList.remove("slide-up");
+  topText.innerHTML = "";
+});
+
+// ----------------------------------------------
+// 野獣先輩ギミック：画像即時全画面＆音声再生、終了でリダイレクト
+// ----------------------------------------------
+function playYajuuScene() {
+  // 全UI無効
+  document.querySelectorAll('input,button,.mic,.close-button').forEach(el=>{
+    el.style.pointerEvents="none";
+  });
+
+  // 黒背景＆画像最大
+  const bg = document.createElement('div');
+  bg.className = 'yajuu-full-bg';
+  bg.innerHTML = `<img src="114514.jpg" alt="野獣先輩" class="yajuu-img" draggable="false">`;
+  document.body.appendChild(bg);
+
+  // 音声再生
+  const audio = new Audio('mac.wav');
+  audio.play().catch(()=>{});
+  audio.addEventListener('ended', ()=>{
+    // 音声終了→即リダイレクト（フェードなし）
+    location.href = "https://810114514.netlify.app";
+  });
+
+  // スマホ回転・リサイズでも常に最大中央
+  window.addEventListener('resize', ()=>{
+    if(bg.parentNode) {
+      // object-fit: contain なので自動で最大化される
+    }
+  });
+}
+</script>
 </body>
 </html>

@@ -189,7 +189,7 @@
     }
 
     .back-text::after {
-      content: ' 戻る';
+      content: ' Back';
       font-size: 20px;
       opacity: 0;
       margin-left: 0;

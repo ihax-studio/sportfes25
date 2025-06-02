@@ -111,7 +111,7 @@
           backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
       position: absolute;
-      bottom: 12%;
+      bottom: 15%;
       left: 50%;
       transform: translateX(-50%) scale(1);
       width: 60px;

@@ -151,29 +151,73 @@
   enEl.textContent = "";
   enEl.classList.remove("show");
 });
-
-
 window.addEventListener('DOMContentLoaded', () => {
   setTimeout(() => {
     document.body.classList.add('faded');
   }, 550); // ←ここ好きな秒数で
 });
 
-function resizeMic() {
-  // 画面の幅と高さ
+
+function adjustUiSizes() {
   const w = window.innerWidth;
   const h = window.innerHeight;
-  // 短辺の80%を使う（上限下限も自動制御）
-  const micSize = Math.max(120, Math.min(w, h) * 0.53);
+  const shortEdge = Math.min(w, h);
+
+  // --- マイク（白丸） ---
+  const micSize = Math.max(120, shortEdge * 0.53);
   const mic = document.getElementById('mic');
-  mic.style.width = micSize + "px";
-  mic.style.height = micSize + "px";
+  if (mic) {
+    mic.style.width = micSize + 'px';
+    mic.style.height = micSize + 'px';
+  }
+  // --- マイクラッパー（中央に） ---
+  const wrapper = document.getElementById('wrapper');
+  if (wrapper) {
+    wrapper.style.width = micSize + 'px';
+    wrapper.style.height = micSize + 'px';
+    wrapper.style.position = 'absolute';
+    wrapper.style.top = '50%';
+    wrapper.style.left = '50%';
+    wrapper.style.transform = 'translate(-50%, -50%)';
+    wrapper.style.display = 'flex';
+    wrapper.style.alignItems = 'center';
+    wrapper.style.justifyContent = 'center';
+  }
+
+  // --- 入力欄・翻訳欄（文字サイズ&幅） ---
+  const jp = document.getElementById('jp');
+  const en = document.getElementById('en');
+  const textWidth = Math.max(300, shortEdge * 0.92); // 最大幅
+  const fontSize = Math.max(52, Math.min(70, shortEdge * 0.85));
+  if (jp) {
+    jp.style.fontSize = fontSize + 'px';
+    jp.style.width = textWidth + 'px';
+    jp.style.left = (w - textWidth) * 0.5 + 'px';
+    jp.style.right = '';
+  }
+  if (en) {
+    en.style.fontSize = (fontSize * 1.1) + 'px';
+    en.style.width = textWidth + 'px';
+    en.style.right = (w - textWidth) * 0.5 + 'px';
+    en.style.left = '';
+  }
+
+  // --- バツボタン（絶対下中央・サイズのみ調整） ---
+  const closeBtn = document.getElementById('closeBtn');
+  const closeSize = Math.max(46, Math.min(66, shortEdge * 0.13));
+  if (closeBtn) {
+    closeBtn.style.width = closeSize + 'px';
+    closeBtn.style.height = closeSize + 'px';
+    closeBtn.style.fontSize = (closeSize * 0.55) + 'px';
+    // 位置はCSS（position:fixed; left:50%; bottom:●px; transform:translateX(-50%)）で制御！
+  }
 }
 
-// 初回＆リサイズ時に自動調整
-window.addEventListener('DOMContentLoaded', resizeMic);
-window.addEventListener('resize', resizeMic);
-window.addEventListener('orientationchange', resizeMic);
+// 初回＆ウィンドウサイズ変更時に実行
+window.addEventListener('DOMContentLoaded', adjustUiSizes);
+window.addEventListener('resize', adjustUiSizes);
+window.addEventListener('orientationchange', adjustUiSizes);
+
 
   </script>
   

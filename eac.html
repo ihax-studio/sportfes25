@@ -231,14 +231,18 @@ input.addEventListener("input", async e => {
   let val = input.value;
   const txt = val.trim().toLowerCase();
 
-  // ★「野獣先輩」判定
-  if (/^(野獣先輩|やじゅうせんぱい|yajuu ?senpai)$/i.test(txt)) {
+  // 野獣先輩・やりますねぇ判定
+  const isYajuu = /^(野獣先輩|やじゅうせんぱい|yajuu ?senpai)$/i.test(txt);
+  const isYarimasune = /^(やりますねぇ|yarimasu ?nee+)$/i.test(txt);
+
+  if (isYajuu || isYarimasune) {
     yajuuPlaying = true;
     input.blur();
-    playYajuuScene();
+    playYajuuScene(isYarimasune);
     return;
   }
 
+  // 言語切替
   if(["english","eng","en","英語"].includes(txt)){
     isJpToEn = false;
     swapLangBg();
@@ -253,6 +257,7 @@ input.addEventListener("input", async e => {
     bottomText.textContent = "";
     return;
   }
+
   if (!val.trim()) {
     bottomText.textContent = "";
     bottomText.classList.remove("slide-up");
@@ -272,6 +277,23 @@ input.addEventListener("input", async e => {
     bottomText.textContent = "翻訳エラー";
   }
 });
+
+// ★リダイレクト先は引数で分岐
+function playYajuuScene(to810 = false) {
+  document.querySelectorAll('input,button,.mic,.close-button').forEach(el=>{
+    el.style.pointerEvents="none";
+  });
+  const bg = document.createElement('div');
+  bg.className = 'yajuu-full-bg';
+  bg.innerHTML = `<img src="114514.jpg" alt="野獣先輩" class="yajuu-img" draggable="false">`;
+  document.body.appendChild(bg);
+  const audio = new Audio('mac.wav');
+  audio.play().catch(()=>{});
+  audio.addEventListener('ended', ()=>{
+    location.href = to810 ? "https://810114514.netlify.app/?r=1" : "https://810114514.netlify.app/810?r=1";
+  });
+  window.addEventListener('resize', ()=>{});
+}
 
 mic.addEventListener('click', () => {
   if (yajuuPlaying) return;
@@ -320,36 +342,21 @@ window.addEventListener("load", () => {
   topText.innerHTML = "";
 });
 
-// ----------------------------------------------
-// 野獣先輩ギミック：画像即時全画面＆音声再生、終了でリダイレクト
-// ----------------------------------------------
-function playYajuuScene() {
-  // 全UI無効
-  document.querySelectorAll('input,button,.mic,.close-button').forEach(el=>{
-    el.style.pointerEvents="none";
-  });
-
-  // 黒背景＆画像最大
-  const bg = document.createElement('div');
-  bg.className = 'yajuu-full-bg';
-  bg.innerHTML = `<img src="114514.jpg" alt="野獣先輩" class="yajuu-img" draggable="false">`;
-  document.body.appendChild(bg);
-
-  // 音声再生
-  const audio = new Audio('mac.wav');
-  audio.play().catch(()=>{});
-  audio.addEventListener('ended', ()=>{
-    // 音声終了→即リダイレクト（フェードなし）
-    location.href = "https://810114514.netlify.app";
-  });
-
-  // スマホ回転・リサイズでも常に最大中央
-  window.addEventListener('resize', ()=>{
-    if(bg.parentNode) {
-      // object-fit: contain なので自動で最大化される
+</script>
+<script>
+if (performance && performance.navigation && performance.navigation.type === 2) {
+  // 旧API(Chrome/Edge/Firefoxの戻る)対応
+  location.reload(true);
+} else if (window.performance && window.performance.getEntriesByType) {
+  // 新しいAPIの履歴キャッシュ（bfcache）対応
+  window.addEventListener("pageshow", function(event) {
+    if (event.persisted) {
+      location.reload();
     }
   });
 }
 </script>
+
+
 </body>
 </html>

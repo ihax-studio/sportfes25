@@ -57,16 +57,12 @@ html, body {
   
   
 h1{
-  font-size:42px;
+  font-size:39px;
     margin-left:5px;
-  margin-top:10%;
+  margin-top:12%;
+   margin-bottom:-15px;
 }
-h2{
-    margin-left:3px;
-  margin-top:-28px;
-  margin-bottom:80px;
-  font-size:60px;
-}
+
 .btn-container {
   position: fixed;
   top: 80%;
@@ -93,7 +89,7 @@ h2{
   }
 @media (min-width: 1100px) {
   h1 {
-    margin-top:6%;
+    margin-top:10%;
   }
   .btn-container {
   position: fixed;
@@ -216,10 +212,11 @@ transition:all 500ms ease;
 }
 
 .large-text {
-  margin-top:66px;
+  margin-top:88px;
   align-items:center;
-  width:50%;
-  font-size: 79px;
+  width:55%;
+  margin-left:-4%;
+  font-size: 77px;
   text-shadow: 1px 2px 15px rgb(255 255 255 / 50%);
   opacity: 0.9;
   font-weight:400;

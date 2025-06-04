@@ -357,7 +357,7 @@ transition:all 500ms ease;
   color: #202020b2;
   position: relative;
   display: flex;
-  align-items: center;
+  align-items: left:
   gap: 14px;
   opacity: 1;
   transform: scale(1);

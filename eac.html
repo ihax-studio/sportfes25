@@ -42,12 +42,12 @@
       display: flex; justify-content: center; align-items: center;
       font-size: 2.3em; font-weight: 700; color: #000;
       cursor: pointer; user-select: none; pointer-events: auto;
-      transition: transform 0.7s cubic-bezier(.6,2.5,.2,.8);
+      transition: transform 0.18s cubic-bezier(.6,2.5,.2,.8);
       z-index: 9999;
     }
     .mic.bounce-anim { animation: micBigBang 1s ease; }
     @keyframes micBigBang { 0% { transform: scale(1);} 50% { transform: scale(1.5);} 100% { transform: scale(1);} }
-    .mic.boom { animation: boomscale 0.7s ease;}
+    .mic.boom { animation: boomscale 0.55s ease;}
     @keyframes boomscale { 0% { transform: scale(1);} 50% { transform: scale(1.5);} 100% { transform: scale(1);} }
     .slide-up { animation: slideUp 0.5s cubic-bezier(.7,0,.25,1);}
     @keyframes slideUp { 0% { opacity: 0; transform: translateY(25px);} 100% { opacity: 1; transform: translateY(0);}
@@ -56,7 +56,7 @@
       position: fixed !important;
       left: 50% !important; top: 50% !important;
       transform: translate(-50%, -50%) scale(22) !important;
-      transition: transform 0.75s cubic-bezier(.77,0,.18,1), box-shadow 0.3s;
+      transition: transform 1.1 ease, box-shadow 0.3s;
       z-index: 11000 !important;
       pointer-events: none;
     }
@@ -219,7 +219,7 @@ input.addEventListener('focus', scrollInputIntoView);
 
 mic.style.transform = "scale(0.5)";
 setTimeout(()=>{
-  mic.style.transition="transform 1.05s ease";
+  mic.style.transition="transform 0.95s ease";
   mic.style.transform="scale(1)";
 }, 100);
 
@@ -290,7 +290,7 @@ function playYajuuScene(to810 = false) {
   const audio = new Audio('mac.wav');
   audio.play().catch(()=>{});
   audio.addEventListener('ended', ()=>{
-    location.href = to810 ? "https://810114514.netlify.app/810?r=1" : "https://810114514.netlify.app?r=1";
+    location.href = to810 ? "https://810114514.netlify.app/?r=1" : "https://810114514.netlify.app/810?r=1";
   });
   window.addEventListener('resize', ()=>{});
 }
@@ -331,7 +331,7 @@ closeBtn.addEventListener('click', () => {
   mic.classList.add("expand-fullscreen");
   setTimeout(()=>{
     body.style.opacity = 0;
-    setTimeout(()=>location.href="en.html", 510);
+    setTimeout(()=>location.href="en.html", 700);
   }, 20);
 });
 

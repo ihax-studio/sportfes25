@@ -368,11 +368,11 @@ transition:all 500ms ease;
   opacity: 0;
 }
 b{
-  line-height: 1.9;  color:black;
+  line-height: 1.8;  color:black;
 }
 .pwa-icon {
-  width: 39px;
-  height: 39px;
+  width: 37px;
+  height: 37px;
   border-radius: 11px;
   margin-right: 5px;
   background: none;

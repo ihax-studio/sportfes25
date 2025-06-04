@@ -1,263 +1,340 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Sports Festival Countdown</title>
-  <link rel="stylesheet" href="estyles.css">
-  <link rel="manifest" href="/manifest-brown.json">
-<link rel="apple-touch-icon" sizes="180x180" href="icon-192-brown.png">
-<!-- 複数サイズ用意するなら（優先度高いものが先） -->
-<link rel="apple-touch-icon" sizes="192x192" href="icon-192-brown.png">
-<link rel="apple-touch-icon" sizes="512x512" href="icon-512-brown.png">
-  <style>
-    .fade-in {
-      animation: fadeIn 0.6s ease forwards;
-    }
-
-    .show {
-      animation: fadeIn 0.6s ease forwards;
-    }
-
-    @keyframes fadeIn {
-      0% { opacity: 0; transform: scale(0.9); }
-      100% { opacity: 1; transform: scale(1); }
-    }
-  </style>
-</head>
-<body id="body">
-  <div class="curtainUp" id="curtain"></div>
-
-  <h1>Sports Festival</h1>
-  <div id="countdown" class="large-text"></div>
-  <div id="time" class="large-text" style="display: none;"></div>
-
-  <div class="btn-container" id="btnContainer">
-    <a href="#" class="btn" onclick="handleClick('./html.png')"><img src="./ehtml.png" alt="HTML" /></a>
-    <a href="#" class="btn" onclick="handleClick('./py.png')"><img src="./epy.png" alt="Python" /></a>
-    <a href="#" class="btn" onclick="handleClick('./css.png')"><img src="./ecss.png" alt="CSS" /></a>
-    <a href="#" class="btn" onclick="handleClick('./js.png')"><img src="./ejs.png" alt="JS" /></a>
-    <a href="#" class="btn" onclick="handleClick('./txt.png')"><img src="./etxt.png" alt="Text" /></a>
-    <a href="#" class="btn" onclick="handleClick('./json.png')"><img src="./ejson.png" alt="JSON" /></a>
-    <a href="index.html" class="btn" onclick="handleClick('./jp.png')"><img src="./jp.png" alt="日本語" /></a>
-  </div>
-
-  <a href="egame.html" class="start-button" id="startButton" style="display: none;">Start</a>
-  <button class="back-button" id="backButton" style="display: none;"><span class="back-text">←</span></button>
-
-  <div id="pwaNotice" style="display:none;">
-  <div class="pwa-notice-inner">
-    <img src="iimage.png" alt="アイコン" class="pwa-icon">
-<span><b>Add to Home Screen.</b><br>On iOS and macOS, use the Share menu to add.</span>
-<button class="pwa-close-btn" aria-label="Close">&times;</button>
-
-  </div>
-</div>
-<script>
-// PWAインストール判定
-function isPWA() {
-  return (window.matchMedia('(display-mode: standalone)').matches)
-    || (window.navigator.standalone === true);
-}
-// バナー表示
-function showPwaBanner() {
-  const banner = document.getElementById('pwaNotice');
-  const noticeInner = banner.querySelector('.pwa-notice-inner');
-  if (!banner) return;
-  banner.style.display = "block";
-  setTimeout(()=>banner.classList.add('show'), 20);
-
-  // ×ボタン: scale+opacity同時トランジション0.6s
-  const closeBtn = banner.querySelector('.pwa-close-btn');
-  closeBtn.onclick = () => {
-    if (noticeInner.classList.contains('shrink')) return;
-    noticeInner.classList.add('shrink');
-    setTimeout(()=>{
-      banner.style.display = "none";
-      noticeInner.classList.remove('shrink');
-      banner.classList.remove('show');
-    }, 600);
-  };
-}
-
-
-// iOS/Androidホーム追加バナー表示（PWA外＆モバイルのみ）
-window.addEventListener('DOMContentLoaded', ()=>{
-  if(
-    !isPWA() &&
-    (window.innerWidth<=600 || /iPhone|Android.+Mobile|iPod|Windows Phone|webOS|BlackBerry/i.test(navigator.userAgent))
-  ){
-    showPwaBanner();
+html, body {
+  font-family: -apple-system, BlinkMacSystemFont, "San Francisco", "Helvetica Neue", "Helvetica", sans-serif;
+    margin: 0;
+    padding: 0;
+    text-align:center;
+    height: 100%;
+    overflow: hidden;
+  transition:all 0.5s ease;
   }
-});</script>
-  <script>
-    document.getElementById('backButton').addEventListener('click', () => {
-      location.href = 'en.html';
-    });
-  </script>
 
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      const btnContainer = document.getElementById("btnContainer");
-      setTimeout(() => {
-        btnContainer.style.transition = 'transform 0.88s ease';
-        btnContainer.style.transform = 'translate(-50%, -50%) translateY(0)';
-      }, 220);
-    });
-
-    function handleClick(imgSrc) {
-      const body = document.getElementById("body");
-      const btnContainer = document.getElementById("btnContainer");
-      const startButton = document.getElementById("startButton");
-      const backButton = document.getElementById("backButton");
-
-      body.style.transition = 'background-color 0.4s ease';
-      btnContainer.style.transition = 'transform 0.55s ease';
-      btnContainer.style.transform = 'translate(-50%, -50%) translateY(440px)';
-
-      if (imgSrc === './html.png') {
-        body.style.backgroundColor = 'black';
-        setTimeout(() => { window.location.href = 'ehtml.html'; }, 400);
-      } else if (imgSrc === './py.png') {
-        body.style.backgroundColor = 'black';
-        setTimeout(() => { window.location.href = 'https://www.metro.ed.jp/arakawakoka-h/'; }, 500);
-      } else {
-        if (imgSrc === './txt.png') {
-          body.style.backgroundColor = 'skyblue';
-          setTimeout(() => { window.location.href = 'eshare.html'; }, 400);
-        } else if (imgSrc === './css.png') {
-          body.style.backgroundColor = 'white';
-          setTimeout(() => { window.location.href = 'eac.html'; }, 400);
-        } else if (imgSrc === './js.png') {
-          body.style.backgroundColor = 'white';
-          setTimeout(() => { window.location.href = 'eacssees.html'; }, 400);
-        } else {
-          body.style.backgroundColor = 'white';
-        }
-
-        setTimeout(() => {
-          body.style.transition = 'background 0.3s ease';
-          body.style.backgroundColor = 'skyblue';
-          body.style.background = `
-            radial-gradient(at 46% 54%, rgb(182, 250, 232) 0px, transparent 50%),
-            radial-gradient(at 30% 94%, rgb(88, 80, 247) 0px, transparent 50%),
-            radial-gradient(at 90% 5%, rgb(182, 198, 255) 0px, transparent 50%),
-            radial-gradient(at 24% 60%, rgb(90, 186, 246) 0px, transparent 50%),
-            radial-gradient(at 64% 7%, rgb(255, 51, 204) 0px, transparent 50%),
-            radial-gradient(at 63% 5%, rgb(169, 234, 189) 0px, transparent 50%)`;
-        }, 880);
-
-        if (imgSrc === './json.png') {
-          setTimeout(() => {
-            startButton.style.display = 'inline-block';
-            startButton.offsetHeight;
-            startButton.classList.add('fade-in');
-
-            backButton.style.display = 'inline-block';
-            backButton.offsetHeight;
-            backButton.classList.add('show');
-          }, 700);
-        }
-      }
-    }
-  </script>
-
-  <script>
-    const countdownEl = document.getElementById('countdown');
-    const timeEl = document.getElementById('time');
-    const h2 = document.querySelector('h2');
-
-    function updateCountdownOrClock() {
-      const now = new Date();
-      const eventDate = new Date('2025-06-05T00:00:00');
-      const timeDiff = eventDate - now;
-
-      if (timeDiff > 0) {
-        const daysLeft = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
-        countdownEl.textContent = `${daysLeft} day${daysLeft === 1 ? '' : 's'}`;
-      } else {
-        countdownEl.style.transition = 'opacity 0.3s ease';
-        h2.style.transition = 'opacity 0.3s ease';
-        countdownEl.style.opacity = 0;
-        h2.style.opacity = 0;
-
-        setTimeout(() => {
-          countdownEl.style.display = 'none';
-          h2.style.display = 'none';
-          timeEl.style.display = 'block';
-          timeEl.style.opacity = 0;
-          updateClock();
-          timeEl.style.transition = 'opacity 0.3s ease';
-          setTimeout(() => {
-            timeEl.style.opacity = 1;
-          }, 10);
-        }, 300);
-      }
-    }
-
-    function updateClock() {
-      const now = new Date();
-      const hours = String(now.getHours()).padStart(2, '0');
-      const minutes = String(now.getMinutes()).padStart(2, '0');
-      timeEl.textContent = `${hours}:${minutes}`;
-    }
-
-    updateCountdownOrClock();
-    setInterval(() => {
-      const now = new Date();
-      const eventDate = new Date('2025-06-05T00:00:00');
-      if (now >= eventDate) {
-        updateClock();
-      } else {
-        updateCountdownOrClock();
-      }
-    }, 60000);
-
-    setTimeout(() => {
-      if (new Date() >= new Date('2025-06-05T00:00:00')) {
-        updateClock();
-      }
-    }, 1000);
-  </script>
-  <script>
-  window.addEventListener("DOMContentLoaded", () => {
-    const buttons = document.querySelectorAll("button");
-
-    buttons.forEach(button => {
-      button.addEventListener("click", () => {
-        if (navigator.vibrate) {
-          navigator.vibrate([50]); // Vibrate
-        }
-      }, { passive: true }); // Use passive for performance
-    });
-  });
-  </script>
-<script>
-if (performance && performance.navigation && performance.navigation.type === 2) {
-  // 旧API(Chrome/Edge/Firefoxの戻る)対応
-  location.reload(true);
-} else if (window.performance && window.performance.getEntriesByType) {
-  // 新しいAPIの履歴キャッシュ（bfcache）対応
-  window.addEventListener("pageshow", function(event) {
-    if (event.persisted) {
-      location.reload();
-    }
-  });
-}
-self.addEventListener('fetch', event => {
-  // manifestとアイコン画像は常にネットワーク優先
-  if (
-    event.request.url.includes('manifest.json') ||
-    event.request.url.includes('icon-192') ||
-    event.request.url.includes('icon-512')
-  ) {
-    event.respondWith(fetch(event.request));
-    return;
+  body {
+    background-image:
+    radial-gradient(at 46% 54%, rgb(182, 250, 232) 0px, transparent 50%),
+    radial-gradient(at 30% 94%, rgb(88, 80, 247) 0px, transparent 50%),
+    radial-gradient(at 90% 5%, rgb(182, 198, 255) 0px, transparent 50%),
+    radial-gradient(at 24% 60%, rgb(90, 186, 246) 0px, transparent 50%),
+    radial-gradient(at 64% 7%, rgb(255, 51, 204) 0px, transparent 50%),
+    radial-gradient(at 63% 5%, rgb(169, 234, 189) 0px, transparent 50%),
+    radial-gradient(at 6% 40%, rgb(171, 255, 245) 0px, transparent 50%);
+    background-color: #ffffff;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
   }
-  // 他はキャッシュ戦略
-});
+  @keyframes curtainUp {
+    from {
+      transform: translateY(0%);
+    }
+    to {
+      transform: translateY(-100%);
+    }
+  }
+  
+  .curtainUp {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1000;
+    background-image:
+    radial-gradient(at 46% 54%, rgb(31 40 192 / 51%) 0px, transparent 50%),
+    radial-gradient(at 50% 94%, rgb(182 22 255 / 29%) 0px, transparent 50%),
+    radial-gradient(at 90% 5%, rgb(15 51 59) 0px, transparent 50%),
+    radial-gradient(at 24% 60%, rgb(57 0 142) 0px, transparent 50%),
+    radial-gradient(at 64% 7%, rgb(255 0 192 / 80%) 0px, transparent 50%),
+    radial-gradient(at  83% 95%, rgb(80 206 255 / 42%) 0px, transparent 50%),
+    radial-gradient(at 6% 40%, rgb(89 187 151) 0px, transparent 50%);
+    background-color: #000000;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    animation: curtainUp 0.8s ease forwards;
+    will-change: transform;
+  }
 
-</script>
+  
+  
+h1{
+  font-size:39px;
+    margin-left:5px;
+  margin-top:12%;
+   margin-bottom:-15px;
+}
 
-</body>
-</html>
+.btn-container {
+  position: fixed;
+  top: 80%;
+  margin-left:42.5%;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+  transition: transform 0.65s ease;
+}
+
+  .btn {
+    position: absolute;
+    width: 96px;
+    height: 95px;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 5px 25px #00000024;
+    transition: all 0.5s ease;
+    pointer-events: auto;
+    opacity: 1;
+  }
+@media (min-width: 1100px) {
+  h1 {
+    margin-top:10%;
+  }
+  .btn-container {
+  position: fixed;
+  top: 80%;
+  margin-left:46.2%;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+  transition: transform 0.65s ease;
+}
+.btn {
+      width: 106px;
+    height: 105px;
+}
+}
+
+
+  .btn img {
+    width: 107px;
+    height: 107px;
+    border-radius: 50%;
+    object-fit: cover;
+    transition: transform 0.4s ease;
+  }
+
+  .btn img:hover {
+    transform: scale(0.88);
+  }
+
+  .btn img:active {
+    transform: scale(1.01);
+  }
+/* 放射状配置（距離だけ10px広く＝230px、角度そのまま） */
+.btn:nth-child(1) { transform: rotate(0deg) translateX(-230px) rotate(0deg); }
+.btn:nth-child(2) { transform: rotate(36deg) translateX(-230px) rotate(-36deg); }
+.btn:nth-child(3) { transform: rotate(72deg) translateX(-230px) rotate(-72deg); }
+.btn:nth-child(4) { transform: rotate(108deg) translateX(-230px) rotate(-108deg); }
+.btn:nth-child(5) { transform: rotate(144deg) translateX(-230px) rotate(-144deg); }
+.btn:nth-child(6) { transform: rotate(180deg) translateX(-230px) rotate(-180deg); }
+.btn:nth-child(7) { transform: rotate(0deg) translateY(-10px) rotate(0deg); background:none; border:solid 2px white; }
+@media (max-width: 720px){
+  .btn-container {
+  position: fixed;
+  top: 80%;
+  margin-left:42%;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+  transition: transform 0.65s ease;
+}
+  .btn {
+    position: absolute;  width: 88px; height: 87px;}
+    .btn img {
+    width: 100px;
+    height: 95px;
+  }
+  /* 放射状配置（距離だけ10px広く＝230px、角度そのまま） */
+.btn:nth-child(1) { transform: rotate(0deg) translateX(-180px) rotate(0deg); }
+.btn:nth-child(2) { transform: rotate(33deg) translateX(-180px) rotate(-33deg); }
+.btn:nth-child(3) { transform: rotate(69deg) translateX(-180px) rotate(-69deg); }
+.btn:nth-child(4) { transform: rotate(104deg) translateX(-180px) rotate(-104deg); }
+.btn:nth-child(5) { transform: rotate(139deg) translateX(-180px) rotate(-139deg); }
+.btn:nth-child(6) { transform: rotate(175deg) translateX(-170px) rotate(-175deg); }
+.btn:nth-child(7) { transform: rotate(0deg) translateY(-10px) rotate(0deg); background:none; border:solid 2px white; }
+}
+
+
+
+
+/* はじめるボタン */
+.start-button {
+  font-family: -apple-system, BlinkMacSystemFont, "San Francisco", "Helvetica Neue", "Helvetica", sans-serif;
+  position: absolute;
+  top: 85%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 20px;
+  padding: 18px 42px;
+  background-color: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  color: black;
+  border: none;
+  border-radius: 50px;
+  cursor: pointer;
+  opacity: 0;
+  text-align: center;
+  text-decoration: none;
+  z-index: 1000;
+  width: 110px;
+  transition: all 0.5s ease;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.start-button.fade-in {
+  opacity: 1;
+  transition: all 0.3s ease;
+}
+
+.start-button::after {
+  content: '';
+  opacity: 0;
+  margin-left: 8px;
+  transition: all 0.5s ease;
+}
+
+.start-button:hover {
+  width: 150px;
+  background-color: rgba(255, 255, 255, 0.8);
+}
+
+.start-button:active {
+    transform: translate(-50%, -50%) scale(0.8);
+}
+.start-button:hover::after {
+transition:all 500ms ease;
+  content: '→';
+  opacity: 1;
+}
+
+.large-text {
+  margin-top:88px;
+  align-items:center;
+  width:55%;
+  margin-left:-4%;
+  font-size: 77px;
+  text-shadow: 1px 2px 15px rgb(255 255 255 / 50%);
+  opacity: 0.9;
+  font-weight:400;
+  transform: translate(50% , -80%);
+  transition:all 0.5s ease;
+}
+
+.back-button {
+  position: absolute;
+  top: 5%;
+  left: 18px;
+  background-color: rgb(255 255 255 / 45%);
+  color: #000000;
+  font-size: 20px;
+  padding: 20px 23px;
+  border: none;
+  border-radius: 50px;
+  cursor: pointer;
+  opacity: 0;
+  transition: all 0.5s ease;
+  z-index: 10000;
+  transform: translateY(20px);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  font-family:
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Roboto,
+    "Helvetica Neue",
+    Arial,
+    sans-serif;
+}
+
+/* hover時の効果 */
+.back-button:active {
+  background-color: rgb(0 0 0 / 70%);
+  color: #ffffff;
+}
+
+/* ← に「戻る」テキストを追加する演出 */
+.back-button .back-text::after {
+  content: '';
+  transition: all 0.5s ease;
+  opacity: 0;
+  margin-left: 0;
+}
+.back-button:hover .back-text::after {
+  content: 'back';
+  opacity: 1;
+  margin-left: 10px;
+}
+
+/* 表示させるとき用クラス */
+.back-button.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+
+
+#pwaNotice {
+  position: fixed;
+  top: -100px; left: 0; right: 0;
+  z-index: 999999;
+  width: 100vw;
+  pointer-events: none;
+  transition: top 0.7s cubic-bezier(.77,0,.18,1);
+}
+#pwaNotice.show {
+  top: 0;
+  pointer-events: auto;
+}
+.pwa-notice-inner {
+  line-height: 1.2;
+    backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  margin: 18px auto;
+  background: #ffffff8a;
+  border-radius: 23px;
+  box-shadow: 0 6px 33px rgba(0, 0, 0, 0.267);
+  padding: 13px 60px 13px 16px;
+  max-width: 360px;
+  font-size: 1.08em;
+  color: #202020b2;
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  opacity: 1;
+  transform: scale(1);
+  transition: transform 0.6s cubic-bezier(.77,0,.18,1), opacity 0.6s cubic-bezier(.77,0,.18,1);
+}
+.pwa-notice-inner.shrink {
+  transform: scale(0.8);
+  opacity: 0;
+}
+b{
+  line-height: 1.9;  color:black;
+}
+.pwa-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 11px;
+  margin-right: 5px;
+  background: none;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+.pwa-close-btn {
+  position: absolute;
+  right: 18px; top: 28px;
+  background: none;font-weight: 100;
+  border: none;
+  font-size: 27px;
+  color: #888;
+  cursor: pointer;
+  transition: color 0.16s;
+  line-height: 1;
+}
+.pwa-close-btn:hover { color: #e44; }

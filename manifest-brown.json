@@ -1,0 +1,20 @@
+{
+  "name": "Sport fes 2025",
+  "short_name": "Sport fes 2025",
+  "start_url": "/en",
+  "display": "standalone",
+  "background_color": "#6b4d2a",
+  "theme_color": "#6b4d2a",
+  "icons": [
+    {
+      "src": "icon-192-brown.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icon-512-brown.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

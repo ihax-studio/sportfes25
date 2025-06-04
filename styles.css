@@ -114,7 +114,7 @@ h2{
     width: 91px;
     height: 90px;
     border-radius: 50%;
-    background-color: rgba(255, 255, 255, 0.5);
+    background-color: rgb(255 255 255 / 65%);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -122,6 +122,8 @@ h2{
     transition: all 0.5s ease;
     pointer-events: auto;
     opacity: 1;
+      backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   }
 @media (min-width: 584px) {
   h1 {
@@ -317,7 +319,7 @@ transition:all 500ms ease;
   margin-left: 0;
 }
 .back-button:hover .back-text::after {
-  content: '戻る';
+  content: ' 戻る';
   opacity: 1;
   margin-left: 10px;
 }

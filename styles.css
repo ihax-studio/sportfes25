@@ -351,8 +351,8 @@ transition:all 500ms ease;
   background: #ffffff8a;
   border-radius: 23px;
   box-shadow: 0 6px 33px rgba(0, 0, 0, 0.267);
-  padding: 13px 60px 13px 16px;
-  max-width: 340px;
+  padding: 13px 66px 13px 16px;
+  max-width: 360px;
   font-size: 1.08em;
   color: #202020b2;
   position: relative;
@@ -371,8 +371,8 @@ b{
   line-height: 1.9;  color:black;
 }
 .pwa-icon {
-  width: 42px;
-  height: 42px;
+  width: 39px;
+  height: 39px;
   border-radius: 11px;
   margin-right: 5px;
   background: none;

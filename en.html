@@ -3,8 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Sports Festival Countdown (Beta)</title>
+  <title>Sports Festival Countdown</title>
   <link rel="stylesheet" href="estyles.css">
+  <link rel="manifest" href="/manifest-brown.json">
+<link rel="apple-touch-icon" sizes="180x180" href="icon-192-brown.png">
+<!-- 複数サイズ用意するなら（優先度高いものが先） -->
+<link rel="apple-touch-icon" sizes="192x192" href="icon-192-brown.png">
+<link rel="apple-touch-icon" sizes="512x512" href="icon-512-brown.png">
   <style>
     .fade-in {
       animation: fadeIn 0.6s ease forwards;
@@ -194,6 +199,19 @@ if (performance && performance.navigation && performance.navigation.type === 2) 
     }
   });
 }
+self.addEventListener('fetch', event => {
+  // manifestとアイコン画像は常にネットワーク優先
+  if (
+    event.request.url.includes('manifest.json') ||
+    event.request.url.includes('icon-192') ||
+    event.request.url.includes('icon-512')
+  ) {
+    event.respondWith(fetch(event.request));
+    return;
+  }
+  // 他はキャッシュ戦略
+});
+
 </script>
 
 </body>

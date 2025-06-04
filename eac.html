@@ -42,7 +42,7 @@
       display: flex; justify-content: center; align-items: center;
       font-size: 2.3em; font-weight: 700; color: #000;
       cursor: pointer; user-select: none; pointer-events: auto;
-      transition: transform 0.18s cubic-bezier(.6,2.5,.2,.8);
+      transition: transform 0.5s cubic-bezier(.6,2.5,.2,.8);
       z-index: 9999;
     }
     .mic.bounce-anim { animation: micBigBang 1s ease; }
@@ -219,7 +219,7 @@ input.addEventListener('focus', scrollInputIntoView);
 
 mic.style.transform = "scale(0.5)";
 setTimeout(()=>{
-  mic.style.transition="transform 0.95s ease";
+  mic.style.transition="transform 1.05s ease";
   mic.style.transform="scale(1)";
 }, 100);
 
@@ -331,7 +331,7 @@ closeBtn.addEventListener('click', () => {
   mic.classList.add("expand-fullscreen");
   setTimeout(()=>{
     body.style.opacity = 0;
-    setTimeout(()=>location.href="en.html", 800);
+    setTimeout(()=>location.href="en.html", 900);
   }, 20);
 });
 

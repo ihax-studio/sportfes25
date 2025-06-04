@@ -45,6 +45,51 @@
   <a href="egame.html" class="start-button" id="startButton" style="display: none;">Start</a>
   <button class="back-button" id="backButton" style="display: none;"><span class="back-text">←</span></button>
 
+  <div id="pwaNotice" style="display:none;">
+  <div class="pwa-notice-inner">
+    <img src="iimage.png" alt="アイコン" class="pwa-icon">
+<span><b>Add to Home Screen.</b><br>On iOS and macOS, use the Share menu to add.</span>
+<button class="pwa-close-btn" aria-label="Close">&times;</button>
+
+  </div>
+</div>
+<script>
+// PWAインストール判定
+function isPWA() {
+  return (window.matchMedia('(display-mode: standalone)').matches)
+    || (window.navigator.standalone === true);
+}
+// バナー表示
+function showPwaBanner() {
+  const banner = document.getElementById('pwaNotice');
+  const noticeInner = banner.querySelector('.pwa-notice-inner');
+  if (!banner) return;
+  banner.style.display = "block";
+  setTimeout(()=>banner.classList.add('show'), 20);
+
+  // ×ボタン: scale+opacity同時トランジション0.6s
+  const closeBtn = banner.querySelector('.pwa-close-btn');
+  closeBtn.onclick = () => {
+    if (noticeInner.classList.contains('shrink')) return;
+    noticeInner.classList.add('shrink');
+    setTimeout(()=>{
+      banner.style.display = "none";
+      noticeInner.classList.remove('shrink');
+      banner.classList.remove('show');
+    }, 600);
+  };
+}
+
+
+// iOS/Androidホーム追加バナー表示（PWA外＆モバイルのみ）
+window.addEventListener('DOMContentLoaded', ()=>{
+  if(
+    !isPWA() &&
+    (window.innerWidth<=600 || /iPhone|Android.+Mobile|iPod|Windows Phone|webOS|BlackBerry/i.test(navigator.userAgent))
+  ){
+    showPwaBanner();
+  }
+});</script>
   <script>
     document.getElementById('backButton').addEventListener('click', () => {
       location.href = 'en.html';

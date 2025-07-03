@@ -75,6 +75,25 @@
     });
 
     function handleClick(imgSrc) {
+      function handleClick(imgSrc) {
+  // ⬇️⬇️⬇️ ここから追加
+  for (let i = 0; i < 5; i++) {
+    setTimeout(() => {
+      if (navigator.vibrate) navigator.vibrate(50);
+    }, i * 200);
+  }
+  // ⬆️⬆️⬆️ ここまで追加
+
+  const body = document.getElementById("body");
+  const btnContainer = document.getElementById("btnContainer");
+  const startButton = document.getElementById("startButton");
+  const backButton = document.getElementById("backButton");
+
+  body.style.transition = 'background-color 0.4s ease';
+  btnContainer.style.transition = 'transform 0.55s ease';
+  btnContainer.style.transform = 'translate(-50%, -50%) translateY(440px)';
+
+  // ...（以降はそのままでOK）
       const body = document.getElementById("body");
       const btnContainer = document.getElementById("btnContainer");
       const startButton = document.getElementById("startButton");

@@ -65,90 +65,103 @@
     });
   </script>
 
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      const btnContainer = document.getElementById("btnContainer");
-      setTimeout(() => {
-        btnContainer.style.transition = 'transform 0.88s ease';
-        btnContainer.style.transform = 'translate(-50%, -50%) translateY(0)';
-      }, 220);
-    });
-
-
-      function handleClick(imgSrc) {
-  // ⬇️⬇️⬇️ ここから追加
-  for (let i = 0; i < 5; i++) {
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const btnContainer = document.getElementById("btnContainer");
     setTimeout(() => {
-      if (navigator.vibrate) navigator.vibrate(50);
-    }, i * 200);
+      btnContainer.style.transition = 'transform 0.88s ease';
+      btnContainer.style.transform = 'translate(-50%, -50%) translateY(0)';
+    }, 220);
+  });
+
+  // iOS18以降トグル式疑似Haptic対応
+  function triggerHapticPattern() {
+    // トグル式 haptic switch trick (HapticSwitch)
+    let i = 0;
+    const interval = setInterval(() => {
+      if (navigator.vibrate) navigator.vibrate(50); // 50msの振動
+      // これがtoggle式hapticスイッチのような効果になる
+      const toggle = document.createElement("input");
+      toggle.type = "checkbox";
+      toggle.checked = true;
+      toggle.style.display = "none";
+      document.body.appendChild(toggle);
+      toggle.click(); // 擬似的にトグル動作を発火
+      document.body.removeChild(toggle);
+      i++;
+      if (i >= 5) clearInterval(interval); // 5回で停止
+    }, 200); // 200ms間隔で5連打
   }
-  // ⬆️⬆️⬆️ ここまで追加
 
-  const body = document.getElementById("body");
-  const btnContainer = document.getElementById("btnContainer");
-  const startButton = document.getElementById("startButton");
-  const backButton = document.getElementById("backButton");
+  function handleClick(imgSrc) {
+    // Haptic Switch pattern を実行
+    triggerHapticPattern();
 
-  body.style.transition = 'background-color 0.4s ease';
-  btnContainer.style.transition = 'transform 0.55s ease';
-  btnContainer.style.transform = 'translate(-50%, -50%) translateY(440px)';
+    const body = document.getElementById("body");
+    const btnContainer = document.getElementById("btnContainer");
+    const startButton = document.getElementById("startButton");
+    const backButton = document.getElementById("backButton");
 
-  // ...（以降はそのままでOK）
-      const body = document.getElementById("body");
-      const btnContainer = document.getElementById("btnContainer");
-      const startButton = document.getElementById("startButton");
-      const backButton = document.getElementById("backButton");
+    body.style.transition = 'background-color 0.4s ease';
+    btnContainer.style.transition = 'transform 0.55s ease';
+    btnContainer.style.transform = 'translate(-50%, -50%) translateY(440px)';
 
-      body.style.transition = 'background-color 0.4s ease';
-      btnContainer.style.transition = 'transform 0.55s ease';
-      btnContainer.style.transform = 'translate(-50%, -50%) translateY(440px)';
-
-      if (imgSrc === './html.png') {
-        body.style.backgroundColor = 'black';
-        setTimeout(() => { window.location.href = 'html.html'; }, 400);
-      } else if (imgSrc === './py.png') {
-        body.style.backgroundColor = 'black';
-        setTimeout(() => { window.location.href = 'https://www.metro.ed.jp/arakawakoka-h/'; }, 500);
-      } else {
-        if (imgSrc === './txt.png') {
-          body.style.backgroundColor = 'skyblue';
-          setTimeout(() => { window.location.href = 'share.html'; }, 400);
-        } else if (imgSrc === './css.png') {
-          body.style.backgroundColor = 'white';
-          setTimeout(() => { window.location.href = 'ac.html'; }, 400);
-        } else if (imgSrc === './js.png') {
-          body.style.backgroundColor = 'white';
-          setTimeout(() => { window.location.href = 'acssees.html'; }, 400);
-        } else {
-          body.style.backgroundColor = 'white';
-        }
-
+    if (imgSrc === './html.png') {
+      body.style.backgroundColor = 'black';
+      setTimeout(() => {
+        window.location.href = 'html.html';
+      }, 400);
+    } else if (imgSrc === './py.png') {
+      body.style.backgroundColor = 'black';
+      setTimeout(() => {
+        window.location.href = 'https://www.metro.ed.jp/arakawakoka-h/';
+      }, 500);
+    } else {
+      if (imgSrc === './txt.png') {
+        body.style.backgroundColor = 'skyblue';
         setTimeout(() => {
-          body.style.transition = 'background 0.3s ease';
-          body.style.backgroundColor = 'skyblue';
-          body.style.background = `
-            radial-gradient(at 46% 54%, rgb(182, 250, 232) 0px, transparent 50%),
-            radial-gradient(at 30% 94%, rgb(88, 80, 247) 0px, transparent 50%),
-            radial-gradient(at 90% 5%, rgb(182, 198, 255) 0px, transparent 50%),
-            radial-gradient(at 24% 60%, rgb(90, 186, 246) 0px, transparent 50%),
-            radial-gradient(at 64% 7%, rgb(255, 51, 204) 0px, transparent 50%),
-            radial-gradient(at 63% 5%, rgb(169, 234, 189) 0px, transparent 50%)`;
-        }, 880);
+          window.location.href = 'share.html';
+        }, 400);
+      } else if (imgSrc === './css.png') {
+        body.style.backgroundColor = 'white';
+        setTimeout(() => {
+          window.location.href = 'ac.html';
+        }, 400);
+      } else if (imgSrc === './js.png') {
+        body.style.backgroundColor = 'white';
+        setTimeout(() => {
+          window.location.href = 'acssees.html';
+        }, 400);
+      } else {
+        body.style.backgroundColor = 'white';
+      }
 
-        if (imgSrc === './json.png') {
-          setTimeout(() => {
-            startButton.style.display = 'inline-block';
-            startButton.offsetHeight;
-            startButton.classList.add('fade-in');
+      setTimeout(() => {
+        body.style.transition = 'background 0.3s ease';
+        body.style.backgroundColor = 'skyblue';
+        body.style.background = `
+          radial-gradient(at 46% 54%, rgb(182, 250, 232) 0px, transparent 50%),
+          radial-gradient(at 30% 94%, rgb(88, 80, 247) 0px, transparent 50%),
+          radial-gradient(at 90% 5%, rgb(182, 198, 255) 0px, transparent 50%),
+          radial-gradient(at 24% 60%, rgb(90, 186, 246) 0px, transparent 50%),
+          radial-gradient(at 64% 7%, rgb(255, 51, 204) 0px, transparent 50%),
+          radial-gradient(at 63% 5%, rgb(169, 234, 189) 0px, transparent 50%)`;
+      }, 880);
 
-            backButton.style.display = 'inline-block';
-            backButton.offsetHeight;
-            backButton.classList.add('show');
-          }, 700);
-        }
+      if (imgSrc === './json.png') {
+        setTimeout(() => {
+          startButton.style.display = 'inline-block';
+          startButton.offsetHeight; // 再描画
+          startButton.classList.add('fade-in');
+
+          backButton.style.display = 'inline-block';
+          backButton.offsetHeight;
+          backButton.classList.add('show');
+        }, 700);
       }
     }
-  </script>
+  }
+</script>
 
   <script>
     const countdownEl = document.getElementById('countdown');

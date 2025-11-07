@@ -1,0 +1,1956 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"/>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#000000">
+<title>田中2E 生徒会長選挙</title>
+<script type="module">
+import { haptic } from "https://esm.sh/ios-haptics";
+window.haptic = haptic;
+</script>
+<style>/* Basic setup */
+*, *::before, *::after {
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+html, body {
+    height: 100%;
+    overflow: hidden;
+    background: #f5f5f7;
+    font-family: "SF Pro Display", "SF Pro Text", "San Francisco", -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, "Hiragino Sans", "Hiragino Kaku Gothic ProN", Meiryo, sans-serif;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    touch-action: manipulation;
+}
+
+/* Container for the "Thanks" screen */
+#thanks-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 2500;
+    background: #000000;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 24px;
+    opacity: 1;
+    visibility: visible;
+    transition: opacity 0.8s cubic-bezier(.62,0,.4,1);
+    padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+}
+
+#thanks-overlay.fade-out {
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* Circle element */
+#thanks-circle {
+    width: 180px;
+    height: 180px;
+    border: 3px solid rgba(255,255,255,.9);
+    border-radius: 9999px;
+    box-shadow: 0 0 20px rgba(255,255,255,.35), 0 0 50px rgba(255,255,255,.15) inset;
+    display: grid;
+    place-items: center;
+    animation: circle-pop .7s cubic-bezier(.2,1,.3,1) both;
+    position: relative;
+    overflow: visible;
+    cursor: pointer;
+    transition: transform 0.2s cubic-bezier(.62,0,.4,1);
+}
+
+#thanks-circle:hover {
+    transform: scale(1.05);
+}
+
+#thanks-circle:active {
+    transform: scale(0.95);
+}
+
+ @keyframes circle-pop {
+    0% { transform: scale(.6); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+#thanks-arrow {
+    font-weight: 400;
+    font-size: 72px;
+    line-height: 1;
+    color: #fff;
+    position: relative;
+    z-index: 2;
+    transition: opacity 0.3s ease;
+}
+
+#thanks-arrow.hidden {
+    opacity: 0;
+}
+
+/* iOS-style check icon */
+#thanks-check, #suggestion-check {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    opacity: 0;
+    z-index: 3;
+}
+
+#thanks-check {
+    width: 70px;
+    height: 70px;
+}
+
+#suggestion-check {
+    width: 120px;
+    height: 120px;
+    z-index: 4001;
+}
+
+
+#thanks-check.show, #suggestion-check.show {
+    opacity: 1;
+}
+
+#thanks-check path, #suggestion-check path {
+    stroke: #fff;
+    stroke-width: 2;
+    fill: none;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-dasharray: 100;
+    stroke-dashoffset: 100;
+}
+
+#suggestion-check path {
+    stroke-width: 3;
+}
+
+#thanks-check.animate path, #suggestion-check.animate path {
+    animation: checkmark-draw 0.6s cubic-bezier(.2,1,.3,1) forwards;
+}
+
+ @keyframes checkmark-draw {
+    to {
+        stroke-dashoffset: 0;
+    }
+}
+
+#thanks-ring {
+    position: absolute;
+    inset: 0;
+    margin: auto;
+    width: 180px;
+    height: 180px;
+    border-radius: 9999px;
+    border: 3px solid rgba(255,255,255,.9);
+    box-shadow: 0 0 18px rgba(255,255,255,.35);
+    z-index: 1;
+    opacity: 0;
+    transform: scale(1);
+}
+
+.ring-anim {
+    animation: ring-expand 1.2s cubic-bezier(.2,1,.3,1) forwards;
+}
+
+ @keyframes ring-expand {
+    0% { opacity: 1; transform: scale(1); }
+    100% { opacity: 0; transform: scale(3); }
+}
+
+#thanks-text {
+    font-size: 32px;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: .02em;
+    text-shadow: 0 5px 18px rgba(0,0,0,.55);
+}
+
+#thanks-sub {
+    font-size: 16px;
+    color: #cfcfcf;
+}
+
+#thanks-dots, #suggestion-thanks-dots {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    overflow: hidden;
+    z-index: 2550;
+}
+
+#suggestion-thanks-dots {
+    z-index: 4002;
+}
+
+.dot {
+    position: absolute;
+    border-radius: 9999px;
+    background: #fff;
+    opacity: 0;
+    animation: dot-pop 1.6s cubic-bezier(.25,.46,.45,.94) forwards;
+    box-shadow: 0 2px 8px rgba(0,0,0,.3);
+}
+
+ @keyframes dot-pop {
+    0% { opacity: 0; transform: translate(-50%,-50%) scale(.3); }
+    10% { opacity: 1; }
+    100% { opacity: 0; transform: translate(var(--tx),var(--ty)) scale(1); }
+}
+
+/* Main content screen */
+#main-content {
+    position: fixed;
+    inset: 0;
+    z-index: 2000;
+    background: #f5f5f7;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 40px 20px;
+    padding-top: max(40px, env(safe-area-inset-top));
+    padding-bottom: max(40px, env(safe-area-inset-bottom));
+    padding-left: max(20px, env(safe-area-inset-left));
+    padding-right: max(20px, env(safe-area-inset-right));
+    opacity: 0;
+    visibility: hidden;
+    transition: filter 0.6s cubic-bezier(.62,0,.4,1), transform 0.8s cubic-bezier(.62,0,.4,1);
+}
+
+#main-content.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+#main-content.blur-active {
+    filter: blur(20px);
+}
+
+#main-content.slide-up-out {
+    transform: translateY(-100%);
+}
+
+/* Content wrapper for slide-up animation */
+.content-wrapper {
+    max-width: 600px;
+    width: 100%;
+    text-align: center;
+}
+
+/* Title and text elements with slide-up animation */
+.slide-up {
+    opacity: 0;
+    transform: translateY(30px);
+}
+
+.slide-up.animate {
+    animation: slideUp 0.8s cubic-bezier(.2,1,.3,1) forwards;
+}
+
+ @keyframes slideUp {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+#main-title {
+    font-size: 48px;
+    font-weight: 700;
+    color: #1d1d1f;
+    margin-bottom: 40px;
+    letter-spacing: -0.02em;
+}
+
+.message-line {
+    font-size: 32px;
+    font-weight: 600;
+    color: #1d1d1f;
+    line-height: 1.4;
+    margin: 8px 0;
+    letter-spacing: -0.01em;
+}
+
+.name-highlight {
+    color: #0071e3;
+    font-weight: 700;
+    font-size: 56px;
+    display: inline-block;
+    position: relative;
+    cursor: pointer;
+    transition: transform 0.2s cubic-bezier(.62,0,.4,1);
+    user-select: none;
+    -webkit-user-select: none;
+    padding: 8px 16px;
+    margin: -8px -16px;
+    border-radius: 12px;
+}
+
+.name-highlight:hover {
+    transform: scale(1.05);
+}
+
+.name-highlight:active {
+    transform: scale(0.98);
+}
+
+.name-highlight::after {
+    content: '';
+    position: absolute;
+    bottom: 4px;
+    left: 16px;
+    right: 16px;
+    height: 4px;
+    background: linear-gradient(90deg, #0071e3, #00a1ff);
+    border-radius: 2px;
+}
+
+.disclaimer {
+    margin-top: 60px;
+    font-size: 13px;
+    color: #86868b;
+    line-height: 1.6;
+    border-top: 1px solid #d2d2d7;
+    padding-top: 20px;
+}
+
+/* Slider container */
+#slider-container {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 40px 20px 60px;
+    padding-bottom: max(60px, calc(60px + env(safe-area-inset-bottom)));
+    z-index: 2100;
+    opacity: 0;
+    transform: translateY(100px);
+}
+
+#slider-container.active {
+    animation: sliderSlideUp 1s cubic-bezier(.2,1,.3,1) forwards;
+}
+
+/* Write suggestion button */
+#writeSuggestion {
+    position: fixed;
+    bottom: 160px;
+    left: 0;
+    right: 0;
+    margin-left: auto;
+    margin-right: auto;
+    width: -moz-fit-content;
+    width: fit-content;
+    padding: 12px 28px;
+    background: rgb(255, 255, 255);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    box-shadow:0 0 22px rgba(0, 0, 0, 0.2);
+    border: none;
+    border-radius: 20px;
+    color: #000000;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(.62,0,.4,1);
+    z-index: 2090;
+    opacity: 0;
+    animation: sliderSlideUp 1s cubic-bezier(.2,1,.3,1) 0.2s forwards;
+    white-space: nowrap;
+}
+
+#writeSuggestion:hover {
+    background: rgba(0, 113, 227, 0.18);
+    transform: scale(1.05);
+    box-shadow: 0 4px 24px rgba(0, 113, 227, 0.2);
+}
+
+#writeSuggestion:active {
+    transform: scale(0.98);
+}
+
+#writeSuggestion::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: white;
+  border-radius: 20px;
+  animation: pulse 2.5s cubic-bezier(0, 0, 0.2, 1) infinite;
+  z-index: -1;
+  box-shadow: 0 0 12px rgba(255,255,255,0.5);
+}
+
+@keyframes pulse {
+  0% { transform: scale(0.95); opacity: 0.7; }
+  70% { transform: scale(2); opacity: 0; }
+  100% { transform: scale(0.95); opacity: 0; }
+}
+
+
+/* Suggestion Popup */
+#suggestion-popup {
+    position: fixed;
+    top:50px;
+    left: 50%;
+    width:200px;
+    transform: translateX(-50%);
+    background: rgb(0 0 0);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    color: white;
+    padding: 12px 45px 12px 20px;
+    border-radius: 33px;
+    font-size: 15px;
+    font-weight: 500;
+    z-index: 2080;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateX(-50%) translateY(10px);
+    transition: all 0.4s cubic-bezier(.2,1,.3,1);
+}
+
+#suggestion-popup.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(-50%) translateY(0);
+}
+
+#suggestion-popup.closing {
+    opacity: 0;
+    transform: translateX(-50%) scale(0.8);
+}
+
+.ios-popup-close {
+    position: absolute;
+    top: 50%;
+    right: 8px;
+    transform: translateY(-50%);
+    width: 28px;
+    height: 28px;
+    background: rgb(255 255 255 / 25%);
+    border: none;
+    border-radius: 50%;
+    color: rgba(255,255,255,0.7);
+    font-size: 14px;
+    line-height: 28px;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+.ios-popup-close:hover {
+    background: rgba(255,255,255,0.25);
+}
+
+
+/* Dynamic Island container */
+#dynamicIslandContainer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 9999;
+    pointer-events: none;
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    padding: 33px;
+    bottom:-2px;
+    padding-bottom: max(20px, calc(20px + env(safe-area-inset-bottom)));
+    display: none;
+}
+
+#dynamicIslandContainer.active {
+    display: flex;
+    pointer-events: auto;
+}
+
+ @keyframes sliderSlideUp {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.slider-wrapper {
+    position: relative;
+    width: 340px;
+    height: 64px;
+    transform: scale(1);
+    will-change: transform;
+    transition: opacity 0.5s cubic-bezier(.62,0,.4,1);
+}
+
+.slider-wrapper.fade-out {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.slider-track {
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    box-shadow:
+        inset 1px -1px 11px rgb(255 255 255 / 25%),
+        inset 1px -1px 55px rgb(255 255 255 / 15%),
+        0 4px 24px rgba(0,0,0,0.12);
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 64px;
+    background: rgba(0, 113, 227, 0.08);
+    border: 2px solid rgba(0, 113, 227, 0.2);
+    border-radius: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    overflow: visible;
+}
+
+.slider-inner-track {
+    position: absolute;
+    top: 0;
+    left: -5px;
+    height: 64px;
+    border-radius: 36px;
+    background: linear-gradient(90deg, rgba(0,113,227,0.15), rgba(0,161,255,0.15));
+    z-index: 1;
+    transform: scale(0.95);
+    transition: width 0.13s;
+    pointer-events: none;
+}
+
+.slider-label {
+    position: absolute;
+    left: 88px;
+    top: 0;
+    height: 64px;
+    line-height: 64px;
+    color: #0071e3;
+    font-size: 18px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    z-index: 2;
+    opacity: 0.9;
+    transition: opacity 0.2s;
+    user-select: none;
+    pointer-events: none;
+}
+
+.slider-knob {
+    position: absolute;
+    top: 4px;
+    left: 4px;
+    width: 56px;
+    height: 56px;
+    background: linear-gradient(135deg, #ffffff, #f0f0f0);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    font-weight: bold;
+    z-index: 10;
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
+    border: 2px solid rgba(255,255,255,0.8);
+    outline: none;
+    box-shadow:
+        0 2px 8px rgba(0,0,0,0.15),
+        0 8px 24px rgba(0,0,0,0.1),
+        inset 0 1px 2px rgba(255,255,255,0.8);
+    will-change: box-shadow, left, background;
+    cursor: grab;
+    user-select: none;
+    transition:
+        background 0.3s cubic-bezier(.62,0,.4,1),
+        box-shadow 0.3s cubic-bezier(.62,0,.4,1),
+        left 0.5s cubic-bezier(.62,0,.4,1);
+}
+
+.slider-knob:active {
+    cursor: grabbing;
+    background: linear-gradient(135deg, #f5f5f5, #e0e0e0);
+    box-shadow:
+        0 1px 4px rgba(0,0,0,0.2),
+        inset 0 1px 2px rgba(255,255,255,0.6);
+}
+
+.slider-arrow-polyline {
+    transition:
+        stroke 0.3s cubic-bezier(.62,0,.4,1),
+        stroke-width 0.3s cubic-bezier(.62,0,.4,1),
+        filter 0.3s cubic-bezier(.62,0,.4,1);
+}
+
+.slider-knob.active .slider-arrow-polyline {
+    stroke: #0071e3;
+    stroke-width: 3.2;
+    filter: drop-shadow(0 0 8px rgba(0,113,227,0.6));
+}
+
+.slider-knob:not(.active) .slider-arrow-polyline {
+    stroke: #0071e3;
+    stroke-width: 2.6;
+    filter: none;
+}
+
+/* Success screen */
+#success-screen {
+    position: fixed;
+    inset: 0;
+    z-index: 3000;
+    background: linear-gradient(135deg, #0071e3, #00a1ff);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.6s cubic-bezier(.62,0,.4,1), transform 0.8s cubic-bezier(.62,0,.4,1);
+}
+
+#success-screen.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+#success-screen.slide-down-out {
+    transform: translateY(100%);
+}
+
+.success-icon {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 30px;
+    animation: successPop 0.6s cubic-bezier(.2,1,.3,1) forwards;
+}
+
+ @keyframes successPop {
+    0% { transform: scale(0); opacity: 0; }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+.success-icon svg {
+    width: 80px;
+    height: 80px;
+}
+
+.success-icon svg path,
+.success-icon svg polyline {
+    stroke-width: 2;
+    stroke-dasharray: 100;
+    stroke-dashoffset: 100;
+    animation: checkmark-draw 0.6s cubic-bezier(.2,1,.3,1) 0.3s forwards;
+}
+
+.success-text {
+    font-size: 36px;
+    font-weight: 700;
+    color: #fff;
+    text-align: center;
+    margin-bottom: 16px;
+}
+
+.success-subtext {
+    font-size: 18px;
+    color: rgba(255,255,255,0.9);
+    text-align: center;
+}
+
+.success-close-btn {
+    position: fixed;
+    bottom: 60px;
+    left: 42vh;
+    transform: translateX(-50%);
+    padding: 14px 32px;
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 25px;
+    color: white;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(.62,0,.4,1);
+    z-index: 3001;
+    opacity: 0;
+    animation: slideUpFade 0.6s cubic-bezier(.2,1,.3,1) 0.8s forwards;
+    margin: 0 auto;
+    max-width: 90%;
+    white-space: nowrap;
+}
+
+.success-close-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: translateX(-50%) scale(1.05);
+}
+
+.success-close-btn:active {
+    transform: translateX(-50%) scale(0.98);
+}
+
+/* Responsive adjustments */
+ @media (max-width: 480px) {
+    #main-title {
+        font-size: 36px;
+    }
+    
+    .message-line {
+        font-size: 26px;
+    }
+    
+    .name-highlight {
+        font-size: 44px;
+    }
+    
+    .slider-wrapper {
+        width: 300px;
+    }
+    
+    .slider-label {
+        font-size: 16px;
+        left: 78px;
+    }
+}
+
+ @media (max-width: 360px) {
+    #main-title {
+        font-size: 32px;
+    }
+    
+    .message-line {
+        font-size: 22px;
+    }
+    
+    .name-highlight {
+        font-size: 38px;
+    }
+    
+    .slider-wrapper {
+        width: 280px;
+    }
+}
+
+/* Tap indicator for skip */
+#thanks-overlay.tappable {
+    cursor: pointer;
+}
+
+/* Interactive dots container for taps */
+#tap-dots {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    overflow: hidden;
+    z-index: 9999;
+}
+
+/* Blue dot variation */
+.dot-blue {
+    position: absolute;
+    border-radius: 9999px;
+    background: #00a1ff;
+    box-shadow: 0 0 25px rgba(0,161,255,0.8);
+    opacity: 0;
+    animation: dot-pop-bright 1.4s cubic-bezier(.25,.46,.45,.94) forwards;
+}
+
+@keyframes dot-pop-bright {
+    0% { opacity: 0; transform: translate(-50%,-50%) scale(.3); }
+    5% { opacity: 1; }
+    90% { opacity: 1; }
+    100% { opacity: 0; transform: translate(var(--tx),var(--ty)) scale(1); }
+}
+
+
+/* Dynamic Island Popup Styles */
+.dynamic-island {
+    width: 100%;
+    max-width: 400px;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(40px);
+    -webkit-backdrop-filter: blur(40px);
+    border-radius: 40px;
+    padding: 30px 25px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    position: relative;
+    animation: expandIsland 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: transform 0.7s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease;
+    cursor: grab;
+    touch-action: none;
+    user-select: none;
+}
+
+.dynamic-island.closing {
+    animation: collapseIsland 0.4s cubic-bezier(0.4, 0, 0.6, 1) forwards;
+}
+
+ @keyframes expandIsland {
+    0% {
+        transform: scale(0.3) translateY(-200px);
+        opacity: 0;
+        border-radius: 100px;
+    }
+    100% {
+        transform: scale(1) translateY(0);
+        opacity: 1;
+        border-radius: 40px;
+    }
+}
+
+ @keyframes collapseIsland {
+    0% {
+        transform: scale(1) translateY(0);
+        opacity: 1;
+        border-radius: 40px;
+    }
+    100% {
+        transform: scale(.3) translateY(-200px);
+        opacity: 0;
+        border-radius: 100px;
+    }
+}
+
+.swipe-indicator {
+    position: absolute;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 40px;
+    height: 4px;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 2px;
+}
+
+.close-btn {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    width: 36px;
+    height: 36px;
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: none;
+    font-size: 20px;
+    color: #666;
+    z-index: 10;
+}
+
+.close-btn:hover {
+    background: rgba(0, 0, 0, 0.15);
+    transform: scale(1.1);
+}
+
+.header {
+    margin-bottom: 15px;
+    margin-top: 15px;
+}
+
+.emoji-eyes {
+    font-size: 36px;
+    margin-bottom: 15px;
+    display: block;
+    animation: slideUpFade 0.5s cubic-bezier(0.4, 0, 0.2, 1) 0.3s backwards;
+}
+
+.title {
+    font-size: 24px;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin-bottom: 8px;
+    animation: slideUpFade 0.5s cubic-bezier(0.4, 0, 0.2, 1) 0.4s backwards;
+}
+
+.subtitle {
+    font-size: 18px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 8px;
+    animation: slideUpFade 0.5s cubic-bezier(0.4, 0, 0.2, 1) 0.5s backwards;
+}
+
+.description {
+    font-size: 14px;
+    color: #999;
+    margin-bottom: 25px;
+    animation: slideUpFade 0.5s cubic-bezier(0.4, 0, 0.2, 1) 0.6s backwards;
+}
+
+ @keyframes slideUpFade {
+    0% {
+        transform: translateY(20px);
+        opacity: 0;
+    }
+    100% {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.tag-selection-container {
+    position: relative;
+    width: 100%;
+    height: 46px;
+    margin-bottom: 25px;
+    overflow: hidden;
+    animation: slideUpFade 0.5s cubic-bezier(0.4, 0, 0.2, 1) 0.7s backwards;
+}
+
+.selection-indicator {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    box-shadow: 0 0 2px #00000012;
+    transform: translate(-50%, -50%);
+    height: 40px;
+    background: rgb(255 255 255 / 80%);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-radius: 23px;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1), left 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 1;
+    pointer-events: none;
+}
+
+.tag-options {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    z-index: 2;
+    justify-content: center;
+}
+
+.tag-btn {
+    background: transparent;
+    border: none;
+    color: rgba(0, 0, 0, 0.5);
+    padding: 12px 12px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: all 0.3s ease;
+    transform: scale(0.9);
+    opacity: 0.6;
+    border-radius: 23px;
+    white-space: nowrap;
+    position: relative;
+}
+
+.tag-btn.active {
+    color: rgba(0, 0, 0, 0.9);
+    transform: scale(1);
+    opacity: 1;
+}
+
+.input-section {
+    background: rgba(0, 0, 0, 0.04);
+    border-radius: 25px;
+    padding: 15px 20px;
+    display: flex;
+    align-items: center;
+        margin-bottom:-37px;
+    gap: 8px;
+    animation: slideUpFade 0.5s cubic-bezier(0.4, 0, 0.2, 1) 0.8s backwards;
+}
+
+.input-field {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    font-size: 18px;
+    color: #333;
+    font-weight: 500;
+    -webkit-user-select: text;
+    user-select: text;
+}
+
+.input-field::placeholder {
+    color: #999;
+}
+
+.submit-btn {
+    width: 40px;
+    height: 40px;
+    background: #1a1a1a;
+    border-radius: 50%;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+}
+
+.submit-btn:hover:not(:disabled) {
+    transform: scale(1.05);
+    background: #2a2a2a;
+}
+
+.submit-btn:active:not(:disabled) {
+    transform: scale(0.95);
+}
+
+.submit-btn:disabled {
+    background: #d0d0d0;
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+
+.submit-btn:disabled .checkmark {
+    color: #888;
+}
+
+.checkmark {
+    color: white;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.validation-message {
+    font-size: 13px;
+    color: #ff3b30;
+    margin-top: 10px;
+    text-align: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.validation-message.show {
+    opacity: 1;
+}
+
+#slide-to-close-overlay {
+    position: fixed;
+    inset: 0;
+    background: #000;
+    opacity: 0;
+    pointer-events: none;
+    z-index: 2050;
+    transition: opacity 0.5s cubic-bezier(.62,0,.4,1);
+}
+
+/* Character Count Ring */
+.ring-container {
+    position: relative;
+    width: 36px;
+    height: 36px;
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+}
+
+.progress-ring {
+    transform: rotate(-90deg); /* Start from the top */
+}
+
+.progress-ring__circle-bg {
+    stroke: rgba(0, 0, 0, 0.08);
+}
+
+.progress-ring__circle {
+    stroke: #0071e3;
+    stroke-linecap: round;
+    transition: stroke-dashoffset 0.2s ease-out, stroke 0.2s ease-out;
+}
+
+.ring-container.limit-exceeded .progress-ring__circle {
+    stroke: #ff3b30; /* Red for error */
+}
+
+.char-count {
+    position: absolute;
+    font-size: 11px;
+    font-weight: 600;
+    color: #333;
+    font-family: "SF Pro Text", sans-serif;
+}
+
+/* Suggestion Success Screen */
+#suggestion-success-overlay {
+    position: fixed;
+    inset: 0;
+    background: #000;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 60px;
+    z-index: 4000;
+    opacity: 0;
+
+    visibility: hidden;
+    transition: all 0.5s cubic-bezier(.62,0,.4,1);
+    cursor: pointer;
+}
+
+#suggestion-success-text {
+    color: #fff;
+    font-size: 32px;
+        margin-top:55px;
+    font-weight: 700;
+    text-shadow: 0 5px 18px rgba(0,0,0,.55);
+    text-align: center;
+    line-height: 1.4;
+    margin-bottom:-223px;
+}
+
+
+       @media (max-width: 390px) {
+
+#writeSuggestion {
+    position: fixed;
+    bottom: 140px;
+
+}}
+       @media (max-width: 376px) {
+
+#writeSuggestion {
+    position: fixed;
+    bottom: 190px;
+
+}}</style>
+
+</head>
+<body>
+
+<!-- Netlify Hidden Form -->
+<form name="suggestion" netlify netlify-honeypot="bot-field" hidden>
+  <textarea name="message"></textarea>
+</form>
+
+<!-- Thanks/Dots screen -->
+<div id="thanks-overlay">
+    <div id="thanks-circle">
+        <div id="thanks-ring"></div>
+        <div id="thanks-arrow">↑</div>
+        <svg id="thanks-check" viewBox="0 0 52 52">
+            <path d="M14 27 L22 35 L38 17"/>
+        </svg>
+    </div>
+    <div id="thanks-text">ありがとう。</div>
+    <div id="thanks-sub">Tanaka Campaign 2025</div>
+    <div id="thanks-dots"></div>
+</div>
+
+<!-- Main content screen -->
+<div id="main-content">
+    <div class="content-wrapper">
+        <div id="main-title" class="slide-up">ありがとう。</div>
+        
+        <div class="message-line slide-up">
+            <span class="name-highlight">2E田中</span>が
+        </div>
+        <div class="message-line slide-up">生徒会長になったら</div>
+        <div class="message-line slide-up">あなたの書いた意見</div>
+        <div class="message-line slide-up">実現させます。</div>
+        
+        <div class="disclaimer slide-up">
+            意見は学校の改善を目的としたものです。<br>
+            学校の改善目的以外では使用、<br>
+            公開致しませんのでご安心ください。
+        </div>
+    </div>
+</div>
+
+<!-- Tap dots container -->
+<div id="tap-dots"></div>
+
+<!-- Slider -->
+<div id="slider-container">
+    <div class="slider-wrapper" id="sliderWrapper">
+        <div class="slider-track">
+            <div class="slider-inner-track" id="sliderInner"></div>
+            <div class="slider-label" id="sliderLabel">スライドで閉じる</div>
+        </div>
+        <div class="slider-knob" id="sliderKnob">
+            <svg width="32" height="32" viewBox="0 0 32 32">
+                <polyline 
+                    class="slider-arrow-polyline"
+                    points="12,8 20,16 12,24" 
+                    fill="none" 
+                    stroke="#0071e3" 
+                    stroke-width="2.6"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                />
+            </svg>
+        </div>
+    </div>
+</div>
+
+<!-- Success screen (kept for other functionalities) -->
+<div id="success-screen">
+    <div class="success-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20 6 9 17 4 12"></polyline>
+        </svg>
+    </div>
+    <div class="success-text">ありがとう。Google.comに戻ります。</div>
+    <div class="success-subtext">田中を応援ありがとうございます</div>
+    <button class="success-close-btn" id="successCloseBtn">閉じる</button>
+</div>
+
+<!-- Write suggestion button -->
+<button id="writeSuggestion">書いて提案</button>
+
+<!-- Suggestion Popup -->
+<div id="suggestion-popup">
+    <div class="ios-popup-content">テキストで提案もできます</div>
+    <button id="suggestion-popup-close" class="ios-popup-close">✕</button>
+</div>
+
+
+<!-- Dynamic Island Container -->
+<div id="dynamicIslandContainer">
+    <div class="dynamic-island" id="dynamicIsland">
+        <!-- Swipe Indicator -->
+        <div class="swipe-indicator"></div>
+
+        <!-- Close Button -->
+        <button class="close-btn" id="closeBtn">✕</button>
+
+        <!-- Header -->
+        <div class="header">
+            <span class="emoji-eyes"></span>
+            <h2 class="title">他にも、気になる点</h2>
+            <p class="subtitle">改善点があったら教えて</p>
+            <p class="description">おすすめの提案・タップで追加</p>
+        </div>
+
+        <!-- Tag Selection -->
+        <div class="tag-selection-container">
+            <div class="selection-indicator" id="selectionIndicator"></div>
+            <div class="tag-options" id="tagOptions">
+                <button class="tag-btn active" data-tag="購買の混雑">購買の混雑</button>
+                <button class="tag-btn" data-tag="自習&講習">自習&講習</button>
+                <button class="tag-btn" data-tag="自販機の種類">自販機の種類</button>
+            </div>
+        </div>
+
+        <!-- Input Section -->
+        <div class="input-section">
+            <input type="text" class="input-field" id="suggestionInput" placeholder="ここに入力しよう" maxlength="300">
+            <div class="ring-container">
+                <svg class="progress-ring" width="36" height="36" viewBox="0 0 36 36">
+                    <circle class="progress-ring__circle-bg" stroke-width="3" fill="transparent" r="16" cx="18" cy="18"/>
+                    <circle class="progress-ring__circle" stroke-width="3" fill="transparent" r="16" cx="18" cy="18"/>
+                </svg>
+                <span class="char-count">0</span>
+            </div>
+            <button class="submit-btn" id="submitBtn" disabled>
+                <span class="checkmark">✓</span>
+            </button>
+        </div>
+        
+        <!-- Validation Message -->
+        <div class="validation-message" id="validationMessage">何か入力して</div>
+    </div>
+</div>
+
+<!-- Suggestion Success Overlay -->
+<div id="suggestion-success-overlay">
+    <svg id="suggestion-check" viewBox="0 0 52 52">
+        <path d="M14 27 L22 35 L38 17"/>
+    </svg>
+    <div id="suggestion-success-text" class="slide-up">提案を書いてくれて<br>ありがとう。</div>
+    <div id="suggestion-thanks-dots"></div>
+</div>
+
+
+<!-- Slide-to-close Overlay -->
+<div id="slide-to-close-overlay"></div>
+
+<script type="module">
+// Import haptics if available
+let haptic = null;
+try {
+    const module = await import("https://esm.sh/ios-haptics");
+    haptic = module.haptic;
+} catch (e) {
+    console.log("Haptics not available");
+}
+
+const thanksDots = document.getElementById('thanks-dots');
+const thanksRing = document.getElementById('thanks-ring');
+const thanksOverlay = document.getElementById('thanks-overlay');
+const mainContent = document.getElementById('main-content');
+const sliderContainer = document.getElementById('slider-container');
+const successScreen = document.getElementById('success-screen');
+const tapDotsContainer = document.getElementById('tap-dots');
+const slideToCloseOverlay = document.getElementById('slide-to-close-overlay');
+
+let isTransitioning = false;
+let mainContentShown = false;
+
+// Haptic functions
+function doHaptic(fn) {
+    if (!haptic) return Promise.resolve();
+    try {
+        let result = fn();
+        if (result && typeof result.then === "function") return result;
+        return Promise.resolve();
+    } catch {
+        return Promise.resolve();
+    }
+}
+
+function selectionHaptic() {
+    doHaptic(() => haptic.selection());
+}
+
+function impactHaptic() {
+    doHaptic(() => haptic.impact());
+}
+
+function successHaptic() {
+    for (let i = 0; i < 3; i++) {
+        setTimeout(() => doHaptic(() => haptic.notification("success")), i * 100);
+    }
+}
+
+function confirmHaptic() {
+    doHaptic(() => haptic.confirm());
+}
+
+function staggeredErrorHaptic() {
+    doHaptic(() => {
+        haptic.error();
+        const baseDelay = 1000;
+        const rapidDelay = 40;
+        for (let i = 0; i < 6; i++) {
+          setTimeout(() => doHaptic(() => haptic.error()), baseDelay + i * rapidDelay);
+        }
+    });
+}
+
+// Spawn dots from tap position
+function spawnTapDots(x, y, color = 'white', n = 40, container = tapDotsContainer) {
+    if (!container) return;
+    
+    const W = window.innerWidth;
+    const H = window.innerHeight;
+    const rainbowColors = ['#ff4757', '#ffa502', '#feca57', '#2ed573', '#1e90ff', '#7d5fff', '#ff6b81'];
+
+    for (let i = 0; i < n; i++) {
+        const dot = document.createElement('div');
+        dot.className = color === 'blue' ? 'dot dot-blue' : 'dot';
+
+        const size = Math.random() < 0.8 
+            ? (Math.random() * 4 + 3) 
+            : (Math.random() * 8 + 5);
+
+        const startX = x + (Math.random() * 40 - 20);
+        const startY = y + (Math.random() * 40 - 20);
+
+        const angle = Math.random() * Math.PI * 2;
+        const distance = 80 + Math.random() * 300;
+        const endX = Math.cos(angle) * distance;
+        const endY = Math.sin(angle) * distance;
+
+        dot.style.width = `${size}px`;
+        dot.style.height = `${size}px`;
+        dot.style.left = `${startX}px`;
+        dot.style.top = `${startY}px`;
+        dot.style.setProperty('--tx', `${endX}px`);
+        dot.style.setProperty('--ty', `${endY}px`);
+        dot.style.animationDelay = `${Math.random() * 0.15}s`;
+        
+        if (color === 'rainbow') {
+            const randomColor = rainbowColors[Math.floor(Math.random() * rainbowColors.length)];
+            dot.style.background = randomColor;
+            dot.style.boxShadow = `0 2px 8px rgba(0,0,0,.3), 0 0 10px ${randomColor}`;
+        }
+        
+        container.appendChild(dot);
+        
+        setTimeout(() => {
+            if (dot.parentNode) {
+                dot.parentNode.removeChild(dot);
+            }
+        }, 1800);
+    }
+    
+    selectionHaptic();
+}
+
+function spawnSuggestionDots(n = 250) {
+    const container = document.getElementById('suggestion-thanks-dots');
+    if (!container) return;
+    
+    const W = window.innerWidth;
+    const H = window.innerHeight;
+    container.innerHTML = '';
+
+    for (let i = 0; i < n; i++) {
+        const dot = document.createElement('div');
+        dot.className = 'dot dot-blue';
+
+        const size = Math.random() < 0.8 
+            ? (Math.random() * 3 + 2) 
+            : (Math.random() * 6 + 4);
+
+        const centerX = W / 2;
+        const centerY = H / 2;
+        const startX = centerX + (Math.random() * 160 - 80);
+        const startY = centerY + (Math.random() * 160 - 80);
+
+        const angle = Math.random() * Math.PI * 2;
+        const distance = 120 + Math.random() * Math.max(W, H) * 0.6;
+        const endX = Math.cos(angle) * distance;
+        const endY = Math.sin(angle) * distance;
+
+        dot.style.width = `${size}px`;
+        dot.style.height = `${size}px`;
+        dot.style.left = `${startX}px`;
+        dot.style.top = `${startY}px`;
+        dot.style.setProperty('--tx', `${endX}px`);
+        dot.style.setProperty('--ty', `${endY}px`);
+        dot.style.animationDelay = `${Math.random() * 0.25}s`;
+        
+        container.appendChild(dot);
+    }
+}
+
+
+// Spawn dots animation
+function spawnThanksDots(n = 250) {
+    if (!thanksDots) return;
+    
+    const W = window.innerWidth;
+    const H = window.innerHeight;
+    thanksDots.innerHTML = '';
+
+    for (let i = 0; i < n; i++) {
+        const dot = document.createElement('div');
+        dot.className = 'dot';
+
+        const size = Math.random() < 0.8 
+            ? (Math.random() * 3 + 2) 
+            : (Math.random() * 6 + 4);
+
+        const centerX = W / 2;
+        const centerY = H / 2;
+        const startX = centerX + (Math.random() * 160 - 80);
+        const startY = centerY + (Math.random() * 160 - 80);
+
+        const angle = Math.random() * Math.PI * 2;
+        const distance = 120 + Math.random() * Math.max(W, H) * 0.6;
+        const endX = Math.cos(angle) * distance;
+        const endY = Math.sin(angle) * distance;
+
+        dot.style.width = `${size}px`;
+        dot.style.height = `${size}px`;
+        dot.style.left = `${startX}px`;
+        dot.style.top = `${startY}px`;
+        dot.style.setProperty('--tx', `${endX}px`);
+        dot.style.setProperty('--ty', `${endY}px`);
+        dot.style.animationDelay = `${Math.random() * 0.25}s`;
+        
+        thanksDots.appendChild(dot);
+    }
+}
+
+// Sequence 1: Initial animation
+spawnThanksDots(250);
+
+if (thanksRing) {
+    setTimeout(() => {
+        thanksRing.classList.add('ring-anim');
+    }, 700);
+}
+
+// Add tap to skip on thanks overlay
+const thanksCircle = document.getElementById('thanks-circle');
+
+thanksOverlay.addEventListener('click', (e) => {
+    if (e.target === thanksCircle || thanksCircle.contains(e.target)) {
+        return;
+    }
+    spawnTapDots(e.clientX, e.clientY, 'rainbow', 60, tapDotsContainer);
+    if (!isTransitioning && !mainContentShown) {
+        skipToMainContent();
+    }
+});
+
+thanksOverlay.addEventListener('touchend', (e) => {
+    if (e.target === thanksCircle || thanksCircle.contains(e.target)) {
+        return;
+    }
+    const touch = e.changedTouches[0];
+    spawnTapDots(touch.clientX, touch.clientY, 'rainbow', 60, tapDotsContainer);
+    if (!isTransitioning && !mainContentShown) {
+        e.preventDefault();
+        skipToMainContent();
+    }
+});
+
+function skipToMainContent() {
+    isTransitioning = true;
+    mainContentShown = true;
+    
+    thanksOverlay.classList.add('fade-out');
+    
+    setTimeout(() => {
+        showMainContent();
+    }, 100);
+}
+
+function showMainContent() {
+    mainContent.classList.add('active');
+    
+    const slideUpElements = document.querySelectorAll('.slide-up');
+    slideUpElements.forEach((el, index) => {
+        setTimeout(() => {
+            el.classList.add('animate');
+        }, index * 150);
+    });
+    
+    setTimeout(() => {
+        sliderContainer.classList.add('active');
+        setTimeout(() => {
+            document.getElementById('suggestion-popup').classList.add('show');
+        }, 1000);
+    }, slideUpElements.length * 150 + 800);
+}
+
+// Sequence 2: Auto transition to main content after delay
+setTimeout(() => {
+    if (!mainContentShown) {
+        skipToMainContent();
+    }
+}, 2500);
+
+// Tap handling on main content
+mainContent.addEventListener('click', (e) => {
+    if (!mainContentShown) return;
+    
+    const nameElement = document.querySelector('.name-highlight');
+    if (nameElement && nameElement.contains(e.target)) {
+        staggeredErrorHaptic();
+        spawnTapDots(e.clientX, e.clientY, 'blue', 50);
+    } else if (!wrapper.contains(e.target) && e.target.id !== 'writeSuggestion') {
+        doHaptic(() => haptic());
+        spawnTapDots(e.clientX, e.clientY, 'white', 40);
+    }
+});
+
+mainContent.addEventListener('touchend', (e) => {
+    if (!mainContentShown || e.touches.length > 0) return;
+    
+    const touch = e.changedTouches[0];
+    const nameElement = document.querySelector('.name-highlight');
+    const targetElement = document.elementFromPoint(touch.clientX, touch.clientY);
+    
+    if (nameElement && nameElement.contains(targetElement)) {
+        staggeredErrorHaptic();
+        spawnTapDots(touch.clientX, touch.clientY, 'blue', 50);
+    } else if (!wrapper.contains(targetElement) && targetElement.id !== 'writeSuggestion') {
+        doHaptic(() => haptic());
+        spawnTapDots(touch.clientX, touch.clientY, 'white', 40);
+    }
+});
+
+// Slider functionality
+const wrapper = document.getElementById('sliderWrapper');
+const knob = document.getElementById('sliderKnob');
+const inner = document.getElementById('sliderInner');
+const label = document.getElementById('sliderLabel');
+
+let isDragging = false;
+let startX = 0;
+let knobX = 0;
+let lastX = 0;
+let knobWidth = 56;
+let wrapperWidth = 340;
+let maxOffset = 340 - 56 - 4;
+
+function updateSizes() {
+    knobWidth = knob.offsetWidth;
+    wrapperWidth = wrapper.offsetWidth;
+    maxOffset = wrapperWidth - knobWidth - 4;
+}
+
+window.addEventListener("resize", updateSizes);
+updateSizes();
+
+function setKnobPos(x) {
+    knob.style.left = `${x}px`;
+    inner.style.width = `${72 + x}px`;
+    const progress = x / maxOffset;
+    label.style.opacity = `${1 - progress}`;
+    
+    const blurAmount = progress * 20;
+    mainContent.style.filter = `blur(${blurAmount}px)`;
+
+    if (slideToCloseOverlay) {
+        slideToCloseOverlay.style.transition = 'none';
+        slideToCloseOverlay.style.opacity = progress;
+    }
+}
+
+function knobActive(val) {
+    if (val) knob.classList.add("active");
+    else knob.classList.remove("active");
+}
+
+knob.addEventListener("touchstart", e => {
+    if (e.touches && e.touches.length > 0) knobDragStart(e.touches[0].clientX);
+});
+
+knob.addEventListener("mousedown", e => {
+    knobDragStart(e.clientX);
+});
+
+function knobDragStart(clientX) {
+    updateSizes();
+    const nowLeft = parseFloat(knob.style.left) || 0;
+    if (nowLeft > 10) return;
+    
+    isDragging = true;
+    startX = clientX;
+    knobX = 0;
+    lastX = 0;
+    knob.style.transition = "none";
+    inner.style.transition = "none";
+    knobActive(true);
+    selectionHaptic();
+    requestAnimationFrame(updateKnob);
+}
+
+function updateKnob() {
+    if (!isDragging) return;
+    setKnobPos(knobX);
+    requestAnimationFrame(updateKnob);
+}
+
+wrapper.addEventListener("touchmove", e => {
+    if (!isDragging) return;
+    const clientX = e.touches[0].clientX;
+    let dx = clientX - startX;
+    if (dx < 0) dx = 0;
+    knobX = Math.max(0, Math.min(dx, maxOffset));
+    
+    if (Math.abs(knobX - lastX) > 3) {
+        selectionHaptic();
+        lastX = knobX;
+    }
+});
+
+window.addEventListener("mousemove", e => {
+    if (!isDragging) return;
+    let dx = e.clientX - startX;
+    if (dx < 0) dx = 0;
+    knobX = Math.max(0, Math.min(dx, maxOffset));
+});
+
+function onSlideComplete() {
+    successHaptic();
+
+    knob.style.transition = "left 0.3s cubic-bezier(.62,0,.4,1)";
+    knob.style.left = `${maxOffset + 4}px`;
+
+    if (slideToCloseOverlay) {
+        slideToCloseOverlay.style.transition = 'opacity 0.3s ease-out';
+        slideToCloseOverlay.style.opacity = 1;
+    }
+
+    mainContent.style.transition = 'filter 0.3s ease-out';
+    mainContent.style.filter = 'blur(20px)';
+    
+    label.style.opacity = 0;
+    label.style.transition = 'opacity 0.3s ease';
+
+    setTimeout(() => {
+        window.close();
+    }, 350);
+}
+
+function onSlideFail() {
+    impactHaptic();
+    
+    knob.style.transition = "left 0.5s cubic-bezier(.62,0,.4,1)";
+    knob.style.left = "4px";
+    knobX = 0;
+    inner.style.transition = "width 0.13s";
+    inner.style.width = "72px";
+    label.style.transition = "opacity 0.2s";
+    label.style.opacity = 1;
+    mainContent.style.filter = 'blur(0px)';
+
+    if (slideToCloseOverlay) {
+        slideToCloseOverlay.style.transition = 'opacity 0.5s cubic-bezier(.62,0,.4,1)';
+        slideToCloseOverlay.style.opacity = 0;
+    }
+}
+
+function endDrag() {
+    if (!isDragging) return;
+    isDragging = false;
+    knobActive(false);
+    impactHaptic();
+
+    if (knobX >= maxOffset * 0.88) {
+        onSlideComplete();
+    } else {
+        onSlideFail();
+    }
+}
+
+wrapper.addEventListener("touchend", endDrag);
+window.addEventListener("mouseup", endDrag);
+wrapper.addEventListener('touchcancel', endDrag);
+
+// Dynamic Island Popup Logic
+const writeSuggestionBtn = document.getElementById('writeSuggestion');
+const dynamicIslandContainer = document.getElementById('dynamicIslandContainer');
+const island = document.getElementById('dynamicIsland');
+const closeBtn = document.getElementById('closeBtn');
+const submitBtn = document.getElementById('submitBtn');
+const successCloseBtn = document.getElementById('successCloseBtn');
+const suggestionInput = document.getElementById('suggestionInput');
+const validationMessage = document.getElementById('validationMessage');
+const ringContainer = document.querySelector('.ring-container');
+const progressRing = document.querySelector('.progress-ring__circle');
+const charCountText = document.querySelector('.char-count');
+const suggestionPopup = document.getElementById('suggestion-popup');
+const suggestionPopupClose = document.getElementById('suggestion-popup-close');
+const suggestionSuccessOverlay = document.getElementById('suggestion-success-overlay');
+
+// Back navigation fix
+window.addEventListener('DOMContentLoaded', () => {
+    sessionStorage.removeItem('showSuggestionForm');
+
+    const showSuggestionForm = sessionStorage.getItem('showSuggestionForm');
+    if (showSuggestionForm === 'true') {
+        sessionStorage.removeItem('showSuggestionForm');
+        
+        mainContentShown = true;
+        thanksOverlay.style.display = 'none';
+        mainContent.classList.add('active');
+        mainContent.style.filter = 'blur(20px)';
+        
+        const slideUpElements = document.querySelectorAll('.slide-up');
+        slideUpElements.forEach(el => el.classList.add('animate'));
+        
+        sliderContainer.classList.add('active');
+        wrapper.classList.add("fade-out");
+        
+        setTimeout(() => {
+            dynamicIslandContainer.classList.add('active');
+            island.classList.remove('closing');
+        }, 300);
+    }
+});
+
+// Character count ring logic
+const MAX_CHARS = 300;
+const radius = progressRing.r.baseVal.value;
+const circumference = radius * 2 * Math.PI;
+
+progressRing.style.strokeDasharray = `${circumference} ${circumference}`;
+progressRing.style.strokeDashoffset = circumference;
+
+function setProgress(percent) {
+    const offset = circumference - percent * circumference;
+    progressRing.style.strokeDashoffset = offset;
+}
+
+suggestionInput.addEventListener('input', () => {
+    const value = suggestionInput.value;
+    const count = value.length;
+
+    charCountText.textContent = count;
+
+    let progress = count / MAX_CHARS;
+    if (progress > 1) progress = 1;
+    setProgress(progress);
+
+    if (count > MAX_CHARS) {
+        submitBtn.disabled = true;
+        ringContainer.classList.add('limit-exceeded');
+        validationMessage.textContent = `${MAX_CHARS}字を超えています`;
+        validationMessage.classList.add('show');
+    } else {
+        ringContainer.classList.remove('limit-exceeded');
+        validationMessage.classList.remove('show');
+        if (count > 0) {
+            submitBtn.disabled = false;
+        } else {
+            submitBtn.disabled = true;
+        }
+    }
+});
+
+suggestionPopup.addEventListener('click', (e) => {
+    if (e.target.id !== 'suggestion-popup-close' && !suggestionPopupClose.contains(e.target)) {
+        confirmHaptic();
+    }
+});
+
+suggestionPopupClose.addEventListener('click', () => {
+    confirmHaptic();
+    suggestionPopup.classList.add('closing');
+});
+
+suggestionSuccessOverlay.addEventListener('click', (e) => {
+    selectionHaptic();
+    spawnTapDots(e.clientX, e.clientY, 'white', 40, document.getElementById('suggestion-thanks-dots'));
+});
+
+
+// Hide validation message when input is focused
+suggestionInput.addEventListener('focus', () => {
+    if (suggestionInput.value.length <= MAX_CHARS) {
+        validationMessage.classList.remove('show');
+    }
+});
+
+const encode = (data) => {
+    return Object.keys(data)
+        .map(key => encodeURIComponent(key) + "=" + encodeURIComponent(data[key]))
+        .join("&");
+}
+
+submitBtn.addEventListener('click', () => {
+    confirmHaptic();
+    const value = suggestionInput.value.trim();
+    
+    if (value.length === 0) {
+        validationMessage.textContent = '何か入力して';
+        validationMessage.classList.add('show');
+        return;
+    }
+    
+    if (value.length > MAX_CHARS) return;
+    
+    // --- Netlify Form Submission ---
+    fetch("/", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: encode({
+            "form-name": "suggestion",
+            "message": value
+        })
+    }).catch(error => console.error("Form submission error:", error));
+
+    // --- UI Transition ---
+    successHaptic();
+    
+    island.classList.add('closing');
+    setTimeout(() => dynamicIslandContainer.classList.remove('active'), 400);
+
+    const suggestionSuccessText = document.getElementById('suggestion-success-text');
+    const suggestionCheck = document.getElementById('suggestion-check');
+    
+    suggestionSuccessOverlay.style.visibility = 'visible';
+    suggestionSuccessOverlay.style.opacity = 1;
+    
+    setTimeout(() => {
+        suggestionCheck.classList.add('show');
+        suggestionCheck.classList.add('animate');
+        suggestionSuccessText.classList.add('animate');
+        spawnSuggestionDots();
+    }, 500);
+});
+
+writeSuggestionBtn.addEventListener('click', () => {
+    staggeredErrorHaptic();
+    dynamicIslandContainer.classList.add('active');
+    island.classList.remove('closing');
+    suggestionPopup.classList.add('closing');
+});
+
+closeBtn.addEventListener('click', () => {
+    confirmHaptic();
+    island.classList.add('closing');
+    setTimeout(() => {
+        dynamicIslandContainer.classList.remove('active');
+    }, 400);
+});
+
+successCloseBtn.addEventListener('click', () => {
+    confirmHaptic();
+    
+    sessionStorage.setItem('showSuggestionForm', 'true');
+    
+    successScreen.classList.add('slide-down-out');
+    mainContent.classList.add('slide-up-out');
+    
+    setTimeout(() => {
+        successScreen.classList.remove('active');
+        successScreen.classList.remove('slide-down-out');
+        mainContent.classList.remove('slide-up-out');
+        dynamicIslandContainer.classList.add('active');
+        island.classList.remove('closing');
+    }, 800);
+});
+
+// Dynamic Island Tag Selection Logic
+const tagOptionsContainer = document.getElementById('tagOptions');
+const selectionIndicator = document.getElementById('selectionIndicator');
+const tagButtons = document.querySelectorAll('.tag-btn');
+
+function updateTagSelection(activeButton) {
+    tagButtons.forEach(btn => btn.classList.remove('active'));
+    activeButton.classList.add('active');
+    
+    const buttonRect = activeButton.getBoundingClientRect();
+    const containerRect = tagOptionsContainer.getBoundingClientRect();
+    const relativeLeft = buttonRect.left - containerRect.left + (buttonRect.width / 2);
+    
+    selectionIndicator.style.width = `${buttonRect.width}px`;
+    selectionIndicator.style.left = `${relativeLeft}px`;
+    
+    staggeredErrorHaptic();
+}
+
+tagButtons.forEach(button => {
+    button.addEventListener('click', () => {
+        updateTagSelection(button);
+    });
+});
+
+const initialActiveButton = document.querySelector('.tag-btn.active');
+if (initialActiveButton) {
+    setTimeout(() => {
+        updateTagSelection(initialActiveButton);
+    }, 100);
+}
+
+</script>
+</body>
+</html>

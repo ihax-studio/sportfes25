@@ -1342,6 +1342,21 @@ function successHaptic() {
     }
 }
 
+function confirmHaptic() {
+    doHaptic(() => haptic.confirm());
+}
+
+function staggeredErrorHaptic() {
+    doHaptic(() => {
+        haptic.error();
+        const baseDelay = 1000;
+        const rapidDelay = 40;
+        for (let i = 0; i < 6; i++) {
+          setTimeout(() => doHaptic(() => haptic.error()), baseDelay + i * rapidDelay);
+        }
+    });
+}
+
 // Spawn dots from tap position
 function spawnTapDots(x, y, color = 'white', n = 40, container = tapDotsContainer) {
     if (!container) return;
@@ -1535,12 +1550,7 @@ mainContent.addEventListener('click', (e) => {
     
     const nameElement = document.querySelector('.name-highlight');
     if (nameElement && nameElement.contains(e.target)) {
-        doHaptic(() => haptic.error());
-        setTimeout(() => {
-            for (let i = 0; i < 6; i++) {
-                setTimeout(() => doHaptic(() => haptic.error()), i * 40);
-            }
-        }, 1000);
+        staggeredErrorHaptic();
         spawnTapDots(e.clientX, e.clientY, 'blue', 50);
     } else if (!wrapper.contains(e.target) && e.target.id !== 'writeSuggestion') {
         doHaptic(() => haptic());
@@ -1556,12 +1566,7 @@ mainContent.addEventListener('touchend', (e) => {
     const targetElement = document.elementFromPoint(touch.clientX, touch.clientY);
     
     if (nameElement && nameElement.contains(targetElement)) {
-        doHaptic(() => haptic.error());
-        setTimeout(() => {
-            for (let i = 0; i < 6; i++) {
-                setTimeout(() => doHaptic(() => haptic.error()), i * 40);
-            }
-        }, 1000);
+        staggeredErrorHaptic();
         spawnTapDots(touch.clientX, touch.clientY, 'blue', 50);
     } else if (!wrapper.contains(targetElement) && targetElement.id !== 'writeSuggestion') {
         doHaptic(() => haptic());
@@ -1800,8 +1805,14 @@ suggestionInput.addEventListener('input', () => {
     }
 });
 
+suggestionPopup.addEventListener('click', (e) => {
+    if (e.target.id !== 'suggestion-popup-close' && !suggestionPopupClose.contains(e.target)) {
+        confirmHaptic();
+    }
+});
+
 suggestionPopupClose.addEventListener('click', () => {
-    impactHaptic();
+    confirmHaptic();
     suggestionPopup.classList.add('closing');
 });
 
@@ -1825,7 +1836,7 @@ const encode = (data) => {
 }
 
 submitBtn.addEventListener('click', () => {
-    impactHaptic();
+    confirmHaptic();
     const value = suggestionInput.value.trim();
     
     if (value.length === 0) {
@@ -1867,14 +1878,14 @@ submitBtn.addEventListener('click', () => {
 });
 
 writeSuggestionBtn.addEventListener('click', () => {
-    impactHaptic();
+    staggeredErrorHaptic();
     dynamicIslandContainer.classList.add('active');
     island.classList.remove('closing');
     suggestionPopup.classList.add('closing');
 });
 
 closeBtn.addEventListener('click', () => {
-    impactHaptic();
+    confirmHaptic();
     island.classList.add('closing');
     setTimeout(() => {
         dynamicIslandContainer.classList.remove('active');
@@ -1882,7 +1893,7 @@ closeBtn.addEventListener('click', () => {
 });
 
 successCloseBtn.addEventListener('click', () => {
-    impactHaptic();
+    confirmHaptic();
     
     sessionStorage.setItem('showSuggestionForm', 'true');
     
@@ -1914,7 +1925,7 @@ function updateTagSelection(activeButton) {
     selectionIndicator.style.width = `${buttonRect.width}px`;
     selectionIndicator.style.left = `${relativeLeft}px`;
     
-    doHaptic(() => haptic.impact("light"));
+    staggeredErrorHaptic();
 }
 
 tagButtons.forEach(button => {

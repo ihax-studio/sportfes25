@@ -8,10 +8,6 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#000000">
 <title>田中2E 生徒会長選挙</title>
-<script type="module">
-import { haptic } from "https://esm.sh/ios-haptics";
-window.haptic = haptic;
-</script>
 <style>/* Basic setup */
 *, *::before, *::after {
     -webkit-tap-highlight-color: transparent;
@@ -77,7 +73,7 @@ html, body {
     transform: scale(0.95);
 }
 
- @keyframes circle-pop {
+@keyframes circle-pop {
     0% { transform: scale(.6); opacity: 0; }
     100% { transform: scale(1); opacity: 1; }
 }
@@ -117,7 +113,6 @@ html, body {
     z-index: 4001;
 }
 
-
 #thanks-check.show, #suggestion-check.show {
     opacity: 1;
 }
@@ -140,7 +135,7 @@ html, body {
     animation: checkmark-draw 0.6s cubic-bezier(.2,1,.3,1) forwards;
 }
 
- @keyframes checkmark-draw {
+@keyframes checkmark-draw {
     to {
         stroke-dashoffset: 0;
     }
@@ -164,7 +159,7 @@ html, body {
     animation: ring-expand 1.2s cubic-bezier(.2,1,.3,1) forwards;
 }
 
- @keyframes ring-expand {
+@keyframes ring-expand {
     0% { opacity: 1; transform: scale(1); }
     100% { opacity: 0; transform: scale(3); }
 }
@@ -203,7 +198,7 @@ html, body {
     box-shadow: 0 2px 8px rgba(0,0,0,.3);
 }
 
- @keyframes dot-pop {
+@keyframes dot-pop {
     0% { opacity: 0; transform: translate(-50%,-50%) scale(.3); }
     10% { opacity: 1; }
     100% { opacity: 0; transform: translate(var(--tx),var(--ty)) scale(1); }
@@ -259,7 +254,7 @@ html, body {
     animation: slideUp 0.8s cubic-bezier(.2,1,.3,1) forwards;
 }
 
- @keyframes slideUp {
+@keyframes slideUp {
     to {
         opacity: 1;
         transform: translateY(0);
@@ -396,12 +391,11 @@ html, body {
   box-shadow: 0 0 12px rgba(255,255,255,0.5);
 }
 
- @keyframes pulse {
+@keyframes pulse {
   0% { transform: scale(0.95); opacity: 0.7; }
   70% { transform: scale(2); opacity: 0; }
   100% { transform: scale(0.95); opacity: 0; }
 }
-
 
 /* Suggestion Popup */
 #suggestion-popup {
@@ -487,8 +481,6 @@ html, body {
     transform: translateX(-50%) scale(0.98);
 }
 
-
-
 /* Dynamic Island container */
 #dynamicIslandContainer {
     position: fixed;
@@ -511,7 +503,7 @@ html, body {
     pointer-events: auto;
 }
 
- @keyframes sliderSlideUp {
+@keyframes sliderSlideUp {
     to {
         opacity: 1;
         transform: translateY(0);
@@ -678,7 +670,7 @@ html, body {
     animation: successPop 0.6s cubic-bezier(.2,1,.3,1) forwards;
 }
 
- @keyframes successPop {
+@keyframes successPop {
     0% { transform: scale(0); opacity: 0; }
     50% { transform: scale(1.1); }
     100% { transform: scale(1); opacity: 1; }
@@ -820,7 +812,7 @@ html, body {
     animation: dot-pop-dark 1.4s cubic-bezier(.25,.46,.45,.94) forwards;
 }
 
- @keyframes dot-pop-bright {
+@keyframes dot-pop-bright {
     0% { opacity: 0; transform: translate(-50%,-50%) scale(.3); }
     5% { opacity: 1; }
     90% { opacity: 1; }
@@ -867,7 +859,7 @@ html, body {
     animation: collapseIsland 0.4s cubic-bezier(0.4, 0, 0.6, 1) forwards;
 }
 
- @keyframes expandIsland {
+@keyframes expandIsland {
     0% {
         transform: scale(0.3) translateY(-200px);
         opacity: 0;
@@ -880,7 +872,7 @@ html, body {
     }
 }
 
- @keyframes collapseIsland {
+@keyframes collapseIsland {
     0% {
         transform: scale(1) translateY(0);
         opacity: 1;
@@ -943,7 +935,7 @@ html, body {
     animation: slideUpFade 0.5s cubic-bezier(0.4, 0, 0.2, 1) 0.6s backwards;
 }
 
- @keyframes slideUpFade {
+@keyframes slideUpFade {
     0% {
         transform: translateY(20px);
         opacity: 0;
@@ -1019,7 +1011,7 @@ html, body {
     padding: 15px 15px;
     display: flex;
     align-items: center;
-        margin-bottom:-37px;
+    margin-bottom:-37px;
     gap: 11px;
     animation: slideUpFade 0.5s cubic-bezier(0.4, 0, 0.2, 1) 0.8s backwards;
 }
@@ -1113,7 +1105,7 @@ html, body {
 }
 
 .progress-ring {
-    transform: rotate(-90deg); /* Start from the top */
+    transform: rotate(-90deg);
 }
 
 .progress-ring__circle-bg {
@@ -1127,7 +1119,7 @@ html, body {
 }
 
 .ring-container.limit-exceeded .progress-ring__circle {
-    stroke: #ff3b30; /* Red for error */
+    stroke: #ff3b30;
 }
 
 .char-count {
@@ -1150,7 +1142,6 @@ html, body {
     gap: 60px;
     z-index: 4000;
     opacity: 0;
-
     visibility: hidden;
     transition: all 0.5s cubic-bezier(.62,0,.4,1);
     cursor: pointer;
@@ -1159,7 +1150,7 @@ html, body {
 #suggestion-success-text {
     color: #fff;
     font-size: 32px;
-        margin-top:55px;
+    margin-top:55px;
     font-weight: 700;
     text-shadow: 0 5px 18px rgba(0,0,0,.55);
     text-align: center;
@@ -1167,35 +1158,35 @@ html, body {
     margin-bottom:-223px;
 }
 
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
 
-       @media (max-width: 390px) {
+@media (max-width: 390px) {
+    #writeSuggestion {
+        bottom: 140px;
+    }
+}
 
-#writeSuggestion {
-    position: fixed;
-    bottom: 140px;
-
-}}
-       @media (max-width: 376px) {
-
-#writeSuggestion {
-    position: fixed;
-    bottom: 190px;
-
-}}</style>
-
+@media (max-width: 376px) {
+    #writeSuggestion {
+        bottom: 190px;
+    }
+}
+</style>
 </head>
 <body>
 
-<!-- Tap Dots Container for Empty Space Clicks -->
+<!-- Tap Dots Container -->
 <div id="tap-dots"></div>
 
 <!-- Reset Button -->
 <button id="resetButton">やり直す</button>
 
-
-
-<!-- Netlify Hidden Form -->
+<!-- Netlify Form - Hidden (必須) -->
 <form name="suggestion" netlify netlify-honeypot="bot-field" hidden>
+  <input type="text" name="bot-field" />
   <textarea name="message"></textarea>
   <input type="text" name="tag" />
   <input type="text" name="timestamp" />
@@ -1204,30 +1195,25 @@ html, body {
 <!-- Dynamic Island Container -->
 <div id="dynamicIslandContainer" class="active">
     <div class="dynamic-island" id="dynamicIsland">
-        <!-- Swipe Indicator -->
         <div class="swipe-indicator"></div>
-
-        <!-- Header -->
         <div class="header">
-            <span class="emoji-eyes"></span>
+            <span class="emoji-eyes">👀</span>
             <h2 class="title">書いて田中に提案</h2>
             <p class="subtitle">改善点があったら教えて</p>
             <p class="description">おすすめの提案・タップで追加</p>
         </div>
 
-        <!-- Tag Selection -->
         <div class="tag-selection-container">
             <div class="selection-indicator" id="selectionIndicator"></div>
             <div class="tag-options" id="tagOptions">
-                <button class="tag-btn active" data-tag="購買の混雑">購買の混雑</button>
-                <button class="tag-btn" data-tag="自習&講習">自習&講習</button>
-                <button class="tag-btn" data-tag="自販機の種類">自販機の種類</button>
+                <button class="tag-btn active" data-tag="購買の混雑" type="button">購買の混雑</button>
+                <button class="tag-btn" data-tag="自習&講習" type="button">自習&講習</button>
+                <button class="tag-btn" data-tag="自販機の種類" type="button">自販機の種類</button>
             </div>
         </div>
 
-        <!-- Input Section -->
         <div class="input-section">
-            <input type="text" class="input-field" id="suggestionInput" placeholder="ここに入力しよう" maxlength="300">
+            <input type="text" class="input-field" id="suggestionInput" placeholder="ここに入力しよう" maxlength="300" autocomplete="off">
             <div class="ring-container">
                 <svg class="progress-ring" width="36" height="36" viewBox="0 0 36 36">
                     <circle class="progress-ring__circle-bg" stroke-width="3" fill="transparent" r="16" cx="18" cy="18"/>
@@ -1235,12 +1221,11 @@ html, body {
                 </svg>
                 <span class="char-count">0</span>
             </div>
-            <button class="submit-btn" id="submitBtn" disabled>
+            <button class="submit-btn" id="submitBtn" type="button" disabled>
                 <span class="checkmark">✓</span>
             </button>
         </div>
         
-        <!-- Validation Message -->
         <div class="validation-message" id="validationMessage">何か入力して</div>
     </div>
 </div>
@@ -1254,127 +1239,102 @@ html, body {
     <div id="suggestion-thanks-dots"></div>
 </div>
 
-
-<!-- Slide-to-close Overlay -->
 <div id="slide-to-close-overlay"></div>
 
 <script type="module">
-// Import haptics if available
+// ========== HAPTIC SYSTEM - iOS完全対応 ==========
 let haptic = null;
-try {
-    const module = await import("https://esm.sh/ios-haptics");
-    haptic = module.haptic;
-    console.log("Haptics loaded successfully");
-} catch (e) {
-    console.log("Haptics not available:", e);
+let hapticReady = false;
+
+async function initHaptics() {
+    try {
+        const module = await import("https://esm.sh/ios-haptics@1.0.0");
+        haptic = module.haptic;
+        hapticReady = true;
+        console.log("✅ Haptics initialized");
+        setTimeout(() => triggerHaptic('light'), 100);
+        return true;
+    } catch (e) {
+        console.warn("⚠️ Haptics not available:", e);
+        hapticReady = false;
+        return false;
+    }
 }
 
+function triggerHaptic(type = 'light') {
+    if (!hapticReady || !haptic) return;
+    
+    try {
+        switch(type) {
+            case 'light':
+                if (haptic.impact) haptic.impact('light');
+                break;
+            case 'medium':
+                if (haptic.impact) haptic.impact('medium');
+                break;
+            case 'heavy':
+                if (haptic.impact) haptic.impact('heavy');
+                break;
+            case 'selection':
+                if (haptic.selection) {
+                    haptic.selection();
+                } else if (haptic.impact) {
+                    haptic.impact('light');
+                }
+                break;
+            case 'success':
+                if (haptic.notification) {
+                    haptic.notification('success');
+                    setTimeout(() => haptic.notification && haptic.notification('success'), 100);
+                    setTimeout(() => haptic.notification && haptic.notification('success'), 200);
+                } else if (haptic.impact) {
+                    haptic.impact('heavy');
+                    setTimeout(() => haptic.impact && haptic.impact('heavy'), 100);
+                    setTimeout(() => haptic.impact && haptic.impact('heavy'), 200);
+                }
+                break;
+            case 'error':
+                if (haptic.notification) {
+                    haptic.notification('error');
+                } else if (haptic.impact) {
+                    haptic.impact('heavy');
+                }
+                for (let i = 0; i < 6; i++) {
+                    setTimeout(() => {
+                        if (haptic.impact) haptic.impact('medium');
+                    }, 800 + (i * 40));
+                }
+                break;
+        }
+    } catch (error) {
+        console.warn("Haptic error:", error);
+    }
+}
+
+initHaptics();
+
+// ========== NETLIFY FORMS ENCODING - 確実な送信方式 ==========
+function encode(data) {
+    return Object.keys(data)
+        .map(key => `${encodeURIComponent(key)}=${encodeURIComponent(data[key])}`)
+        .join('&');
+}
+
+// ========== DOT ANIMATION SYSTEM ==========
 const tapDotsContainer = document.getElementById('tap-dots');
 
-// Enhanced Haptic functions with better iOS compatibility
-function doHaptic(fn) {
-    if (!haptic) return Promise.resolve();
-    try {
-        let result = fn();
-        if (result && typeof result.then === "function") return result;
-        return Promise.resolve();
-    } catch (error) {
-        console.log("Haptic error:", error);
-        return Promise.resolve();
-    }
-}
-
-// Enhanced haptic feedback functions
-function selectionHaptic() {
-    doHaptic(() => {
-        if (haptic.selection) {
-            haptic.selection();
-        } else if (haptic.impact) {
-            haptic.impact("light");
-        }
-    });
-}
-
-function successHaptic() {
-    // Triple success haptic for enhanced feedback
-    for (let i = 0; i < 3; i++) {
-        setTimeout(() => {
-            doHaptic(() => {
-                if (haptic.notification) {
-                    haptic.notification("success");
-                } else if (haptic.impact) {
-                    haptic.impact("heavy");
-                }
-            });
-        }, i * 100);
-    }
-}
-
-function staggeredErrorHaptic() {
-    doHaptic(() => {
-        // Initial error haptic
-        if (haptic.notification) {
-            haptic.notification("error");
-        } else if (haptic.impact) {
-            haptic.impact("heavy");
-        }
-        
-        // Follow with rapid feedback
-        const baseDelay = 800;
-        const rapidDelay = 40;
-        for (let i = 0; i < 6; i++) {
-            setTimeout(() => {
-                doHaptic(() => {
-                    if (haptic.impact) {
-                        haptic.impact("medium");
-                    }
-                });
-            }, baseDelay + i * rapidDelay);
-        }
-    });
-}
-
-function impactHaptic(intensity = "medium") {
-    doHaptic(() => {
-        if (haptic.impact) {
-            haptic.impact(intensity);
-        }
-    });
-}
-
-function lightHaptic() {
-    impactHaptic("light");
-}
-
-function mediumHaptic() {
-    impactHaptic("medium");
-}
-
-function heavyHaptic() {
-    impactHaptic("heavy");
-}
-
-// Spawn dots from tap position
 function spawnTapDots(x, y, color = 'white', n = 40, container = tapDotsContainer) {
     if (!container) return;
     
-    const W = window.innerWidth;
-    const H = window.innerHeight;
-    const rainbowColors = ['#ff4757', '#ffa502', '#feca57', '#2ed573', '#1e90ff', '#7d5fff', '#ff6b81'];
-
     for (let i = 0; i < n; i++) {
         const dot = document.createElement('div');
         const dotClass = color === 'blue' ? 'dot dot-blue' : 
                         color === 'black' ? 'dot dot-black' : 'dot';
         dot.className = dotClass;
 
-        const size = Math.random() < 0.8 
-            ? (Math.random() * 4 + 3) 
-            : (Math.random() * 8 + 5);
-
+        const size = Math.random() < 0.8 ? (Math.random() * 4 + 3) : (Math.random() * 8 + 5);
         const startX = x + (Math.random() * 40 - 20);
         const startY = y + (Math.random() * 40 - 20);
-
         const angle = Math.random() * Math.PI * 2;
         const distance = 80 + Math.random() * 300;
         const endX = Math.cos(angle) * distance;
@@ -1388,19 +1348,8 @@ function spawnTapDots(x, y, color = 'white', n = 40, container = tapDotsContaine
         dot.style.setProperty('--ty', `${endY}px`);
         dot.style.animationDelay = `${Math.random() * 0.15}s`;
         
-        if (color === 'rainbow') {
-            const randomColor = rainbowColors[Math.floor(Math.random() * rainbowColors.length)];
-            dot.style.background = randomColor;
-            dot.style.boxShadow = `0 2px 8px rgba(0,0,0,.3), 0 0 10px ${randomColor}`;
-        }
-        
         container.appendChild(dot);
-        
-        setTimeout(() => {
-            if (dot.parentNode) {
-                dot.parentNode.removeChild(dot);
-            }
-        }, 1800);
+        setTimeout(() => dot.remove(), 1800);
     }
 }
 
@@ -1415,16 +1364,11 @@ function spawnSuggestionDots(n = 250) {
     for (let i = 0; i < n; i++) {
         const dot = document.createElement('div');
         dot.className = 'dot dot-blue';
-
-        const size = Math.random() < 0.8 
-            ? (Math.random() * 3 + 2) 
-            : (Math.random() * 6 + 4);
-
+        const size = Math.random() < 0.8 ? (Math.random() * 3 + 2) : (Math.random() * 6 + 4);
         const centerX = W / 2;
         const centerY = H / 2;
         const startX = centerX + (Math.random() * 160 - 80);
         const startY = centerY + (Math.random() * 160 - 80);
-
         const angle = Math.random() * Math.PI * 2;
         const distance = 120 + Math.random() * Math.max(W, H) * 0.6;
         const endX = Math.cos(angle) * distance;
@@ -1442,32 +1386,26 @@ function spawnSuggestionDots(n = 250) {
     }
 }
 
-// Enhanced empty space tap detection with haptic feedback
+// ========== EMPTY SPACE TAP ==========
 document.addEventListener('click', (e) => {
-    // Check if click is on empty space (not on any interactive element)
     const clickedElement = e.target;
-    const interactiveElements = ['BUTTON', 'INPUT', 'SELECT', 'TEXTAREA', 'A'];
     const hasInteractiveParent = clickedElement.closest('button, input, select, textarea, a, .dynamic-island, .tag-btn, .submit-btn');
     
-    if (!interactiveElements.includes(clickedElement.tagName) && !hasInteractiveParent) {
+    if (!hasInteractiveParent && !['BUTTON', 'INPUT', 'SELECT', 'TEXTAREA', 'A'].includes(clickedElement.tagName)) {
         spawnTapDots(e.clientX, e.clientY, 'black', 25);
-        lightHaptic(); // Light haptic for empty space taps
+        triggerHaptic('light');
     }
 });
 
-// Reset button with enhanced haptic feedback
+// ========== RESET BUTTON ==========
 document.getElementById('resetButton').addEventListener('click', (e) => {
     e.preventDefault();
-    staggeredErrorHaptic();
+    triggerHaptic('error');
     spawnTapDots(e.clientX, e.clientY, 'blue', 30);
-    
-    // Add slight delay before navigation for haptic to complete
-    setTimeout(() => {
-        window.location.href = 'cc.html';
-    }, 200);
+    setTimeout(() => window.location.href = 'cc.html', 200);
 });
 
-// Dynamic Island Popup Logic
+// ========== DYNAMIC ISLAND & FORM ==========
 const dynamicIslandContainer = document.getElementById('dynamicIslandContainer');
 const island = document.getElementById('dynamicIsland');
 const submitBtn = document.getElementById('submitBtn');
@@ -1478,15 +1416,7 @@ const progressRing = document.querySelector('.progress-ring__circle');
 const charCountText = document.querySelector('.char-count');
 const suggestionSuccessOverlay = document.getElementById('suggestion-success-overlay');
 
-document.addEventListener('DOMContentLoaded', () => {
-    dynamicIslandContainer.classList.add('active');
-    island.classList.remove('closing');
-    
-    // Initialize haptic feedback on page load
-    lightHaptic();
-});
-
-// Character count ring logic
+// Character count ring
 const MAX_CHARS = 300;
 const radius = progressRing.r.baseVal.value;
 const circumference = radius * 2 * Math.PI;
@@ -1499,35 +1429,23 @@ function setProgress(percent) {
     progressRing.style.strokeDashoffset = offset;
 }
 
-// Enhanced input handling with comprehensive haptic feedback
+// ========== INPUT HANDLING ==========
 suggestionInput.addEventListener('input', (e) => {
     const value = suggestionInput.value;
     const count = value.length;
     
-    // Light haptic feedback on every character input
-    lightHaptic();
+    triggerHaptic('light');
 
-    // Prevent input beyond 300 characters with enhanced feedback
     if (count > MAX_CHARS) {
-        // Remove the extra character
         suggestionInput.value = value.substring(0, MAX_CHARS);
-        
-        // Add shake animation
         const inputSection = document.querySelector('.input-section');
         inputSection.classList.add('shake-animation');
-        
-        // Remove shake class after animation
-        setTimeout(() => {
-            inputSection.classList.remove('shake-animation');
-        }, 500);
-        
-        // Enhanced haptic feedback for limit exceeded
-        staggeredErrorHaptic();
+        setTimeout(() => inputSection.classList.remove('shake-animation'), 500);
+        triggerHaptic('error');
         return;
     }
 
     charCountText.textContent = count;
-
     let progress = count / MAX_CHARS;
     if (progress > 1) progress = 1;
     setProgress(progress);
@@ -1542,156 +1460,111 @@ suggestionInput.addEventListener('input', (e) => {
         validationMessage.classList.remove('show');
         if (count > 0) {
             submitBtn.disabled = false;
-            // Medium haptic when submit becomes available
-            if (count === 1) mediumHaptic();
+            if (count === 1) triggerHaptic('medium');
         } else {
             submitBtn.disabled = true;
         }
     }
 });
 
-// Enhanced input focus/blur events with haptic feedback
 suggestionInput.addEventListener('focus', () => {
-    mediumHaptic();
+    triggerHaptic('medium');
     if (suggestionInput.value.length <= MAX_CHARS) {
         validationMessage.classList.remove('show');
     }
 });
 
-suggestionInput.addEventListener('blur', () => {
-    lightHaptic();
-});
+suggestionInput.addEventListener('blur', () => triggerHaptic('light'));
 
-// Enhanced success overlay interaction
+// ========== SUCCESS OVERLAY ==========
 suggestionSuccessOverlay.addEventListener('click', (e) => {
-    selectionHaptic();
+    triggerHaptic('selection');
     spawnTapDots(e.clientX, e.clientY, 'white', 40, document.getElementById('suggestion-thanks-dots'));
 });
 
-// Enhanced swipe down detection with haptic feedback
+// ========== SWIPE DOWN ==========
 let startY = 0;
 let isDragging = false;
 
 island.addEventListener('touchstart', (e) => {
     startY = e.touches[0].clientY;
     isDragging = true;
-    lightHaptic(); // Haptic on touch start
+    triggerHaptic('light');
 });
 
 island.addEventListener('touchmove', (e) => {
     if (!isDragging) return;
-    
     const currentY = e.touches[0].clientY;
     const deltaY = currentY - startY;
     
-    // Progressive haptic feedback during swipe
-    if (deltaY > 50 && deltaY < 80) {
-        mediumHaptic();
-    }
+    if (deltaY > 50 && deltaY < 80) triggerHaptic('medium');
     
-    // If swiped down more than 100px, navigate to cc.html
     if (deltaY > 100) {
-        staggeredErrorHaptic();
+        triggerHaptic('error');
         window.location.href = 'cc.html';
         isDragging = false;
     }
 });
 
 island.addEventListener('touchend', () => {
-    if (isDragging) {
-        lightHaptic(); // Light haptic on touch end
-    }
+    if (isDragging) triggerHaptic('light');
     isDragging = false;
 });
 
-// Enhanced form encoding function
-const encode = (data) => {
-    return Object.keys(data)
-        .map(key => encodeURIComponent(key) + "=" + encodeURIComponent(data[key]))
-        .join("&");
-}
-
-// Enhanced submit button with comprehensive error handling and haptic feedback
-submitBtn.addEventListener('click', (e) => {
+// ========== FORM SUBMISSION - NETLIFY完全対応 ==========
+submitBtn.addEventListener('click', async (e) => {
     e.preventDefault();
     
-    // Initial haptic feedback
-    mediumHaptic();
+    triggerHaptic('medium');
     
     const value = suggestionInput.value.trim();
     const selectedTag = document.querySelector('.tag-btn.active')?.getAttribute('data-tag') || '';
     
-    // Validation with haptic feedback
+    // バリデーション
     if (value.length === 0) {
         validationMessage.textContent = '何か入力して';
         validationMessage.classList.add('show');
-        staggeredErrorHaptic();
+        triggerHaptic('error');
         return;
     }
     
     if (value.length > MAX_CHARS) {
-        staggeredErrorHaptic();
+        triggerHaptic('error');
         return;
     }
     
-    // Check if submission size is under 0.5kb (500 bytes)
-    const submissionData = {
-        message: value,
-        tag: selectedTag,
-        timestamp: new Date().toISOString()
-    };
-    
-    const submissionSize = new Blob([JSON.stringify(submissionData)]).size;
-    if (submissionSize > 500) {
-        validationMessage.textContent = 'メッセージが長すぎます';
-        validationMessage.classList.add('show');
-        staggeredErrorHaptic();
-        return;
-    }
-    
-    // --- Enhanced Netlify Form Submission with better error handling ---
-    const formData = encode({
-        "form-name": "suggestion",
-        "message": value,
-        "tag": selectedTag,
-        "timestamp": submissionData.timestamp
-    });
-    
-    // Show loading state
+    // ローディング開始
     submitBtn.disabled = true;
     submitBtn.innerHTML = '<div style="width: 20px; height: 20px; border: 2px solid #fff; border-radius: 50%; border-top: 2px solid transparent; animation: spin 1s linear infinite;"></div>';
     
-    // Submit form with enhanced error handling
-    fetch("/", {
-        method: "POST",
-        headers: { 
-            "Content-Type": "application/x-www-form-urlencoded",
-            "Accept": "text/html"
-        },
-        body: formData
-    })
-    .then(response => {
+    try {
+        // Netlify Forms送信 - application/x-www-form-urlencoded形式
+        const response = await fetch('/', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: encode({
+                'form-name': 'suggestion',
+                'message': value,
+                'tag': selectedTag,
+                'timestamp': new Date().toISOString()
+            })
+        });
+        
         if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+            throw new Error(`HTTP ${response.status}`);
         }
-        return response.text();
-    })
-    .then(data => {
-        console.log("Form submitted successfully:", data);
         
-        // --- Success UI Transition with enhanced haptics ---
-        successHaptic();
+        console.log("✅ Form submitted successfully");
         
-        // Restore submit button
+        // 成功ハプティック
+        triggerHaptic('success');
+        
+        // 成功UI
         submitBtn.innerHTML = '<span class="checkmark">✓</span>';
-        
-        // Add success animation to submit button
         submitBtn.style.background = '#34C759';
-        setTimeout(() => {
-            submitBtn.style.background = '#1a1a1a';
-        }, 1000);
+        setTimeout(() => submitBtn.style.background = '#1a1a1a', 1000);
         
-        // Continue with success animation
+        // アニメーション遷移
         island.classList.add('closing');
         setTimeout(() => dynamicIslandContainer.classList.remove('active'), 400);
 
@@ -1702,64 +1575,35 @@ submitBtn.addEventListener('click', (e) => {
         suggestionSuccessOverlay.style.opacity = 1;
         
         setTimeout(() => {
-            suggestionCheck.classList.add('show');
-            suggestionCheck.classList.add('animate');
+            suggestionCheck.classList.add('show', 'animate');
             suggestionSuccessText.classList.add('animate');
             spawnSuggestionDots();
         }, 500);
-    })
-    .catch(error => {
-        console.error("Form submission error:", error);
         
-        // Show error with haptic feedback
+    } catch (error) {
+        console.error("❌ Submission error:", error);
+        
+        triggerHaptic('error');
+        
         validationMessage.textContent = '送信に失敗しました。もう一度試してください。';
         validationMessage.classList.add('show');
-        staggeredErrorHaptic();
         
-        // Restore submit button
         submitBtn.disabled = false;
         submitBtn.innerHTML = '<span class="checkmark">✓</span>';
-        
-        // Try alternative submission method (using hidden form)
-        try {
-            const form = document.querySelector('form[name="suggestion"]');
-            const messageInput = form.querySelector('textarea[name="message"]');
-            const tagInput = form.querySelector('input[name="tag"]');
-            const timestampInput = form.querySelector('input[name="timestamp"]');
-            
-            if (messageInput && tagInput && timestampInput) {
-                messageInput.value = value;
-                tagInput.value = selectedTag;
-                timestampInput.value = submissionData.timestamp;
-                
-                // Create and submit form programmatically
-                const tempForm = form.cloneNode(true);
-                tempForm.style.display = 'none';
-                document.body.appendChild(tempForm);
-                tempForm.submit();
-            }
-        } catch (fallbackError) {
-            console.error("Fallback submission failed:", fallbackError);
-        }
-    });
+    }
 });
 
-// Enhanced tag selection logic with haptic feedback
+// ========== TAG SELECTION ==========
 const tagOptionsContainer = document.getElementById('tagOptions');
 const selectionIndicator = document.getElementById('selectionIndicator');
 const tagButtons = document.querySelectorAll('.tag-btn');
 
 function updateTagSelection(activeButton) {
-    // Enhanced haptic feedback for tag selection
-    selectionHaptic();
+    triggerHaptic('selection');
     
-    // Remove active class from all buttons
     tagButtons.forEach(btn => btn.classList.remove('active'));
-    
-    // Add active class to clicked button
     activeButton.classList.add('active');
     
-    // Update selection indicator position and width
     const buttonRect = activeButton.getBoundingClientRect();
     const containerRect = tagOptionsContainer.getBoundingClientRect();
     const relativeLeft = buttonRect.left - containerRect.left + (buttonRect.width / 2);
@@ -1767,7 +1611,6 @@ function updateTagSelection(activeButton) {
     selectionIndicator.style.width = `${buttonRect.width + 4}px`;
     selectionIndicator.style.left = `${relativeLeft}px`;
     
-    // Update placeholder text based on selected tag
     const selectedTag = activeButton.getAttribute('data-tag');
     const placeholderTexts = {
         '購買の混雑': '購買の改善案を入力...',
@@ -1777,58 +1620,42 @@ function updateTagSelection(activeButton) {
     suggestionInput.placeholder = placeholderTexts[selectedTag] || 'ここに入力しよう';
 }
 
-// Enhanced tag button event listeners with haptic feedback
 tagButtons.forEach(button => {
-    // Click events
     button.addEventListener('click', (e) => {
         e.preventDefault();
         updateTagSelection(button);
-        
-        // Visual feedback
         spawnTapDots(e.clientX, e.clientY, 'blue', 15);
     });
     
-    // Touch events for better mobile experience
-    button.addEventListener('touchstart', () => {
-        lightHaptic();
+    button.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        triggerHaptic('light');
     });
     
-    // Hover effects with haptic
     button.addEventListener('mouseenter', () => {
         if (!button.classList.contains('active')) {
-            lightHaptic();
+            triggerHaptic('light');
         }
     });
 });
 
-// Initialize the first button as active and set up indicator
+// 初期タグ設定
 const initialActiveButton = document.querySelector('.tag-btn.active');
 if (initialActiveButton) {
-    setTimeout(() => {
-        updateTagSelection(initialActiveButton);
-    }, 100);
+    setTimeout(() => updateTagSelection(initialActiveButton), 100);
 }
 
-// Add CSS for loading spinner
-const style = document.createElement('style');
-style.textContent = `
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
-`;
-document.head.appendChild(style);
-
-// Enhanced error handling for page visibility changes
-document.addEventListener('visibilitychange', () => {
-    if (!document.hidden) {
-        lightHaptic(); // Light haptic when returning to page
-    }
+// ========== PAGE LIFECYCLE ==========
+document.addEventListener('DOMContentLoaded', () => {
+    dynamicIslandContainer.classList.add('active');
+    island.classList.remove('closing');
 });
 
-// Log haptic availability
-console.log("Haptic support:", haptic ? "Available" : "Not available");
+document.addEventListener('visibilitychange', () => {
+    if (!document.hidden) triggerHaptic('light');
+});
 
+console.log("🚀 App initialized - Haptics:", hapticReady ? "Ready" : "Not available");
 </script>
 </body>
 </html>

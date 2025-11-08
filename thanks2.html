@@ -25,6 +25,8 @@ html, body {
     padding: 0;
     box-sizing: border-box;
     touch-action: manipulation;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
 
 /* Container for the "Thanks" screen */
@@ -515,7 +517,6 @@ html, body {
     width: 340px;
     height: 64px;
     transform: scale(1);
-    will-change: transform;
     transition: opacity 0.5s cubic-bezier(.62,0,.4,1);
 }
 
@@ -597,7 +598,6 @@ html, body {
         0 2px 8px rgba(0,0,0,0.15),
         0 8px 24px rgba(0,0,0,0.1),
         inset 0 1px 2px rgba(255,255,255,0.8);
-    will-change: box-shadow, left, background;
     cursor: grab;
     user-select: none;
     transition:
@@ -1024,8 +1024,11 @@ html, body {
     font-size: 18px;
     color: #333;
     font-weight: 500;
-    -webkit-user-select: text;
-    user-select: text;
+    -webkit-user-select: text !important;
+    -moz-user-select: text !important;
+    -ms-user-select: text !important;
+    user-select: text !important;
+    -webkit-touch-callout: default !important;
 }
 
 .input-field::placeholder {
@@ -1214,7 +1217,7 @@ html, body {
         </div>
 
         <div class="input-section">
-            <input type="text" class="input-field" id="suggestionInput" placeholder="ここに入力しよう" maxlength="300" autocomplete="off">
+            <input type="text" class="input-field" id="suggestionInput" placeholder="ここに入力しよう" maxlength="300" autocomplete="off" autocorrect="on" autocapitalize="sentences" spellcheck="true">
             <div class="ring-container">
                 <svg class="progress-ring" width="36" height="36" viewBox="0 0 36 36">
                     <circle class="progress-ring__circle-bg" stroke-width="3" fill="transparent" r="16" cx="18" cy="18"/>
@@ -1340,12 +1343,12 @@ function encode(data) {
 // ========== DOT ANIMATION SYSTEM ==========
 const tapDotsContainer = document.getElementById('tap-dots');
 
-function spawnTapDots(x, y, color = 'white', n = 40, container = tapDotsContainer) {
+function spawnTapDots(x, y, color = 'white', n = 20, container = tapDotsContainer) {
     if (!container) return;
-    
+
     for (let i = 0; i < n; i++) {
         const dot = document.createElement('div');
-        const dotClass = color === 'blue' ? 'dot dot-blue' : 
+        const dotClass = color === 'blue' ? 'dot dot-blue' :
                         color === 'black' ? 'dot dot-black' : 'dot';
         dot.className = dotClass;
 
@@ -1364,16 +1367,16 @@ function spawnTapDots(x, y, color = 'white', n = 40, container = tapDotsContaine
         dot.style.setProperty('--tx', `${endX}px`);
         dot.style.setProperty('--ty', `${endY}px`);
         dot.style.animationDelay = `${Math.random() * 0.15}s`;
-        
+
         container.appendChild(dot);
         setTimeout(() => dot.remove(), 1800);
     }
 }
 
-function spawnSuggestionDots(n = 250) {
+function spawnSuggestionDots(n = 100) {
     const container = document.getElementById('suggestion-thanks-dots');
     if (!container) return;
-    
+
     const W = window.innerWidth;
     const H = window.innerHeight;
     container.innerHTML = '';
@@ -1398,7 +1401,7 @@ function spawnSuggestionDots(n = 250) {
         dot.style.setProperty('--tx', `${endX}px`);
         dot.style.setProperty('--ty', `${endY}px`);
         dot.style.animationDelay = `${Math.random() * 0.25}s`;
-        
+
         container.appendChild(dot);
     }
 }
@@ -1407,9 +1410,9 @@ function spawnSuggestionDots(n = 250) {
 document.addEventListener('click', (e) => {
     const clickedElement = e.target;
     const hasInteractiveParent = clickedElement.closest('button, input, select, textarea, a, .dynamic-island, .tag-btn, .submit-btn');
-    
+
     if (!hasInteractiveParent && !['BUTTON', 'INPUT', 'SELECT', 'TEXTAREA', 'A'].includes(clickedElement.tagName)) {
-        spawnTapDots(e.clientX, e.clientY, 'black', 25);
+        spawnTapDots(e.clientX, e.clientY, 'black', 12);
         doHaptic(); // 空白タップはhapticのみ、リダイレクトなし
     }
 });
@@ -1418,7 +1421,7 @@ document.addEventListener('click', (e) => {
 document.getElementById('resetButton').addEventListener('click', (e) => {
     e.preventDefault();
     doHapticStaggeredError(); // エラー系haptic
-    spawnTapDots(e.clientX, e.clientY, 'blue', 30);
+    spawnTapDots(e.clientX, e.clientY, 'blue', 15);
     setTimeout(() => window.location.href = 'cc.html', 200);
 });
 
@@ -1450,8 +1453,6 @@ function setProgress(percent) {
 suggestionInput.addEventListener('input', (e) => {
     const value = suggestionInput.value;
     const count = value.length;
-    
-    doHaptic(); // 入力時のhaptic
 
     if (count > MAX_CHARS) {
         suggestionInput.value = value.substring(0, MAX_CHARS);
@@ -1477,7 +1478,7 @@ suggestionInput.addEventListener('input', (e) => {
         validationMessage.classList.remove('show');
         if (count > 0) {
             submitBtn.disabled = false;
-            if (count === 1) doHapticConfirm(); // 1文字目でconfirm haptic
+            if (count === 1) doHapticConfirm(); // 1文字目のみhaptic
         } else {
             submitBtn.disabled = true;
         }
@@ -1491,21 +1492,21 @@ suggestionInput.addEventListener('focus', () => {
     }
 });
 
-suggestionInput.addEventListener('blur', () => doHaptic());
-
 // ========== SUCCESS OVERLAY ==========
 suggestionSuccessOverlay.addEventListener('click', (e) => {
     doHapticSelection(); // 成功画面タップ時のhaptic
-    spawnTapDots(e.clientX, e.clientY, 'white', 40, document.getElementById('suggestion-thanks-dots'));
+    spawnTapDots(e.clientX, e.clientY, 'white', 20, document.getElementById('suggestion-thanks-dots'));
 });
 
 // ========== SWIPE DOWN ==========
 let startY = 0;
 let isDragging = false;
+let swipeHapticFired = false;
 
 island.addEventListener('touchstart', (e) => {
     startY = e.touches[0].clientY;
     isDragging = true;
+    swipeHapticFired = false;
     doHaptic();
 });
 
@@ -1513,9 +1514,12 @@ island.addEventListener('touchmove', (e) => {
     if (!isDragging) return;
     const currentY = e.touches[0].clientY;
     const deltaY = currentY - startY;
-    
-    if (deltaY > 50 && deltaY < 80) doHapticConfirm();
-    
+
+    if (deltaY > 50 && deltaY < 80 && !swipeHapticFired) {
+        doHapticConfirm();
+        swipeHapticFired = true;
+    }
+
     if (deltaY > 100) {
         doHapticStaggeredError();
         window.location.href = 'cc.html';
@@ -1524,8 +1528,8 @@ island.addEventListener('touchmove', (e) => {
 });
 
 island.addEventListener('touchend', () => {
-    if (isDragging) doHaptic();
     isDragging = false;
+    swipeHapticFired = false;
 });
 
 // ========== FORM SUBMISSION - NETLIFY確実送信 ==========
@@ -1662,13 +1666,7 @@ tagButtons.forEach(button => {
         }
         e.preventDefault();
         updateTagSelection(button);
-        spawnTapDots(e.clientX, e.clientY, 'blue', 15);
-    });
-
-    button.addEventListener('mouseenter', () => {
-        if (!button.classList.contains('active')) {
-            doHaptic();
-        }
+        spawnTapDots(e.clientX, e.clientY, 'blue', 10);
     });
 });
 
@@ -1682,13 +1680,6 @@ if (initialActiveButton) {
 document.addEventListener('DOMContentLoaded', () => {
     dynamicIslandContainer.classList.add('active');
     island.classList.remove('closing');
-    
-    // ページロード時のhaptic
-    setTimeout(() => doHaptic(), 100);
-});
-
-document.addEventListener('visibilitychange', () => {
-    if (!document.hidden) doHaptic();
 });
 
 console.log("🚀 App initialized - Haptics ready, Netlify Forms configured");

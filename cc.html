@@ -2,23 +2,54 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>2E田中</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>2E田中寿弥</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+/* テキスト選択や拡大鏡を無効化 */
+* {
+  -webkit-user-select: none;  /* iOS Safari */
+  -moz-user-select: none;     /* Firefox */
+  -ms-user-select: none;      /* IE/Edge */
+  user-select: none;          /* 標準 */
+  -webkit-touch-callout: none; /* 長押しメニュー無効化 */
+  -webkit-tap-highlight-color: transparent; /* ハイライト除去 */
+}
+
+/* 入力欄だけは選択できるように戻す */
+input, textarea {
+  -webkit-user-select: text;
+  user-select: text;
+}
+</style>
+
+<script>
+// JSでも念押しでブロック
+document.addEventListener('selectstart', e => e.preventDefault());
+document.addEventListener('gesturestart', e => e.preventDefault()); // iOSピンチズーム対策
+document.addEventListener('touchstart', e => {
+  if (e.touches.length > 1) e.preventDefault(); // 複数指拡大防止
+}, { passive: false });
+</script>
+
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            -webkit-user-select: none; /* Safari */
-            -ms-user-select: none; /* IE 10+ */
-            user-select: none; /* Standard syntax */
-            -webkit-tap-highlight-color: transparent;
         }
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Segoe UI', 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', Meiryo, sans-serif;
             overscroll-behavior-y: none;
+        }
+
+        /* 標準の文字選択機能をblock */
+        * {
+            user-select: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
         }
 
         /* ==================== スプラッシュ画面 ==================== */
@@ -185,6 +216,34 @@
             }
         }
 
+        /* 再アニメーション用 */
+        @keyframes reExpandIsland {
+            0% {
+                width: 420px;
+                height: 60px;
+                border-radius: 30px;
+            }
+            30% {
+                width: 12px;
+                height: 12px;
+                border-radius: 50%;
+            }
+            70% {
+                width: 12px;
+                height: 12px;
+                border-radius: 50%;
+            }
+            100% {
+                width: 420px;
+                height: 60px;
+                border-radius: 30px;
+            }
+        }
+
+        .dynamic-island.re-expand {
+            animation: reExpandIsland 1.2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+
         @media (max-width: 768px) {
             @keyframes expandIsland {
                 0% {
@@ -193,6 +252,31 @@
                     border-radius: 50%;
                 }
                 50% {
+                    width: 12px;
+                    height: 12px;
+                    border-radius: 50%;
+                }
+                100% {
+                    width: 90%;
+                    max-width: 380px;
+                    height: 60px;
+                    border-radius: 30px;
+                }
+            }
+
+            @keyframes reExpandIsland {
+                0% {
+                    width: 90%;
+                    max-width: 380px;
+                    height: 60px;
+                    border-radius: 30px;
+                }
+                30% {
+                    width: 12px;
+                    height: 12px;
+                    border-radius: 50%;
+                }
+                70% {
                     width: 12px;
                     height: 12px;
                     border-radius: 50%;
@@ -359,8 +443,8 @@
 
         @media (max-width: 768px) {
             .circle-container {
-                width: 90vmin;
-                height: 90vmin;
+                width: 90vw;
+                height: 90vw;
                 max-width: 400px;
                 max-height: 400px;
             }
@@ -728,7 +812,7 @@
             pointer-events: auto;
         }
 
-        /* 書いて提案ボタン（2-E田中と同じスタイル） */
+        /* 書いて提案ボタン（2-E田中寿弥と同じスタイル） */
         .submit-button {
             position: fixed;
             bottom: 100px;
@@ -776,115 +860,6 @@
             .submit-button-text {
                 font-size: 14px;
             }
-        }
-
-        /* ありがとう画面 */
-        #thanks-overlay {
-            position: fixed;
-            inset: 0;
-            z-index: 10000;
-            background: #000000;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            gap: 24px;
-            opacity: 0;
-            visibility: hidden;
-            transition: opacity 0.6s ease, visibility 0.6s ease;
-        }
-
-        #thanks-overlay.active {
-            opacity: 1;
-            visibility: visible;
-        }
-
-        #thanks-circle {
-            width: 180px;
-            height: 180px;
-            border: 3px solid rgba(255, 255, 255, 0.9);
-            border-radius: 9999px;
-            box-shadow: 0 0 20px rgba(255, 255, 255, 0.35), 0 0 50px rgba(255, 255, 255, 0.15) inset;
-            display: grid;
-            place-items: center;
-            position: relative;
-            overflow: visible;
-        }
-
-        #thanks-circle.animate {
-            animation: circle-pop 0.7s cubic-bezier(0.2, 1, 0.3, 1) both;
-        }
-
-        @keyframes circle-pop {
-            0% { transform: scale(0.6); opacity: 0; }
-            100% { transform: scale(1); opacity: 1; }
-        }
-
-        #thanks-arrow-text {
-            font-weight: 400;
-            font-size: 72px;
-            line-height: 1;
-            color: #fff;
-            position: relative;
-            z-index: 2;
-        }
-
-        #thanks-ring {
-            position: absolute;
-            inset: 0;
-            margin: auto;
-            width: 180px;
-            height: 180px;
-            border-radius: 9999px;
-            border: 3px solid rgba(255, 255, 255, 0.9);
-            box-shadow: 0 0 18px rgba(255, 255, 255, 0.35);
-            z-index: 1;
-            opacity: 0;
-            transform: scale(1);
-        }
-
-        #thanks-ring.ring-anim {
-            animation: ring-expand 1.2s cubic-bezier(0.2, 1, 0.3, 1) forwards;
-        }
-
-        @keyframes ring-expand {
-            0% { opacity: 1; transform: scale(1); }
-            100% { opacity: 0; transform: scale(3); }
-        }
-
-        #thanks-text {
-            font-size: 32px;
-            font-weight: 700;
-            color: #fff;
-            letter-spacing: 0.02em;
-            text-shadow: 0 5px 18px rgba(0, 0, 0, 0.55);
-        }
-
-        #thanks-sub {
-            font-size: 16px;
-            color: #cfcfcf;
-        }
-
-        #thanks-dots {
-            position: absolute;
-            inset: 0;
-            pointer-events: none;
-            overflow: hidden;
-            z-index: 10001;
-        }
-
-        #thanks-dots .dot {
-            position: absolute;
-            border-radius: 9999px;
-            background: #ffffff;
-            opacity: 0;
-            animation: dot-pop 1.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
-        }
-
-        @keyframes dot-pop {
-            0% { opacity: 0; transform: translate(-50%, -50%) scale(0.3); }
-            10% { opacity: 1; }
-            100% { opacity: 0; transform: translate(var(--tx), var(--ty)) scale(1); }
         }
 
         /* 要素の縮小アニメーション */
@@ -960,18 +935,22 @@
             font-weight: 300;
             color: rgba(0, 0, 0, 0.7);
             opacity: 0;
-            transition: opacity 0.5s ease;
+            transition: opacity 0.5s ease, transform 0.2s ease;
             pointer-events: none;
             z-index: 9999;
             transform-style: preserve-3d;
             animation: arrow3D 3s ease-in-out infinite;
-            text-shadow: 
+            text-shadow:
                 0 1px 0 rgba(255, 255, 255, 0.8),
                 0 2px 0 rgba(0, 0, 0, 0.2),
                 0 3px 0 rgba(0, 0, 0, 0.15),
                 0 4px 0 rgba(0, 0, 0, 0.1),
                 0 5px 10px rgba(0, 0, 0, 0.2);
             cursor: pointer;
+        }
+
+        .center-arrow:active {
+            transform: scale(0.95);
         }
 
         /* ===== 確認画面UI ===== */
@@ -1131,39 +1110,39 @@
             cursor: pointer;
             margin: 40px 0;
             transition: all 0.3s ease;
-            box-shadow: 
+            box-shadow:
                 0 12px 40px rgba(0, 0, 0, 0.15),
                 inset 0 2px 8px rgba(255, 255, 255, 0.6);
             animation: floatUpAndScale 2s ease-in-out infinite;
         }
-        
+
         /* インライン矢印ボタン（選択したアイテムと一緒に表示） */
         .confirmation-center-arrow-inline {
             width: 140px;
             height: 140px;
             border-radius: 50%;
-            background: #007AFF;
+            background: rgba(255, 255, 255, 0.7);
             backdrop-filter: blur(15px);
             border: 2px solid rgba(255, 255, 255, 0.9);
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 64px;
-            color: white;
+            color: rgba(0, 0, 0, 0.7);
             cursor: pointer;
             transition: all 0.3s ease;
-            box-shadow: 
-                0 12px 40px rgba(0, 122, 255, 0.4),
+            box-shadow:
+                0 12px 40px rgba(0, 0, 0, 0.15),
                 inset 0 2px 8px rgba(255, 255, 255, 0.6);
             animation: floatUpAndScaleInline 2s ease-in-out infinite, slideUpButtons 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
             animation-delay: 0s, 0.15s;
             opacity: 0;
         }
-        
+
         .confirmation-center-arrow-inline:active {
             transform: scale(0.95);
         }
-        
+
         @keyframes floatUpAndScaleInline {
             0%, 100% {
                 transform: translateY(0) scale(1);
@@ -1578,7 +1557,7 @@
                         2E田中
                     </h1>
                     <h1 class="text-9xl md:text-8xl lg:text-9xl font-bold text-white leading-tight opacity-70">
-                        田中
+                        寿弥
                     </h1>
                 </div>
             </div>
@@ -1593,14 +1572,14 @@
                     </div>
                     
                     <button class="main-button relative px-12 py-5 bg-transparent border-2 border-white rounded-full text-white text-lg md:text-xl font-medium tracking-widest shadow-lg">
-                        2E 田中 2E
+                        2E 田中寿弥 2E
                     </button>
                 </div>
             </div>
 
         </div>
     </div>
-    
+
     <form id="suggestion-form" name="suggestion" method="POST" action="thanks.html" data-netlify="true">
         <input type="hidden" name="form-name" value="suggestion" />
         <input type="hidden" id="selection1" name="selection1" />
@@ -1613,8 +1592,8 @@
 
             <!-- Dynamic Island -->
             <div class="dynamic-island" id="dynamicIsland">
-                <div class="island-text" id="islandText1">今、悩んでるカテゴリを真ん中の⚪︎に投げよう</div>
-                <div class="island-text" id="islandText2">あと1個！丸になげてみて👀</div>
+                <div class="island-text" id="islandText1">今、学校で悩んでるカテゴリを２個選ぼう</div>
+                <div class="island-text" id="islandText2">あと1個！えらんでみて👀</div>
                 <div class="island-text" id="islandText3">いいね！タップして田中に提案しよう</div>
             </div>
 
@@ -1741,7 +1720,7 @@
     <div class="blur-overlay" id="blurOverlay"></div>
     <div class="confirmation-screen" id="confirmationScreen">
         <div class="confirmation-banner">
-            提案内容を確認してください
+            いいね！ここをタップか丸をスワイプして田中に提案しよう
         </div>
         
         <div class="selected-items-display" id="selectedItemsDisplay">
@@ -1749,44 +1728,22 @@
         </div>
         
         <div class="confirmation-buttons">
-            <button class="btn-redo" id="redoButton">えらび直す</button>
+            <button class="btn-redo" id="haptic">えらび直す</button>
             <button class="btn-suggest-text" id="suggestTextButton">書いて田中に提案</button>
         </div>
         
         <div class="confirmation-footer">
+            <div>提案の内容を確認してください</div>
             <div class="confirmation-name">2-E 田中寿弥</div>
         </div>
     </div>
 
-    <!-- ありがとう画面 -->
-    <div id="thanks-overlay">
-        <div id="thanks-circle">
-            <div id="thanks-ring"></div>
-            <div id="thanks-arrow-text">↑</div>
-        </div>
-        <div id="thanks-text">ありがとう。</div>
-        <div id="thanks-sub">2E田中寿弥に提案を送りました</div>
-        <div id="thanks-dots"></div>
-    </div>
-
-    <script type="module">
-        // hapticライブラリをインポートし、グローバルで使えるようにする
-        import { haptic } from "https://esm.sh/ios-haptics";
-        window.haptic = haptic;
-
-        // スプラッシュ画面のボタンに触覚フィードバックを追加
-        const mainButton = document.querySelector('.main-button');
-        if (mainButton) {
-            mainButton.addEventListener('click', () => {
-                if(window.haptic) window.haptic('impact');
-            });
-        }
-    </script>
     <script>
         const splash = document.getElementById('splash-screen');
         const mainUI = document.getElementById('main-ui');
         let canTransition = false;
         
+        // 1秒後にクリック可能に
         setTimeout(() => {
             canTransition = true;
         }, 1000);
@@ -1794,7 +1751,6 @@
         setTimeout(() => transitionToMain(), 1500);
         splash.addEventListener('click', () => {
             if (canTransition) {
-                if(window.haptic) window.haptic('impact');
                 transitionToMain();
             }
         });
@@ -1809,6 +1765,22 @@
         }
 
         function initializeMainUI() {
+            // Haptic Feedback Object
+            const haptic = {
+                vibrate: (pattern) => {
+                    if (window.navigator.vibrate) {
+                        try {
+                            window.navigator.vibrate(pattern);
+                        } catch (e) {
+                            console.log("Vibration failed", e);
+                        }
+                    }
+                },
+                success: function() { this.vibrate([100, 50, 100]); },
+                error: function() { this.vibrate([75, 50, 75, 50, 75]); },
+                click: function() { this.vibrate(20); }
+            };
+
             const form = document.getElementById('suggestion-form');
             const container = document.querySelector('.circle-container');
             const containerRect = container.getBoundingClientRect();
@@ -1825,16 +1797,6 @@
             const selectedIcons = new Map();
             const maxSelection = 2;
             let currentIslandText = 1;
-
-            // haptic関数がなければ何もしないダミー関数を定義
-            const haptic = window.haptic || function() {};
-            
-            function hapticEvenBurst() {
-                const delay = 50; // 50ms間隔
-                for (let i = 0; i < 5; i++) { // 5回
-                    setTimeout(() => haptic('impact'), i * delay);
-                }
-            }
 
             if (window.innerWidth <= 768) {
                 progressRing.setAttribute('viewBox', '0 0 140 140');
@@ -1859,8 +1821,8 @@
                 icon.style.left = `${centerX + x}px`;
                 icon.style.top = `${centerY + y}px`;
                 icon.style.transform = 'translate(-50%, -50%)';
-                icon.dataset.originalX = icon.style.left;
-                icon.dataset.originalY = icon.style.top;
+                icon.dataset.originalX = centerX + x;
+                icon.dataset.originalY = centerY + y;
             });
 
             const outerIcons = document.querySelectorAll('.outer-icon');
@@ -1875,18 +1837,18 @@
                 icon.style.left = `${centerX + x}px`;
                 icon.style.top = `${centerY + y}px`;
                 icon.style.transform = 'translate(-50%, -50%)';
-                icon.dataset.originalX = icon.style.left;
-                icon.dataset.originalY = icon.style.top;
+                icon.dataset.originalX = centerX + x;
+                icon.dataset.originalY = centerY + y;
             });
 
             setTimeout(() => document.getElementById('islandText1').classList.add('visible'), 1500);
 
             const island = document.getElementById('dynamicIsland');
             island.addEventListener('click', function() {
-                haptic('impact');
-                // if (selectedCards.length === 2) {
-                //     showConfirmationScreen();
-                // }
+                haptic.click();
+                if (selectedCards.length === 2) {
+                    showConfirmationScreen();
+                }
             });
 
             function updateIslandText(textNumber) {
@@ -1970,21 +1932,23 @@
                             updateProgressRing(100);
                             setTimeout(() => {
                                 progressRing.classList.add('hidden');
-                                
+
                                 const completionBloom = document.getElementById('completionBloom');
                                 const bloomPulse = document.getElementById('bloomPulse');
                                 const lightPulse1 = document.getElementById('lightPulse1');
                                 const lightPulse2 = document.getElementById('lightPulse2');
                                 const lightPulse3 = document.getElementById('lightPulse3');
-                                
+
                                 completionBloom.classList.add('active');
                                 setTimeout(() => lightPulse1.classList.add('active'), 0);
                                 setTimeout(() => lightPulse2.classList.add('active'), 200);
                                 setTimeout(() => lightPulse3.classList.add('active'), 400);
                                 setTimeout(() => bloomPulse.classList.add('active'), 800);
-                                
-                                // Skip the "tap to suggest" step and show the confirmation screen directly
-                                setTimeout(showConfirmationScreen, 1200);
+
+                                // 2個選んだら即座に確認画面を表示
+                                setTimeout(() => {
+                                    showConfirmationScreen();
+                                }, 1000);
                             }, 800);
                         }
                     }, 100);
@@ -1992,7 +1956,7 @@
             }
 
             function submitForm() {
-                haptic('success');
+                haptic.success();
                 if (selectedCards.length === 2) {
                     document.getElementById('selection1').value = selectedCards[0].dataset.title;
                     document.getElementById('selection2').value = selectedCards[1].dataset.title;
@@ -2003,61 +1967,39 @@
             const confirmationScreen = document.getElementById('confirmationScreen');
             const blurOverlay = document.getElementById('blurOverlay');
             const selectedItemsDisplay = document.getElementById('selectedItemsDisplay');
-            const redoButton = document.getElementById('redoButton');
+            const redoButton = document.getElementById('haptic');
             const suggestTextButton = document.getElementById('suggestTextButton');
             
             function showConfirmationScreen() {
-                haptic('impact');
+                haptic.click();
                 selectedItemsDisplay.innerHTML = '';
                 
-                // Add first selected card
                 if (selectedCards.length >= 1) {
                     const firstCard = selectedCards[0];
                     const firstItemDiv = document.createElement('div');
                     firstItemDiv.className = 'selected-item-card';
                     firstItemDiv.style.animationDelay = '0s';
                     firstItemDiv.innerHTML = `
-                        <div class="selected-item-circle" style="color: ${firstCard.dataset.color};">${firstCard.dataset.emoji}</div>
+                        <div class="selected-item-circle">${firstCard.dataset.emoji}</div>
                         <div class="selected-item-title">${firstCard.dataset.title}</div>
                     `;
                     selectedItemsDisplay.appendChild(firstItemDiv);
                 }
                 
-                // Create a container for the arrow and text
-                const arrowContainer = document.createElement('div');
-                arrowContainer.style.textAlign = 'center';
-                arrowContainer.style.cursor = 'pointer';
-                arrowContainer.addEventListener('click', () => {
-                    haptic('success');
-                    submitForm();
-                });
-
-                // Create the arrow
                 const arrowDiv = document.createElement('div');
                 arrowDiv.className = 'confirmation-center-arrow-inline';
                 arrowDiv.id = 'confirmationArrow';
                 arrowDiv.textContent = '↑';
-                arrowDiv.style.margin = '0 auto 10px auto'; // Add space for text below
-                arrowContainer.appendChild(arrowDiv);
-
-                // Create the text below the arrow
-                const arrowText = document.createElement('p');
-                arrowText.textContent = 'タップして田中に提案';
-                arrowText.style.color = 'rgba(0, 0, 0, 0.7)';
-                arrowText.style.fontWeight = '600';
-                arrowText.style.fontSize = '14px';
-                arrowContainer.appendChild(arrowText);
-
-                selectedItemsDisplay.appendChild(arrowContainer);
+                arrowDiv.addEventListener('click', submitForm);
+                selectedItemsDisplay.appendChild(arrowDiv);
                 
-                // Add second selected card
                 if (selectedCards.length >= 2) {
                     const secondCard = selectedCards[1];
                     const secondItemDiv = document.createElement('div');
                     secondItemDiv.className = 'selected-item-card';
                     secondItemDiv.style.animationDelay = '0.1s';
                     secondItemDiv.innerHTML = `
-                        <div class="selected-item-circle" style="color: ${secondCard.dataset.color};">${secondCard.dataset.emoji}</div>
+                        <div class="selected-item-circle">${secondCard.dataset.emoji}</div>
                         <div class="selected-item-title">${secondCard.dataset.title}</div>
                     `;
                     selectedItemsDisplay.appendChild(secondItemDiv);
@@ -2078,25 +2020,19 @@
             }
             
             redoButton.addEventListener('click', function() {
-                haptic('impact');
-                
+                haptic.click();
+
                 selectedIcons.forEach(icon => icon.remove());
                 selectedIcons.clear();
-                
+
                 selectedCards.forEach(card => card.classList.remove('selected'));
                 selectedCards = [];
-                
+
                 centerNumber.classList.remove('visible');
                 centerArrow.classList.remove('visible');
                 centerText.classList.remove('hidden');
                 progressRing.classList.remove('active', 'hidden');
                 updateProgressRing(0);
-
-                // Reset island text to the initial state
-                const allIslandTexts = document.querySelectorAll('.island-text');
-                allIslandTexts.forEach(text => text.classList.remove('visible', 'slide-in', 'slide-out'));
-                document.getElementById('islandText1').classList.add('visible');
-                currentIslandText = 1;
 
                 document.getElementById('backgroundBlur').classList.remove('active');
                 document.getElementById('completionBloom').classList.remove('active');
@@ -2104,11 +2040,19 @@
                 ['lightPulse1', 'lightPulse2', 'lightPulse3'].forEach(id => document.getElementById(id).classList.remove('active'));
 
                 hideConfirmationScreen();
+
+                // Dynamic Islandを再アニメーション
+                const island = document.getElementById('dynamicIsland');
+                island.classList.add('re-expand');
+                setTimeout(() => {
+                    island.classList.remove('re-expand');
+                    updateIslandText(1);
+                }, 1200);
             });
             
             suggestTextButton.addEventListener('click', function() {
-                haptic('impact');
-                window.location.href = 'thanks2.html';
+                haptic.click();
+                // 何もしない
             });
             
             centerArrow.addEventListener('click', function() {
@@ -2117,52 +2061,10 @@
                 }
             });
 
-            function spawnThanksDots(n = 200) {
-                const thanksDots = document.getElementById('thanks-dots');
-                if (!thanksDots) return;
-                
-                const W = window.innerWidth;
-                const H = window.innerHeight;
-                thanksDots.innerHTML = '';
-
-                for (let i = 0; i < n; i++) {
-                    const dot = document.createElement('div');
-                    dot.className = 'dot';
-
-                    const size = Math.random() < 0.8 
-                        ? (Math.random() * 3 + 2) 
-                        : (Math.random() * 6 + 4);
-
-                    const centerX = W / 2;
-                    const centerY = H / 2;
-                    const startX = centerX + (Math.random() * 160 - 80);
-                    const startY = centerY + (Math.random() * 160 - 80);
-
-                    const angle = Math.random() * Math.PI * 2;
-                    const distance = 120 + Math.random() * Math.max(W, H) * 0.6;
-                    const endX = Math.cos(angle) * distance;
-                    const endY = Math.sin(angle) * distance;
-
-                    dot.style.width = `${size}px`;
-                    dot.style.height = `${size}px`;
-                    dot.style.left = `${startX}px`;
-                    dot.style.top = `${startY}px`;
-                    dot.style.setProperty('--tx', `${endX}px`);
-                    dot.style.setProperty('--ty', `${endY}px`);
-                    dot.style.animationDelay = `${Math.random() * 0.25}s`;
-                    
-                    thanksDots.appendChild(dot);
-                }
-            }
-
             function handleSelection(card) {
-                if (card.dataset.type === 'suggestion' || card.dataset.type === 'other') {
-                    window.location.href = 'thanks2.html';
-                    return;
-                }
                 if (selectedCards.includes(card) || selectedCards.length >= maxSelection) return;
                 
-                hapticEvenBurst();
+                haptic.click();
                 selectedCards.push(card);
                 card.classList.add('selected', 'animating');
                 
@@ -2178,11 +2080,18 @@
                 addIconToRing(card);
                 
                 setTimeout(() => {
-                    card.style.left = card.dataset.originalX;
-                    card.style.top = card.dataset.originalY;
+                    card.style.left = card.dataset.originalX + 'px';
+                    card.style.top = card.dataset.originalY + 'px';
                     card.style.opacity = '1';
                     card.style.transition = '';
                     card.classList.remove('animating');
+                    
+                    if (selectedCards.length === 2) {
+                        setTimeout(() => {
+                            // 2個選んだら直接確認画面へ
+                            // showConfirmationScreen();
+                        }, 500);
+                    }
                 }, 600);
             }
 
@@ -2207,30 +2116,50 @@
             let justTapped = false;
             let currentCard = null;
             let startX, startY;
+            let dragStartTime = 0;
 
             document.querySelectorAll('.icon-card').forEach(card => {
-                card.addEventListener('mousedown', startDrag);
-                card.addEventListener('touchstart', startDrag, { passive: false });
-
+                // タップ/クリックで選択
                 card.addEventListener('click', function(e) {
-                    if (justTapped || isDragging) return;
                     if (this.classList.contains('selected')) return;
-                    
-                    justTapped = true;
-                    setTimeout(() => { justTapped = false; }, 300);
-                    
+                    if (isDragging) return;
+
+                    e.preventDefault();
+                    e.stopPropagation();
                     handleSelection(this);
                 });
+
+                // タッチイベントでも選択
+                card.addEventListener('touchend', function(e) {
+                    if (this.classList.contains('selected')) return;
+
+                    const touchDuration = Date.now() - dragStartTime;
+                    const moveDistance = Math.sqrt(
+                        Math.pow(e.changedTouches[0].clientX - startX, 2) +
+                        Math.pow(e.changedTouches[0].clientY - startY, 2)
+                    );
+
+                    // 短いタップで移動距離が少ない場合は選択
+                    if (touchDuration < 200 && moveDistance < 10 && !isDragging) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        handleSelection(this);
+                    }
+                }, { passive: false });
+
+                // ドラッグ機能も維持
+                card.addEventListener('mousedown', startDrag);
+                card.addEventListener('touchstart', startDrag, { passive: false });
             });
 
             function startDrag(e) {
                 if (this.classList.contains('selected')) return;
-                
-                haptic('impact');
-                e.preventDefault();
+
+                haptic.click();
                 isDragging = false;
                 currentCard = this;
-                
+                dragStartTime = Date.now();
+
                 const touch = e.type === 'touchstart' ? e.touches[0] : e;
                 startX = touch.clientX;
                 startY = touch.clientY;
@@ -2275,9 +2204,10 @@
                         currentCard.classList.remove('near-center');
                         handleSelection(currentCard);
                     } else if (isDragging) {
+                        // 元の位置に戻すアニメーション
                         currentCard.style.transition = 'all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)';
-                        currentCard.style.left = currentCard.dataset.originalX;
-                        currentCard.style.top = currentCard.dataset.originalY;
+                        currentCard.style.left = currentCard.dataset.originalX + 'px';
+                        currentCard.style.top = currentCard.dataset.originalY + 'px';
                         setTimeout(() => {
                            currentCard.style.transition = '';
                         }, 300);

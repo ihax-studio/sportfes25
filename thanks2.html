@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"/>
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="mobile-web-app-capable" content="yes">
@@ -1189,6 +1189,7 @@ html, body {
   <input type="text" name="bot-field" />
   <textarea name="message"></textarea>
   <input type="text" name="tag" />
+  <input type="hidden" id="selection2" name="selection2" />
   <input type="text" name="timestamp" />
 </form>
 
@@ -1242,78 +1243,94 @@ html, body {
 <div id="slide-to-close-overlay"></div>
 
 <script type="module">
-// ========== HAPTIC SYSTEM - iOS完全対応 ==========
-let haptic = null;
-let hapticReady = false;
+// ========== HAPTIC SYSTEM - シンプルで確実な実装 ==========
+import { haptic } from "https://esm.sh/ios-haptics";
 
-async function initHaptics() {
+console.log("✅ Haptic module imported successfully");
+
+// シンプルで確実なhaptic関数群
+function doHaptic() {
     try {
-        const module = await import("https://esm.sh/ios-haptics@1.0.0");
-        haptic = module.haptic;
-        hapticReady = true;
-        console.log("✅ Haptics initialized");
-        setTimeout(() => triggerHaptic('light'), 100);
-        return true;
+        if (haptic) haptic();
     } catch (e) {
-        console.warn("⚠️ Haptics not available:", e);
-        hapticReady = false;
-        return false;
+        console.warn("Haptic error:", e);
     }
 }
 
-function triggerHaptic(type = 'light') {
-    if (!hapticReady || !haptic) return;
-    
+function doHapticSelection() {
     try {
-        switch(type) {
-            case 'light':
-                if (haptic.impact) haptic.impact('light');
-                break;
-            case 'medium':
-                if (haptic.impact) haptic.impact('medium');
-                break;
-            case 'heavy':
-                if (haptic.impact) haptic.impact('heavy');
-                break;
-            case 'selection':
-                if (haptic.selection) {
-                    haptic.selection();
-                } else if (haptic.impact) {
-                    haptic.impact('light');
-                }
-                break;
-            case 'success':
-                if (haptic.notification) {
-                    haptic.notification('success');
-                    setTimeout(() => haptic.notification && haptic.notification('success'), 100);
-                    setTimeout(() => haptic.notification && haptic.notification('success'), 200);
-                } else if (haptic.impact) {
-                    haptic.impact('heavy');
-                    setTimeout(() => haptic.impact && haptic.impact('heavy'), 100);
-                    setTimeout(() => haptic.impact && haptic.impact('heavy'), 200);
-                }
-                break;
-            case 'error':
-                if (haptic.notification) {
-                    haptic.notification('error');
-                } else if (haptic.impact) {
-                    haptic.impact('heavy');
-                }
-                for (let i = 0; i < 6; i++) {
-                    setTimeout(() => {
-                        if (haptic.impact) haptic.impact('medium');
-                    }, 800 + (i * 40));
-                }
-                break;
+        if (haptic && haptic.selection) {
+            haptic.selection();
+        } else {
+            doHaptic();
         }
-    } catch (error) {
-        console.warn("Haptic error:", error);
+    } catch (e) {
+        console.warn("Haptic selection error:", e);
     }
 }
 
-initHaptics();
+function doHapticConfirm() {
+    try {
+        if (haptic && haptic.confirm) {
+            haptic.confirm();
+        } else {
+            doHaptic();
+        }
+    } catch (e) {
+        console.warn("Haptic confirm error:", e);
+    }
+}
 
-// ========== NETLIFY FORMS ENCODING - 確実な送信方式 ==========
+function doHapticError() {
+    try {
+        if (haptic && haptic.error) {
+            haptic.error();
+        } else {
+            doHaptic();
+        }
+    } catch (e) {
+        console.warn("Haptic error:", e);
+    }
+}
+
+// 成功時の3連続haptic
+function doHapticSuccess() {
+    try {
+        if (haptic && haptic.confirm) {
+            haptic.confirm();
+            setTimeout(() => haptic.confirm && haptic.confirm(), 100);
+            setTimeout(() => haptic.confirm && haptic.confirm(), 200);
+        } else {
+            doHaptic();
+            setTimeout(() => doHaptic(), 100);
+            setTimeout(() => doHaptic(), 200);
+        }
+    } catch (e) {
+        console.warn("Haptic success error:", e);
+    }
+}
+
+// エラー時の爆速連続haptic（参考コードベース）
+function doHapticStaggeredError() {
+    try {
+        if (haptic && haptic.error) {
+            haptic.error();
+            const baseDelay = 800;
+            const rapidDelay = 40;
+            for (let i = 0; i < 6; i++) {
+                setTimeout(() => {
+                    if (haptic.error) haptic.error();
+                }, baseDelay + i * rapidDelay);
+            }
+        } else {
+            doHapticError();
+        }
+    } catch (e) {
+        console.warn("Haptic staggered error:", e);
+    }
+}
+
+// ========== NETLIFY FORMS ENCODING ==========
 function encode(data) {
     return Object.keys(data)
         .map(key => `${encodeURIComponent(key)}=${encodeURIComponent(data[key])}`)
@@ -1386,21 +1403,21 @@ function spawnSuggestionDots(n = 250) {
     }
 }
 
-// ========== EMPTY SPACE TAP ==========
+// ========== EMPTY SPACE TAP - リダイレクトなし ==========
 document.addEventListener('click', (e) => {
     const clickedElement = e.target;
     const hasInteractiveParent = clickedElement.closest('button, input, select, textarea, a, .dynamic-island, .tag-btn, .submit-btn');
     
     if (!hasInteractiveParent && !['BUTTON', 'INPUT', 'SELECT', 'TEXTAREA', 'A'].includes(clickedElement.tagName)) {
         spawnTapDots(e.clientX, e.clientY, 'black', 25);
-        triggerHaptic('light');
+        doHaptic(); // 空白タップはhapticのみ、リダイレクトなし
     }
 });
 
 // ========== RESET BUTTON ==========
 document.getElementById('resetButton').addEventListener('click', (e) => {
     e.preventDefault();
-    triggerHaptic('error');
+    doHapticStaggeredError(); // エラー系haptic
     spawnTapDots(e.clientX, e.clientY, 'blue', 30);
     setTimeout(() => window.location.href = 'cc.html', 200);
 });
@@ -1434,14 +1451,14 @@ suggestionInput.addEventListener('input', (e) => {
     const value = suggestionInput.value;
     const count = value.length;
     
-    triggerHaptic('light');
+    doHaptic(); // 入力時のhaptic
 
     if (count > MAX_CHARS) {
         suggestionInput.value = value.substring(0, MAX_CHARS);
         const inputSection = document.querySelector('.input-section');
         inputSection.classList.add('shake-animation');
         setTimeout(() => inputSection.classList.remove('shake-animation'), 500);
-        triggerHaptic('error');
+        doHapticStaggeredError(); // 300字超過時のエラーhaptic
         return;
     }
 
@@ -1460,7 +1477,7 @@ suggestionInput.addEventListener('input', (e) => {
         validationMessage.classList.remove('show');
         if (count > 0) {
             submitBtn.disabled = false;
-            if (count === 1) triggerHaptic('medium');
+            if (count === 1) doHapticConfirm(); // 1文字目でconfirm haptic
         } else {
             submitBtn.disabled = true;
         }
@@ -1468,17 +1485,17 @@ suggestionInput.addEventListener('input', (e) => {
 });
 
 suggestionInput.addEventListener('focus', () => {
-    triggerHaptic('medium');
+    doHapticConfirm(); // フォーカス時のhaptic
     if (suggestionInput.value.length <= MAX_CHARS) {
         validationMessage.classList.remove('show');
     }
 });
 
-suggestionInput.addEventListener('blur', () => triggerHaptic('light'));
+suggestionInput.addEventListener('blur', () => doHaptic());
 
 // ========== SUCCESS OVERLAY ==========
 suggestionSuccessOverlay.addEventListener('click', (e) => {
-    triggerHaptic('selection');
+    doHapticSelection(); // 成功画面タップ時のhaptic
     spawnTapDots(e.clientX, e.clientY, 'white', 40, document.getElementById('suggestion-thanks-dots'));
 });
 
@@ -1489,7 +1506,7 @@ let isDragging = false;
 island.addEventListener('touchstart', (e) => {
     startY = e.touches[0].clientY;
     isDragging = true;
-    triggerHaptic('light');
+    doHaptic();
 });
 
 island.addEventListener('touchmove', (e) => {
@@ -1497,25 +1514,25 @@ island.addEventListener('touchmove', (e) => {
     const currentY = e.touches[0].clientY;
     const deltaY = currentY - startY;
     
-    if (deltaY > 50 && deltaY < 80) triggerHaptic('medium');
+    if (deltaY > 50 && deltaY < 80) doHapticConfirm();
     
     if (deltaY > 100) {
-        triggerHaptic('error');
+        doHapticStaggeredError();
         window.location.href = 'cc.html';
         isDragging = false;
     }
 });
 
 island.addEventListener('touchend', () => {
-    if (isDragging) triggerHaptic('light');
+    if (isDragging) doHaptic();
     isDragging = false;
 });
 
-// ========== FORM SUBMISSION - NETLIFY完全対応 ==========
+// ========== FORM SUBMISSION - NETLIFY確実送信 ==========
 submitBtn.addEventListener('click', async (e) => {
     e.preventDefault();
     
-    triggerHaptic('medium');
+    doHapticConfirm(); // 送信ボタンhaptic
     
     const value = suggestionInput.value.trim();
     const selectedTag = document.querySelector('.tag-btn.active')?.getAttribute('data-tag') || '';
@@ -1524,12 +1541,12 @@ submitBtn.addEventListener('click', async (e) => {
     if (value.length === 0) {
         validationMessage.textContent = '何か入力して';
         validationMessage.classList.add('show');
-        triggerHaptic('error');
+        doHapticStaggeredError();
         return;
     }
     
     if (value.length > MAX_CHARS) {
-        triggerHaptic('error');
+        doHapticStaggeredError();
         return;
     }
     
@@ -1538,7 +1555,7 @@ submitBtn.addEventListener('click', async (e) => {
     submitBtn.innerHTML = '<div style="width: 20px; height: 20px; border: 2px solid #fff; border-radius: 50%; border-top: 2px solid transparent; animation: spin 1s linear infinite;"></div>';
     
     try {
-        // Netlify Forms送信 - application/x-www-form-urlencoded形式
+        // Netlify Forms送信 - 確実な方式
         const response = await fetch('/', {
             method: 'POST',
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -1546,6 +1563,7 @@ submitBtn.addEventListener('click', async (e) => {
                 'form-name': 'suggestion',
                 'message': value,
                 'tag': selectedTag,
+                'selection2': value,
                 'timestamp': new Date().toISOString()
             })
         });
@@ -1554,10 +1572,11 @@ submitBtn.addEventListener('click', async (e) => {
             throw new Error(`HTTP ${response.status}`);
         }
         
-        console.log("✅ Form submitted successfully");
+        console.log("✅ Form submitted to Netlify successfully");
+        console.log("📝 Submitted data:", { message: value, tag: selectedTag });
         
-        // 成功ハプティック
-        triggerHaptic('success');
+        // 成功haptic（3連続）
+        doHapticSuccess();
         
         // 成功UI
         submitBtn.innerHTML = '<span class="checkmark">✓</span>';
@@ -1583,7 +1602,7 @@ submitBtn.addEventListener('click', async (e) => {
     } catch (error) {
         console.error("❌ Submission error:", error);
         
-        triggerHaptic('error');
+        doHapticStaggeredError();
         
         validationMessage.textContent = '送信に失敗しました。もう一度試してください。';
         validationMessage.classList.add('show');
@@ -1599,7 +1618,7 @@ const selectionIndicator = document.getElementById('selectionIndicator');
 const tagButtons = document.querySelectorAll('.tag-btn');
 
 function updateTagSelection(activeButton) {
-    triggerHaptic('selection');
+    doHapticSelection(); // タグ選択時のhaptic
     
     tagButtons.forEach(btn => btn.classList.remove('active'));
     activeButton.classList.add('active');
@@ -1621,20 +1640,34 @@ function updateTagSelection(activeButton) {
 }
 
 tagButtons.forEach(button => {
+    let touchHandled = false;
+
+    button.addEventListener('touchstart', (e) => {
+        touchHandled = false;
+        doHaptic(); // タグボタンタッチ時のhaptic
+    });
+
+    button.addEventListener('touchend', (e) => {
+        e.preventDefault();
+        touchHandled = true;
+        updateTagSelection(button);
+        const touch = e.changedTouches[0];
+        spawnTapDots(touch.clientX, touch.clientY, 'blue', 15);
+    });
+
     button.addEventListener('click', (e) => {
+        if (touchHandled) {
+            touchHandled = false;
+            return;
+        }
         e.preventDefault();
         updateTagSelection(button);
         spawnTapDots(e.clientX, e.clientY, 'blue', 15);
     });
-    
-    button.addEventListener('touchstart', (e) => {
-        e.preventDefault();
-        triggerHaptic('light');
-    });
-    
+
     button.addEventListener('mouseenter', () => {
         if (!button.classList.contains('active')) {
-            triggerHaptic('light');
+            doHaptic();
         }
     });
 });
@@ -1649,13 +1682,16 @@ if (initialActiveButton) {
 document.addEventListener('DOMContentLoaded', () => {
     dynamicIslandContainer.classList.add('active');
     island.classList.remove('closing');
+    
+    // ページロード時のhaptic
+    setTimeout(() => doHaptic(), 100);
 });
 
 document.addEventListener('visibilitychange', () => {
-    if (!document.hidden) triggerHaptic('light');
+    if (!document.hidden) doHaptic();
 });
 
-console.log("🚀 App initialized - Haptics:", hapticReady ? "Ready" : "Not available");
+console.log("🚀 App initialized - Haptics ready, Netlify Forms configured");
 </script>
 </body>
 </html>

@@ -5,6 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>学校の悩み - 音声入力</title>
     <style>
+        :root {
+            --gradient-speed: 20s;
+            --gradient-brightness: 1;
+            --text-shadow-intensity: 0;
+            --label-shadow-intensity: 0;
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -24,7 +31,7 @@
         /* グラデーション背景（色が回転、要素は回転しない） */
         .gradient-bg {
             position: fixed;
-            width: 228%;
+            width: 288%;
             height: 200%;
             top: 50%;
             left: 50%;
@@ -46,15 +53,17 @@
             border-radius: inherit;
             background: conic-gradient(
                 from 0deg at 50% 50%,
-                  #ff6b45 0deg,
-                #ff1a48 72deg,
-                #D946A6 144deg,
-                #9e35ff 216deg,
-                #0073ff 288deg,
-                #FF6B45 360deg
+                #ff6b21 0deg,
+                #ff0033 72deg,
+                #ff00a6 144deg,
+                #d000ff 216deg,
+                #1a53ff 288deg,
+                #ff1af4 299deg,
+                #ff6b21 0deg
             );
-            filter: blur(80px);
-            animation: rotateGradientColor 20s linear infinite 2s;
+            filter: blur(30px) brightness(var(--gradient-brightness));
+            animation: rotateGradientColor var(--gradient-speed) linear infinite 2s;
+            transition: filter 0.3s ease;
         }
 
         @keyframes rotateGradientColor {
@@ -67,7 +76,7 @@
         }
 
         .gradient-bg.expanded {
-            width: 220%;
+            width: 300%;
             height: 280%;
             border-radius: 0;
         }
@@ -80,6 +89,20 @@
             to {
                 opacity: 1;
             }
+        }
+
+        /* 右上のDocs画像 */
+        .docs-image {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            width: 540px;
+            height: 920px;
+            z-index: 10002;
+            pointer-events: none;
+            opacity: 0.9;
+            border-radius: 8px;
+            box-shadow: 0 2px 18px rgba(0, 0, 0, 0.3);
         }
 
         /* 初期画面（録音前） */
@@ -227,6 +250,11 @@
             font-weight: 670;
             margin-bottom: 8.2em;
             line-height: 1.7;
+            text-shadow: 
+                0 0 calc(var(--text-shadow-intensity) * 10px) rgba(255, 255, 255, 0.8),
+                0 0 calc(var(--text-shadow-intensity) * 20px) rgba(255, 255, 255, 0.6),
+                0 0 calc(var(--text-shadow-intensity) * 30px) rgba(255, 255, 255, 0.4);
+            transition: text-shadow 0.3s ease;
         }
 
         /* メインテキスト */
@@ -235,6 +263,11 @@
             font-weight: 700;
             margin: 0.5em 0 4em 0;
             line-height: 1.4;
+            text-shadow: 
+                0 0 calc(var(--text-shadow-intensity) * 15px) rgba(255, 255, 255, 0.8),
+                0 0 calc(var(--text-shadow-intensity) * 30px) rgba(255, 255, 255, 0.6),
+                0 0 calc(var(--text-shadow-intensity) * 45px) rgba(255, 255, 255, 0.4);
+            transition: text-shadow 0.3s ease;
         }
 
         /* 下部の回転テキスト */
@@ -257,6 +290,11 @@
             width: 100%;
             opacity: 0;
             transform: translateY(35px);
+            text-shadow: 
+                0 0 calc(var(--text-shadow-intensity) * 8px) rgba(255, 255, 255, 0.8),
+                0 0 calc(var(--text-shadow-intensity) * 16px) rgba(255, 255, 255, 0.6),
+                0 0 calc(var(--text-shadow-intensity) * 24px) rgba(255, 255, 255, 0.4);
+            transition: text-shadow 0.3s ease;
         }
 
         .rotating-text.active {
@@ -485,6 +523,18 @@
             z-index: 10001;
             backdrop-filter: blur(10px);
             background: rgba(0, 0, 0, 0.07);
+            box-shadow: 
+                0 0 calc(var(--label-shadow-intensity) * 10px) rgba(255, 255, 255, 0.3),
+                0 0 calc(var(--label-shadow-intensity) * 20px) rgba(255, 255, 255, 0.2),
+                0 0 calc(var(--label-shadow-intensity) * 40px) rgba(255, 255, 255, 0.1),
+                0 4px 16px rgba(0, 0, 0, 0.1);
+            transition: box-shadow 0.3s ease, transform 0.3s ease;
+        }
+
+        /* マイクがオンの時の基本的な白い影 */
+        .bottom-label.mic-active {
+            --label-shadow-intensity: 0.3;
+            transform: translateX(-50%) translateY(-1px);
         }
 
         /* レスポンシブ */
@@ -546,6 +596,9 @@
 <body>
     <!-- グラデーション背景 -->
     <div class="gradient-bg" id="gradientBg"></div>
+
+    <!-- 右上のDocs画像 -->
+    <img src="Docs.jpg" alt="Docs" class="docs-image">
 
     <!-- 初期画面（録音前） -->
     <div id="start-screen">
@@ -620,6 +673,7 @@
         const thanksRing = document.getElementById('thanks-ring');
         const thanksDots = document.getElementById('thanks-dots');
         const gradientBg = document.getElementById('gradientBg');
+        const bottomLabel = document.querySelector('.bottom-label');
         let hasStarted = false;
         let hasTransitioned = false;
 
@@ -627,6 +681,12 @@
         let mediaRecorder = null;
         let audioChunks = [];
         let isRecording = false;
+
+        // 音量監視関連
+        let audioContext = null;
+        let analyser = null;
+        let dataArray = null;
+        let volumeMonitorInterval = null;
 
         // 音声ファイルを再生する関数
         function playAudio(filename) {
@@ -663,6 +723,96 @@
             }, 0);
         }
 
+        // 音量レベルを監視してグラデーションとシャドウエフェクトを調整
+        function monitorVolume() {
+            if (!analyser || !dataArray) return;
+
+            analyser.getByteFrequencyData(dataArray);
+            
+            // 音量レベルを計算（0-255の範囲から0-1に正規化）
+            let sum = 0;
+            for (let i = 0; i < dataArray.length; i++) {
+                sum += dataArray[i];
+            }
+            const average = sum / dataArray.length;
+            const volumeLevel = Math.min(average / 128, 1); // 0-1の範囲に正規化
+
+            // 音量に応じてグラデーション速度と輝度を調整
+            const baseSpeed = 20; // 基本の回転速度（秒）
+            const minSpeed = 8;   // 最速の回転速度（秒）
+            const baseBrightness = 1; // 基本の明度
+            const maxBrightness = 1.4; // 最大の明度
+
+            // 音量レベルに応じて速度を調整（音量が高いほど速く）
+            const targetSpeed = Math.max(minSpeed, baseSpeed - (volumeLevel * (baseSpeed - minSpeed)));
+            
+            // 音量レベルに応じて輝度を調整（音量が高いほど明るく）
+            const targetBrightness = baseBrightness + (volumeLevel * (maxBrightness - baseBrightness));
+
+            // テキストシャドウの強度を調整（音量が高いほど強く）
+            const maxTextShadow = 2.0; // 最大シャドウ強度
+            const targetTextShadow = volumeLevel * maxTextShadow;
+
+            // 底部ラベルのシャドウ強度を調整（基本0.3 + 音量による追加）
+            const baseLablelShadow = 0.3; // 基本シャドウ強度（マイクオン時）
+            const maxLabelShadow = 1.2;   // 最大シャドウ強度
+            const targetLabelShadow = baseLablelShadow + (volumeLevel * (maxLabelShadow - baseLablelShadow));
+
+            // CSS変数を更新（滑らかな変化のため）
+            document.documentElement.style.setProperty('--gradient-speed', `${targetSpeed}s`);
+            document.documentElement.style.setProperty('--gradient-brightness', targetBrightness);
+            document.documentElement.style.setProperty('--text-shadow-intensity', targetTextShadow);
+            document.documentElement.style.setProperty('--label-shadow-intensity', targetLabelShadow);
+        }
+
+        // 音量監視を開始
+        function startVolumeMonitoring(stream) {
+            try {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                analyser = audioContext.createAnalyser();
+                
+                const source = audioContext.createMediaStreamSource(stream);
+                source.connect(analyser);
+                
+                analyser.fftSize = 256;
+                const bufferLength = analyser.frequencyBinCount;
+                dataArray = new Uint8Array(bufferLength);
+                
+                // 音量監視を定期実行
+                volumeMonitorInterval = setInterval(monitorVolume, 50); // 20FPS
+                
+                console.log('音量監視開始');
+            } catch (error) {
+                console.error('音量監視セットアップエラー:', error);
+            }
+        }
+
+        // 音量監視を停止
+        function stopVolumeMonitoring() {
+            if (volumeMonitorInterval) {
+                clearInterval(volumeMonitorInterval);
+                volumeMonitorInterval = null;
+            }
+            
+            if (audioContext && audioContext.state !== 'closed') {
+                audioContext.close();
+                audioContext = null;
+            }
+            
+            // 全てのエフェクト設定を初期値に戻す
+            document.documentElement.style.setProperty('--gradient-speed', '20s');
+            document.documentElement.style.setProperty('--gradient-brightness', '1');
+            document.documentElement.style.setProperty('--text-shadow-intensity', '0');
+            document.documentElement.style.setProperty('--label-shadow-intensity', '0');
+            
+            // 底部ラベルのmic-activeクラスを削除
+            if (bottomLabel) {
+                bottomLabel.classList.remove('mic-active');
+            }
+            
+            console.log('音量監視停止');
+        }
+
         // 録音開始
         async function startRecording() {
             try {
@@ -673,6 +823,14 @@
                         sampleRate: 44100
                     } 
                 });
+                
+                // 音量監視を開始
+                startVolumeMonitoring(stream);
+                
+                // 底部ラベルにmic-activeクラスを追加（基本白い影を表示）
+                if (bottomLabel) {
+                    bottomLabel.classList.add('mic-active');
+                }
                 
                 let options;
                 if (MediaRecorder.isTypeSupported('audio/webm')) {
@@ -698,6 +856,7 @@
                     audioChunks = [];
                     
                     stream.getTracks().forEach(track => track.stop());
+                    stopVolumeMonitoring(); // 音量監視も停止
                 };
                 
                 mediaRecorder.start();
@@ -763,41 +922,42 @@
                 
                 thanksDots.appendChild(dot);
             }
-        }// 初期画面要素を強制的に非表示にする関数
-function forceHideStartElements() {
-    // ▼ startText：1.5倍に拡大しながら0.5秒でフェードアウト
-    if (startText) {
-        startText.style.transition = 'transform 0.5s ease, opacity 0.5s ease';
-        startText.style.transform = 'scale(1.5)';
-        startText.style.opacity = '0';
-    }
+        }
 
-    // ▼ arrowCircle：0.5倍に縮小しながら0.3秒でフェードアウト
-    if (arrowCircle) {
-        arrowCircle.style.transition = 'transform 0.3s ease, opacity 0.3s ease';
-        arrowCircle.style.transform = 'scale(0.5)';
-        arrowCircle.style.opacity = '0';
-    }
+        // 初期画面要素を強制的に非表示にする関数
+        function forceHideStartElements() {
+            // ▼ startText：1.5倍に拡大しながら0.5秒でフェードアウト
+            if (startText) {
+                startText.style.transition = 'transform 0.5s ease, opacity 0.5s ease';
+                startText.style.transform = 'scale(1.5)';
+                startText.style.opacity = '0';
+            }
 
-    // ▼ arrowIcon：普通にフェードアウト
-    if (arrowIcon) {
-        arrowIcon.style.transition = 'opacity 0.3s ease';
-        arrowIcon.style.opacity = '0';
-    }
+            // ▼ arrowCircle：0.5倍に縮小しながら0.3秒でフェードアウト
+            if (arrowCircle) {
+                arrowCircle.style.transition = 'transform 0.3s ease, opacity 0.3s ease';
+                arrowCircle.style.transform = 'scale(0.5)';
+                arrowCircle.style.opacity = '0';
+            }
 
-    // ▼ start-screen全体も徐々に透明化（アニメーション中は非表示にしない）
-    startScreen.style.transition = 'opacity 0.5s ease';
-    startScreen.style.opacity = '0';
+            // ▼ arrowIcon：普通にフェードアウト
+            if (arrowIcon) {
+                arrowIcon.style.transition = 'opacity 0.3s ease';
+                arrowIcon.style.opacity = '0';
+            }
 
-    // ▼ 0.55秒後（アニメーション終了後）に強制非表示化
-    setTimeout(() => {
-        startScreen.classList.add('hidden-forever');
-        if (arrowCircle) arrowCircle.style.display = 'none';
-        if (arrowIcon) arrowIcon.style.display = 'none';
-        if (startText) startText.style.display = 'none';
-    }, 550);
-}
+            // ▼ start-screen全体も徐々に透明化（アニメーション中は非表示にしない）
+            startScreen.style.transition = 'opacity 0.5s ease';
+            startScreen.style.opacity = '0';
 
+            // ▼ 0.55秒後（アニメーション終了後）に強制非表示化
+            setTimeout(() => {
+                startScreen.classList.add('hidden-forever');
+                if (arrowCircle) arrowCircle.style.display = 'none';
+                if (arrowIcon) arrowIcon.style.display = 'none';
+                if (startText) startText.style.display = 'none';
+            }, 550);
+        }
 
         // 録音開始処理
         async function startSession() {
@@ -812,7 +972,7 @@ function forceHideStartElements() {
                 gradientBg.classList.add('expanded');
             }, 100);
 
-            // 55.mp3を再生
+            // 11.mp3を再生
             try {
                 await playAudio('55.mp3');
                 console.log('55.mp3 再生完了');
@@ -820,7 +980,7 @@ function forceHideStartElements() {
                 console.error('55.mp3 再生エラー:', error);
             }
 
-            // 録音開始
+            // 録音開始（音量監視も含む）
             await startRecording();
 
             // メイン画面を表示
@@ -841,7 +1001,7 @@ function forceHideStartElements() {
             if (hasTransitioned) return;
             hasTransitioned = true;
 
-            // 録音を停止してダウンロード
+            // 録音を停止してダウンロード（音量監視も停止）
             stopRecording();
 
             // 白い円を展開

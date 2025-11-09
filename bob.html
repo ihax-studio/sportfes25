@@ -90,6 +90,20 @@
             }
         }
 
+        /* 右上のDocs画像 */
+        .docs-image {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            width: 540px;
+            height: 920px;
+            z-index: 10002;
+            pointer-events: none;
+            opacity: 0.9;
+            border-radius: 8px;
+            box-shadow: 0 2px 18px rgba(0, 0, 0, 0.3);
+        }
+
         /* 初期画面（録音前） */
         #start-screen {
             position: fixed;
@@ -581,6 +595,9 @@
 <body>
     <!-- グラデーション背景 -->
     <div class="gradient-bg" id="gradientBg"></div>
+
+    <!-- 右上のDocs画像 -->
+    <img src="Docs.jpg" alt="Docs" class="docs-image">
 
     <!-- 初期画面（録音前） -->
     <div id="start-screen">

@@ -1525,7 +1525,7 @@ document.addEventListener('touchstart', e => {
 }
 
 .submitting-gif {
-    width: 1000px;
+    width: 1200px;
     aspect-ratio: 4 / 3; /* ← 4:3を維持 */
     height: auto; /* 比率固定のため自動計算 */
     max-width: 100%; /* 小さい画面では収まるように */
@@ -1551,7 +1551,7 @@ document.addEventListener('touchstart', e => {
 /* スマホでも4:3を維持しつつ縮小 */
 @media (max-width: 768px) {
     .submitting-gif {
-        width: 90vw;
+        width: 99vw;
         aspect-ratio: 4 / 3;
         height: auto;
     }
@@ -2049,12 +2049,12 @@ safeBind("centerArrow", haptic.confirm);
                     if (gifElement.complete) {
                         setTimeout(() => {
                             form.submit();
-                        }, 1800);
+                        }, 1900);
                     } else {
                         gifElement.onload = () => {
                             setTimeout(() => {
                                 form.submit();
-                            }, 1800);
+                            }, 1900);
                         };
                     }
                 }

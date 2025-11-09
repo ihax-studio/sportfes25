@@ -2018,6 +2018,35 @@ if (initialActiveButton) {
     }, 100);
 }
 
-</script>
+
+
+        // haptic が利用可能な場合のみ、イベントリスナーを設定
+        if (haptic) {
+            // 対象の要素（オーバーレイ全体）を取得
+            const overlay = document.getElementById("suggestion-success-overlay"); // ← ここで要素を取得
+
+            if (overlay) {
+                // オーバーレイがクリックされたときの処理
+                overlay.onclick = () => { // ← ここでクリックイベントを設定
+                    console.log("Overlay clicked, triggering haptics...");
+
+                    // ユーザーが指定した触覚ロジック
+                    // 既存：1回→1s→爆速6回
+                    haptic.error(); // ← 1回目の実行
+                    const baseDelay = 1000;
+                    const rapidDelay = 40;
+                    for (let i = 0; i < 6; i++) {
+                        // ↓ 1秒後に6回高速実行
+                        setTimeout(() => haptic.error(), baseDelay + i * rapidDelay); 
+                    }
+                    
+// ... 既存のコード ...
+                };
+// ... 既存のコード ...
+            }
+// ... 既存のコード ...
+        }
+// ... 既存のコード ...
+    </script>
 </body>
 </html>

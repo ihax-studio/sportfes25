@@ -980,9 +980,22 @@ html, body {
     padding: 15px 20px;
     display: flex;
     align-items: center;
-        margin-bottom:-37px;
+    margin-bottom:-37px;
     gap: 8px;
     animation: slideUpFade 0.5s cubic-bezier(0.4, 0, 0.2, 1) 0.8s backwards;
+    transition: transform 0.1s ease;
+}
+
+/* Shake animation for 300 char limit */
+.shake-animation {
+    animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+}
+
+@keyframes shake {
+    10%, 90% { transform: translateX(-2px); }
+    20%, 80% { transform: translateX(4px); }
+    30%, 50%, 70% { transform: translateX(-6px); }
+    40%, 60% { transform: translateX(6px); }
 }
 
 .input-field {
@@ -1038,6 +1051,12 @@ html, body {
     color: white;
     font-size: 20px;
     font-weight: bold;
+}
+
+/* Loading spinner */
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
 }
 
 .validation-message {
@@ -1111,7 +1130,6 @@ html, body {
     gap: 60px;
     z-index: 4000;
     opacity: 0;
-
     visibility: hidden;
     transition: all 0.5s cubic-bezier(.62,0,.4,1);
     cursor: pointer;
@@ -1120,7 +1138,7 @@ html, body {
 #suggestion-success-text {
     color: #fff;
     font-size: 32px;
-        margin-top:55px;
+    margin-top:55px;
     font-weight: 700;
     text-shadow: 0 5px 18px rgba(0,0,0,.55);
     text-align: center;
@@ -1128,28 +1146,29 @@ html, body {
     margin-bottom:-223px;
 }
 
+@media (max-width: 390px) {
+    #writeSuggestion {
+        position: fixed;
+        bottom: 140px;
+    }
+}
 
-       @media (max-width: 390px) {
-
-#writeSuggestion {
-    position: fixed;
-    bottom: 140px;
-
-}}
-       @media (max-width: 376px) {
-
-#writeSuggestion {
-    position: fixed;
-    bottom: 190px;
-
-}}</style>
+@media (max-width: 376px) {
+    #writeSuggestion {
+        position: fixed;
+        bottom: 190px;
+    }
+}</style>
 
 </head>
 <body>
 
-<!-- Netlify Hidden Form -->
+<!-- Netlify Hidden Form - selection2フィールド追加 -->
 <form name="suggestion" netlify netlify-honeypot="bot-field" hidden>
   <textarea name="message"></textarea>
+  <input type="text" name="tag" />
+  <textarea name="selection2"></textarea>
+  <input type="text" name="timestamp" />
 </form>
 
 <!-- Thanks/Dots screen -->
@@ -1233,7 +1252,6 @@ html, body {
     <button id="suggestion-popup-close" class="ios-popup-close">✕</button>
 </div>
 
-
 <!-- Dynamic Island Container -->
 <div id="dynamicIslandContainer">
     <div class="dynamic-island" id="dynamicIsland">
@@ -1245,8 +1263,8 @@ html, body {
 
         <!-- Header -->
         <div class="header">
-            <span class="emoji-eyes"></span>
-            <h2 class="title">他にも、気になる点</h2>
+            <span class="emoji-eyes">👀</span>
+            <h2 class="title">書いて田中に提案</h2>
             <p class="subtitle">改善点があったら教えて</p>
             <p class="description">おすすめの提案・タップで追加</p>
         </div>
@@ -1289,7 +1307,6 @@ html, body {
     <div id="suggestion-success-text" class="slide-up">提案を書いてくれて<br>ありがとう。</div>
     <div id="suggestion-thanks-dots"></div>
 </div>
-
 
 <!-- Slide-to-close Overlay -->
 <div id="slide-to-close-overlay"></div>
@@ -1444,7 +1461,6 @@ function spawnSuggestionDots(n = 250) {
         container.appendChild(dot);
     }
 }
-
 
 // Spawn dots animation
 function spawnThanksDots(n = 250) {
@@ -1789,9 +1805,20 @@ function setProgress(percent) {
     progressRing.style.strokeDashoffset = offset;
 }
 
+// 📝 300字制限の実装 - 超過時に切り詰め + shake + haptic
 suggestionInput.addEventListener('input', () => {
     const value = suggestionInput.value;
     const count = value.length;
+
+    // 300字を超えた場合は切り詰める
+    if (count > MAX_CHARS) {
+        suggestionInput.value = value.substring(0, MAX_CHARS);
+        const inputSection = document.querySelector('.input-section');
+        inputSection.classList.add('shake-animation');
+        setTimeout(() => inputSection.classList.remove('shake-animation'), 500);
+        staggeredErrorHaptic(); // エラーhaptic
+        return; // これ以降の処理をスキップ
+    }
 
     charCountText.textContent = count;
 
@@ -1799,19 +1826,13 @@ suggestionInput.addEventListener('input', () => {
     if (progress > 1) progress = 1;
     setProgress(progress);
 
-    if (count > MAX_CHARS) {
-        submitBtn.disabled = true;
-        ringContainer.classList.add('limit-exceeded');
-        validationMessage.textContent = `${MAX_CHARS}字を超えています`;
-        validationMessage.classList.add('show');
+    ringContainer.classList.remove('limit-exceeded');
+    validationMessage.classList.remove('show');
+    
+    if (count > 0) {
+        submitBtn.disabled = false;
     } else {
-        ringContainer.classList.remove('limit-exceeded');
-        validationMessage.classList.remove('show');
-        if (count > 0) {
-            submitBtn.disabled = false;
-        } else {
-            submitBtn.disabled = true;
-        }
+        submitBtn.disabled = true;
     }
 });
 
@@ -1831,21 +1852,22 @@ suggestionSuccessOverlay.addEventListener('click', (e) => {
     spawnTapDots(e.clientX, e.clientY, 'white', 40, document.getElementById('suggestion-thanks-dots'));
 });
 
-
 // Hide validation message when input is focused
 suggestionInput.addEventListener('focus', () => {
-    if (suggestionInput.value.length <= MAX_CHARS) {
-        validationMessage.classList.remove('show');
-    }
+    validationMessage.classList.remove('show');
 });
 
+// Netlify Forms送信用のencode関数
 const encode = (data) => {
     return Object.keys(data)
         .map(key => encodeURIComponent(key) + "=" + encodeURIComponent(data[key]))
         .join("&");
 }
 
-submitBtn.addEventListener('click', () => {
+// 📝 selection2への確実な送信実装
+let selectedTag = '購買の混雑'; // デフォルトのタグ
+
+submitBtn.addEventListener('click', async () => {
     confirmHaptic();
     const value = suggestionInput.value.trim();
     
@@ -1857,34 +1879,76 @@ submitBtn.addEventListener('click', () => {
     
     if (value.length > MAX_CHARS) return;
     
-    // --- Netlify Form Submission ---
-    fetch("/", {
-        method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: encode({
-            "form-name": "suggestion",
-            "message": value
-        })
-    }).catch(error => console.error("Form submission error:", error));
-
-    // --- UI Transition ---
-    successHaptic();
+    // ローディング開始
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<div style="width: 20px; height: 20px; border: 2px solid #fff; border-radius: 50%; border-top: 2px solid transparent; animation: spin 1s linear infinite;"></div>';
     
-    island.classList.add('closing');
-    setTimeout(() => dynamicIslandContainer.classList.remove('active'), 400);
-
-    const suggestionSuccessText = document.getElementById('suggestion-success-text');
-    const suggestionCheck = document.getElementById('suggestion-check');
-    
-    suggestionSuccessOverlay.style.visibility = 'visible';
-    suggestionSuccessOverlay.style.opacity = 1;
-    
-    setTimeout(() => {
-        suggestionCheck.classList.add('show');
-        suggestionCheck.classList.add('animate');
-        suggestionSuccessText.classList.add('animate');
-        spawnSuggestionDots();
-    }, 500);
+    try {
+        // 📝 Netlify Forms送信 - selection2フィールドに確実に送信
+        const response = await fetch('/', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: encode({
+                'form-name': 'suggestion',
+                'message': value,
+                'tag': selectedTag,
+                'selection2': value, // ← ここでselection2に送信
+                'timestamp': new Date().toISOString()
+            })
+        });
+        
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
+        }
+        
+        console.log("✅ Form submitted to Netlify successfully");
+        console.log("📝 Submitted data:", { 
+            message: value, 
+            tag: selectedTag, 
+            selection2: value 
+        });
+        
+        // 成功haptic（3連続）
+        successHaptic();
+        
+        // 成功UI
+        submitBtn.innerHTML = '<span class="checkmark">✓</span>';
+        submitBtn.style.background = '#34C759';
+        setTimeout(() => submitBtn.style.background = '#1a1a1a', 1000);
+        
+        // アニメーション遷移
+        island.classList.add('closing');
+        setTimeout(() => dynamicIslandContainer.classList.remove('active'), 400);
+        const suggestionSuccessText = document.getElementById('suggestion-success-text');
+        const suggestionCheck = document.getElementById('suggestion-check');
+        
+        suggestionSuccessOverlay.style.visibility = 'visible';
+        suggestionSuccessOverlay.style.opacity = 1;
+        
+        setTimeout(() => {
+            suggestionCheck.classList.add('show', 'animate');
+            suggestionSuccessText.classList.add('animate');
+            spawnSuggestionDots();
+        }, 500);
+        
+    } catch (error) {
+        console.error("❌ Form submission error:", error);
+        
+        // エラーhaptic
+        staggeredErrorHaptic();
+        
+        // エラーUI
+        submitBtn.innerHTML = '<span class="checkmark">✕</span>';
+        submitBtn.style.background = '#ff3b30';
+        validationMessage.textContent = '送信エラー。もう一度試してください';
+        validationMessage.classList.add('show');
+        
+        setTimeout(() => {
+            submitBtn.innerHTML = '<span class="checkmark">✓</span>';
+            submitBtn.style.background = '#1a1a1a';
+            submitBtn.disabled = false;
+        }, 2000);
+    }
 });
 
 writeSuggestionBtn.addEventListener('click', () => {
@@ -1927,6 +1991,9 @@ const tagButtons = document.querySelectorAll('.tag-btn');
 function updateTagSelection(activeButton) {
     tagButtons.forEach(btn => btn.classList.remove('active'));
     activeButton.classList.add('active');
+    
+    // 選択されたタグを保存
+    selectedTag = activeButton.dataset.tag;
     
     const buttonRect = activeButton.getBoundingClientRect();
     const containerRect = tagOptionsContainer.getBoundingClientRect();

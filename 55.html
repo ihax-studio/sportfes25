@@ -1,0 +1,916 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>学校の悩み - 音声入力</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Segoe UI', 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', Meiryo, sans-serif;
+            height: 100vh;
+            overflow: hidden;
+            background: #000;
+            color: white;
+            position: relative;
+        }
+
+        /* グラデーション背景（色が回転、要素は回転しない） */
+        .gradient-bg {
+            position: fixed;
+            width: 188%;
+            height: 200%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            border-radius: 20px;
+            opacity: 0;
+            z-index: 0;
+            transition: width 0.5s cubic-bezier(0.16, 1, 0.3, 1), 
+                        height 0.5s cubic-bezier(0.16, 1, 0.3, 1), 
+                        border-radius 0.5s cubic-bezier(0.16, 1, 0.3, 1),
+                        opacity 0.5s ease;
+            animation: fadeInBg 2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        .gradient-bg::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: inherit;
+            background: conic-gradient(
+                from 0deg at 50% 50%,
+                #FF6B35 0deg,
+                #FF4B6E 72deg,
+                #D946A6 144deg,
+                #9333EA 216deg,
+                #4F46E5 288deg,
+                #FF6B35 360deg
+            );
+            filter: blur(80px);
+            animation: rotateGradientColor 20s linear infinite 2s;
+        }
+
+        @keyframes rotateGradientColor {
+            from {
+                transform: rotate(0deg);
+            }
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .gradient-bg.expanded {
+            width: 200%;
+            height: 280%;
+            border-radius: 0;
+        }
+
+        .gradient-bg.fade-to-black {
+            opacity: 0;
+        }
+
+        @keyframes fadeInBg {
+            to {
+                opacity: 1;
+            }
+        }
+
+        /* 初期画面（録音前） */
+        #start-screen {
+            position: fixed;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1;
+            opacity: 0;
+            animation: fadeIn 1s cubic-bezier(0.16, 1, 0.3, 1) 0.5s forwards;
+            transition: opacity 0.3s ease;
+        }
+
+        #start-screen.fade-out {
+            opacity: 0 !important;
+            pointer-events: none !important;
+            visibility: hidden !important;
+            display: none !important;
+        }
+
+        /* より強制的に非表示にするクラス */
+        #start-screen.hidden-forever {
+            opacity: 0 !important;
+            pointer-events: none !important;
+            visibility: hidden !important;
+            display: none !important;
+            position: absolute !important;
+            top: -9999px !important;
+            left: -9999px !important;
+        }
+
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+            }
+        }
+
+        /* 丸の中に↑ */
+        .arrow-circle {
+            width: 180px;
+            height: 180px;
+            border: 3px solid rgba(255,255,255,.9);
+            border-radius: 50%;
+            box-shadow: 0 0 20px rgba(255,255,255,.35);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 3em;
+            position: relative;
+            transition: opacity 0.3s ease;
+        }
+
+        .arrow-circle.fade-out {
+            opacity: 0 !important;
+            visibility: hidden !important;
+        }
+
+        .arrow-icon {
+            font-size: 80px;
+            font-weight: 300;
+            line-height: 1;
+            color: #fff;
+            transition: opacity 0.3s ease;
+        }
+
+        .arrow-icon.fade-out {
+            opacity: 0 !important;
+            visibility: hidden !important;
+        }
+
+        /* 初期テキスト */
+        .start-text {
+            text-align: center;
+            font-size: 1.6em;
+            font-weight: 650;
+            line-height: 1.8;
+            max-width: 90%;
+            transition: opacity 0.3s ease;
+        }
+
+        .start-text.fade-out {
+            opacity: 0 !important;
+            visibility: hidden !important;
+        }
+
+        /* メイン画面（録音中） */
+        #main-screen {
+            position: fixed;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        #main-screen.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        #main-screen.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        /* コンテンツコンテナ */
+        .content-container {
+            position: relative;
+            z-index: 1;
+            text-align: center;
+            padding: 20px;
+        }
+
+        /* 全ての文字を同時にスライドアップ */
+        .text-group {
+            opacity: 0;
+            transform: translateY(50px);
+        }
+
+        .text-group.animate {
+            animation: slideUpIOS 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        @keyframes slideUpIOS {
+            0% {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* 上部の指示テキスト */
+        .instruction-text {
+            font-size: 1.5em;
+            font-weight: 670;
+            margin-bottom: 8.2em;
+            line-height: 1.7;
+        }
+
+        /* メインテキスト */
+        .main-text {
+            font-size: 3.2em;
+            font-weight: 700;
+            margin: 0.5em 0 4em 0;
+            line-height: 1.4;
+        }
+
+        /* 下部の回転テキスト */
+        .rotating-text-container {
+            position: fixed;
+            bottom: 100px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            height: 100px;
+            overflow: hidden;
+            z-index: 2;
+        }
+
+        .rotating-text {
+            font-size: 1.5em;
+            font-weight: 660;
+            line-height: 2;
+            position: absolute;
+            width: 100%;
+            opacity: 0;
+            transform: translateY(35px);
+        }
+
+        .rotating-text.active {
+            animation: rotateTextSubtle 3.3s ease;
+        }
+
+        @keyframes rotateTextSubtle {
+            0% {
+                opacity: 0;
+                transform: translateY(35px);
+            }
+            18% {
+                opacity: 0.65;
+                transform: translateY(0);
+            }
+            82% {
+                opacity: 0.65;
+                transform: translateY(0);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(-35px);
+            }
+        }
+
+        /* 白い円の展開エフェクト（blurあり） */
+        .white-circle {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            width: 120px;
+            height: 120px;
+            border: 4px solid rgba(255, 255, 255, 0.95);
+            border-radius: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            opacity: 0;
+            z-index: 9998;
+            pointer-events: none;
+            box-shadow: 0 0 40px rgba(255, 255, 255, 0.5);
+            filter: blur(3px);
+        }
+
+        .white-circle.expanding {
+            animation: expandCircleFadeOut 0.88s ease forwards;
+        }
+
+        @keyframes expandCircleFadeOut {
+            0% {
+                transform: translate(-50%, -50%) scale(0);
+                opacity: 1;
+                filter: blur(3px);
+            }
+            100% {
+                transform: translate(-50%, -50%) scale(40);
+                opacity: 0;
+                filter: blur(8px);
+            }
+        }
+
+        /* ありがとう画面 */
+        #thanks-screen {
+            position: fixed;
+            inset: 0;
+            z-index: 9999;
+            background: #000;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 24px;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        #thanks-screen.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* 2E田中（上部） */
+        .thanks-label {
+            position: absolute;
+            top: 60px;
+            font-size: 1.3em;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.8);
+            letter-spacing: 0.05em;
+        }
+
+        /* ありがとう画面の円 */
+        #thanks-circle {
+            width: 180px;
+            height: 180px;
+            border: 3px solid rgba(255,255,255,.9);
+            border-radius: 50%;
+            box-shadow: 0 0 20px rgba(255,255,255,.35);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            animation: circlePop 0.7s cubic-bezier(0.2, 1, 0.3, 1) both;
+            position: relative;
+        }
+
+        @keyframes circlePop {
+            0% { 
+                transform: scale(0.6); 
+                opacity: 0; 
+            }
+            100% { 
+                transform: scale(1); 
+                opacity: 1; 
+            }
+        }
+
+        /* 矢印アイコン（SF風） */
+        .thanks-arrow {
+            font-size: 80px;
+            font-weight: 300;
+            line-height: 1;
+            color: #fff;
+            opacity: 0;
+        }
+
+        .thanks-arrow.show {
+            opacity: 1;
+        }
+
+        .thanks-arrow.animate {
+            animation: arrowAppear 0.6s cubic-bezier(0.2, 1, 0.3, 1) forwards;
+        }
+
+        @keyframes arrowAppear {
+            0% {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* リング拡大エフェクト */
+        #thanks-ring {
+            position: absolute;
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            border: 3px solid rgba(255,255,255,.9);
+            box-shadow: 0 0 18px rgba(255,255,255,.35);
+            opacity: 0;
+            transform: scale(1);
+        }
+
+        .ring-anim {
+            animation: ringExpand 1.2s cubic-bezier(0.2, 1, 0.3, 1) forwards;
+        }
+
+        @keyframes ringExpand {
+            0% { 
+                opacity: 1; 
+                transform: scale(1); 
+            }
+            100% { 
+                opacity: 0; 
+                transform: scale(3); 
+            }
+        }
+
+        /* ありがとうテキスト */
+        #thanks-text {
+            font-size: 32px;
+            font-weight: 700;
+            text-align: center;
+            color: #fff;
+            letter-spacing: 0.02em;
+            text-shadow: 0 5px 18px rgba(0,0,0,0.55);
+        }
+
+        /* Thanks Dots */
+        #thanks-dots {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            overflow: hidden;
+            z-index: 10000;
+        }
+
+        .dot {
+            position: absolute;
+            border-radius: 50%;
+            background: #fff;
+            opacity: 0;
+            animation: dotPop 1.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+
+        @keyframes dotPop {
+            0% { 
+                opacity: 0; 
+                transform: translate(-50%, -50%) scale(0.3); 
+            }
+            10% { 
+                opacity: 1; 
+            }
+            100% { 
+                opacity: 0; 
+                transform: translate(var(--tx), var(--ty)) scale(1); 
+            }
+        }
+
+        /* 下部の2E田中ラベル */
+        .bottom-label {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 8px 24px;
+            border: 2px solid rgba(255, 255, 255, 0.8);
+            border-radius: 33px;
+            font-size: 1.1em;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.9);
+            letter-spacing: 0.05em;
+            z-index: 10001;
+            backdrop-filter: blur(10px);
+            background: rgba(0, 0, 0, 0.07);
+        }
+
+        /* レスポンシブ */
+        @media (max-width: 768px) {
+            .main-text {
+                font-size: 2.4em;
+            }
+            
+            .instruction-text {
+                font-size: 1.25em;
+            }
+            
+            .rotating-text {
+                font-size: 1.15em;
+            }
+
+            .start-text {
+                font-size: 1.3em;
+            }
+
+            .arrow-circle {
+                width: 150px;
+                height: 150px;
+            }
+
+            .arrow-icon {
+                font-size: 65px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .main-text {
+                font-size: 1.8em;
+            }
+            
+            .instruction-text {
+                font-size: 1.05em;
+            }
+            
+            .rotating-text {
+                font-size: 0.95em;
+            }
+
+            .start-text {
+                font-size: 1.1em;
+            }
+
+            .arrow-circle {
+                width: 130px;
+                height: 130px;
+            }
+
+            .arrow-icon {
+                font-size: 55px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- グラデーション背景 -->
+    <div class="gradient-bg" id="gradientBg"></div>
+
+    <!-- 初期画面（録音前） -->
+    <div id="start-screen">
+        <div class="arrow-circle" id="arrowCircle">
+            <div class="arrow-icon" id="arrowIcon">↑</div>
+        </div>
+        <div class="start-text" id="startText">
+            学校の悩みがありますか？<br>
+            いずれかのキーかトラックパッドを<br>
+            押して田中に教えて下さい
+        </div>
+    </div>
+
+    <!-- メイン画面（録音中） -->
+    <div id="main-screen">
+        <div class="content-container">
+            <div class="text-group">
+                <div class="instruction-text">
+                    伝え終わったら<br>
+                    好きなキーかトラックパッドを押して下さい
+                </div>
+                
+                <div class="main-text">
+                    学校の悩みを、声で<br>
+                    2-E田中のPCに話しかけて
+                </div>
+            </div>
+        </div>
+
+        <div class="rotating-text-container" id="rotatingContainer"></div>
+    </div>
+
+    <!-- 白い円のエフェクト -->
+    <div class="white-circle" id="whiteCircle"></div>
+
+    <!-- ありがとう画面 -->
+    <div id="thanks-screen">
+        <div class="thanks-label">2E 田中</div>
+        <div id="thanks-circle">
+            <div class="thanks-arrow" id="thanksArrow">↑</div>
+            <div id="thanks-ring"></div>
+        </div>
+        <div id="thanks-text"> ありがとう<br>2-E 田中</div>
+    </div>
+
+    <!-- Thanks Dots -->
+    <div id="thanks-dots"></div>
+
+    <!-- 下部ラベル -->
+    <div class="bottom-label">2E 田中</div>
+
+    <script>
+        // 回転させるテキスト
+        const rotatingTexts = [
+            "食堂の改善<br>購買混みすぎ",
+            "遅刻きつい<br>校則の改善",
+            "課題について<br>学校の改善",
+            "設備について<br>意見箱置かないの？",
+            "生徒会ってどんな仕事するの？<br>今の学校が楽しい"
+        ];
+
+        let currentIndex = 0;
+        const container = document.getElementById('rotatingContainer');
+        const whiteCircle = document.getElementById('whiteCircle');
+        const startScreen = document.getElementById('start-screen');
+        const arrowCircle = document.getElementById('arrowCircle');
+        const arrowIcon = document.getElementById('arrowIcon');
+        const startText = document.getElementById('startText');
+        const mainScreen = document.getElementById('main-screen');
+        const thanksScreen = document.getElementById('thanks-screen');
+        const thanksArrow = document.getElementById('thanksArrow');
+        const thanksRing = document.getElementById('thanks-ring');
+        const thanksDots = document.getElementById('thanks-dots');
+        const gradientBg = document.getElementById('gradientBg');
+        let hasStarted = false;
+        let hasTransitioned = false;
+
+        // 音声録音関連
+        let mediaRecorder = null;
+        let audioChunks = [];
+        let isRecording = false;
+
+        // 音声ファイルを再生する関数
+        function playAudio(filename) {
+            return new Promise((resolve, reject) => {
+                const audio = new Audio(filename);
+                audio.onended = resolve;
+                audio.onerror = (error) => {
+                    console.error(`${filename} 再生エラー:`, error);
+                    resolve(); // エラーでも続行
+                };
+                audio.play().catch((error) => {
+                    console.error(`${filename} 再生失敗:`, error);
+                    resolve(); // エラーでも続行
+                });
+            });
+        }
+
+        // 録音データをダウンロード（Safari対応）
+        function downloadRecording(blob) {
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            document.body.appendChild(a);
+            a.style.display = 'none';
+            a.href = url;
+            const timestamp = new Date().toISOString().replace(/[:.]/g, '-').substring(0, 19);
+            a.download = `recording_${timestamp}.webm`;
+            
+            setTimeout(() => {
+                a.click();
+                setTimeout(() => {
+                    document.body.removeChild(a);
+                    window.URL.revokeObjectURL(url);
+                }, 100);
+            }, 0);
+        }
+
+        // 録音開始
+        async function startRecording() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ 
+                    audio: {
+                        echoCancellation: true,
+                        noiseSuppression: true,
+                        sampleRate: 44100
+                    } 
+                });
+                
+                let options;
+                if (MediaRecorder.isTypeSupported('audio/webm')) {
+                    options = { mimeType: 'audio/webm' };
+                } else if (MediaRecorder.isTypeSupported('audio/mp4')) {
+                    options = { mimeType: 'audio/mp4' };
+                } else {
+                    options = {};
+                }
+                
+                mediaRecorder = new MediaRecorder(stream, options);
+                
+                mediaRecorder.ondataavailable = (event) => {
+                    if (event.data.size > 0) {
+                        audioChunks.push(event.data);
+                    }
+                };
+                
+                mediaRecorder.onstop = () => {
+                    const mimeType = mediaRecorder.mimeType || 'audio/webm';
+                    const audioBlob = new Blob(audioChunks, { type: mimeType });
+                    downloadRecording(audioBlob);
+                    audioChunks = [];
+                    
+                    stream.getTracks().forEach(track => track.stop());
+                };
+                
+                mediaRecorder.start();
+                isRecording = true;
+                console.log('録音開始');
+            } catch (error) {
+                console.error('マイクアクセスエラー:', error);
+            }
+        }
+
+        // 録音停止
+        function stopRecording() {
+            if (mediaRecorder && isRecording) {
+                mediaRecorder.stop();
+                isRecording = false;
+                console.log('録音停止');
+            }
+        }
+
+        // テキストを表示
+        function showText() {
+            container.innerHTML = '';
+            const textDiv = document.createElement('div');
+            textDiv.className = 'rotating-text active';
+            textDiv.innerHTML = rotatingTexts[currentIndex];
+            container.appendChild(textDiv);
+            currentIndex = (currentIndex + 1) % rotatingTexts.length;
+        }
+
+        // Thanks Dotsを生成
+        function spawnThanksDots(n = 250) {
+            if (!thanksDots) return;
+            
+            const W = window.innerWidth;
+            const H = window.innerHeight;
+            thanksDots.innerHTML = '';
+
+            for (let i = 0; i < n; i++) {
+                const dot = document.createElement('div');
+                dot.className = 'dot';
+
+                const size = Math.random() < 0.8 
+                    ? (Math.random() * 3 + 2) 
+                    : (Math.random() * 6 + 4);
+
+                const centerX = W / 2;
+                const centerY = H / 2;
+                const startX = centerX + (Math.random() * 160 - 80);
+                const startY = centerY + (Math.random() * 160 - 80);
+
+                const angle = Math.random() * Math.PI * 2;
+                const distance = 120 + Math.random() * Math.max(W, H) * 0.6;
+                const endX = Math.cos(angle) * distance;
+                const endY = Math.sin(angle) * distance;
+
+                dot.style.width = `${size}px`;
+                dot.style.height = `${size}px`;
+                dot.style.left = `${startX}px`;
+                dot.style.top = `${startY}px`;
+                dot.style.setProperty('--tx', `${endX}px`);
+                dot.style.setProperty('--ty', `${endY}px`);
+                dot.style.animationDelay = `${Math.random() * 0.25}s`;
+                
+                thanksDots.appendChild(dot);
+            }
+        }// 初期画面要素を強制的に非表示にする関数
+function forceHideStartElements() {
+    // ▼ startText：1.5倍に拡大しながら0.5秒でフェードアウト
+    if (startText) {
+        startText.style.transition = 'transform 0.5s ease, opacity 0.5s ease';
+        startText.style.transform = 'scale(1.5)';
+        startText.style.opacity = '0';
+    }
+
+    // ▼ arrowCircle：0.5倍に縮小しながら0.3秒でフェードアウト
+    if (arrowCircle) {
+        arrowCircle.style.transition = 'transform 0.3s ease, opacity 0.3s ease';
+        arrowCircle.style.transform = 'scale(0.5)';
+        arrowCircle.style.opacity = '0';
+    }
+
+    // ▼ arrowIcon：普通にフェードアウト
+    if (arrowIcon) {
+        arrowIcon.style.transition = 'opacity 0.3s ease';
+        arrowIcon.style.opacity = '0';
+    }
+
+    // ▼ start-screen全体も徐々に透明化（アニメーション中は非表示にしない）
+    startScreen.style.transition = 'opacity 0.5s ease';
+    startScreen.style.opacity = '0';
+
+    // ▼ 0.55秒後（アニメーション終了後）に強制非表示化
+    setTimeout(() => {
+        startScreen.classList.add('hidden-forever');
+        if (arrowCircle) arrowCircle.style.display = 'none';
+        if (arrowIcon) arrowIcon.style.display = 'none';
+        if (startText) startText.style.display = 'none';
+    }, 550);
+}
+
+
+        // 録音開始処理
+        async function startSession() {
+            if (hasStarted) return;
+            hasStarted = true;
+
+            // 初期画面の要素を0.3秒で確実に消す
+            forceHideStartElements();
+
+            // グラデーション背景を拡大
+            setTimeout(() => {
+                gradientBg.classList.add('expanded');
+            }, 100);
+
+            // 55.mp3を再生
+            try {
+                await playAudio('55.mp3');
+                console.log('55.mp3 再生完了');
+            } catch (error) {
+                console.error('55.mp3 再生エラー:', error);
+            }
+
+            // 録音開始
+            await startRecording();
+
+            // メイン画面を表示
+            setTimeout(() => {
+                mainScreen.classList.add('active');
+                document.querySelector('.text-group').classList.add('animate');
+            }, 300);
+
+            // テキストローテーション開始
+            setTimeout(() => {
+                showText();
+                setInterval(showText, 2000);
+            }, 1800);
+        }
+
+        // 録音停止とトランジション処理
+        async function triggerTransition() {
+            if (hasTransitioned) return;
+            hasTransitioned = true;
+
+            // 録音を停止してダウンロード
+            stopRecording();
+
+            // 白い円を展開
+            whiteCircle.classList.add('expanding');
+
+            // 背景を0.5sで黒に
+            gradientBg.classList.add('fade-to-black');
+
+            // 0.5秒後にメイン画面を非表示
+            setTimeout(() => {
+                mainScreen.classList.add('hidden');
+            }, 500);
+
+            // 0.6秒後にありがとう画面を表示
+            setTimeout(async () => {
+                thanksScreen.classList.add('active');
+                
+                // 矢印とリングのアニメーション
+                setTimeout(() => {
+                    thanksArrow.classList.add('show');
+                    thanksArrow.classList.add('animate');
+                    thanksRing.classList.add('ring-anim');
+                    
+                    // Thanks Dotsを表示
+                    spawnThanksDots(250);
+                }, 100);
+
+                // ok.mp3を再生
+                try {
+                    await playAudio('bgg.mp3');
+                    console.log('bgg.mp3 再生完了');
+                } catch (error) {
+                    console.error('bgg.mp3 再生エラー:', error);
+                }
+
+                // ok.mp3再生終了後にリロード
+                setTimeout(() => {
+                    location.reload();
+                }, 500);
+            }, 600);
+        }
+
+        // イベントリスナー（初期画面用）
+        function setupStartListeners() {
+            const startHandler = (e) => {
+                e.preventDefault();
+                startSession();
+                // リスナーを削除
+                document.removeEventListener('keydown', startHandler);
+                document.removeEventListener('click', startHandler);
+                document.removeEventListener('touchstart', startHandler);
+                // メイン画面用のリスナーを設定
+                setTimeout(setupMainListeners, 1000);
+            };
+
+            document.addEventListener('keydown', startHandler);
+            document.addEventListener('click', startHandler);
+            document.addEventListener('touchstart', startHandler);
+        }
+
+        // イベントリスナー（メイン画面用）
+        function setupMainListeners() {
+            document.addEventListener('keydown', triggerTransition);
+            document.addEventListener('click', triggerTransition);
+            document.addEventListener('touchstart', triggerTransition);
+        }
+
+        // 初期設定
+        setupStartListeners();
+    </script>
+</body>
+</html>

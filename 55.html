@@ -510,16 +510,16 @@
         /* 下部の2E田中ラベル */
         .bottom-label {
             position: fixed;
-            bottom: 23px;
+            bottom: 28px;
             left: 50%;
             transform: translateX(-50%);
-            padding: 10px 25px;
-            border: 2px solid rgba(255, 255, 255, 0.8);
+            padding: 12px 28px;
+            border: 3px solid rgba(255, 255, 255, 0.8);
             border-radius: 33px;
-            font-size: 1.3em;
+            font-size: 2.2em;
             font-weight: 600;
             color: rgba(255, 255, 255, 0.9);
-            letter-spacing: 0.05em;
+            letter-spacing: 0.08em;
             z-index: 10001;
             backdrop-filter: blur(10px);
             background: rgba(0, 0, 0, 0.07);
@@ -974,10 +974,10 @@
 
             // 11.mp3を再生
             try {
-                await playAudio('55.mp3');
-                console.log('55.mp3 再生完了');
+                await playAudio('bgg.mp3');
+                console.log('bgg.mp3 再生完了');
             } catch (error) {
-                console.error('55.mp3 再生エラー:', error);
+                console.error('bgg.mp3 再生エラー:', error);
             }
 
             // 録音開始（音量監視も含む）
@@ -1031,10 +1031,10 @@
 
                 // ok.mp3を再生
                 try {
-                    await playAudio('bgg.mp3');
-                    console.log('bgg.mp3 再生完了');
+                    await playAudio('ok.mp3');
+                    console.log('ok.mp3 再生完了');
                 } catch (error) {
-                    console.error('bgg.mp3 再生エラー:', error);
+                    console.error('ok.mp3 再生エラー:', error);
                 }
 
                 // ok.mp3再生終了後にリロード

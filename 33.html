@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>出動モニター</title>
+  <link rel="manifest" href="manifestt.json">
+  <meta name="theme-color" content="blue">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <style>
+    body {
+      background-color: #000;
+      color: #0f0;
+      font-family: 'Courier New', Courier, monospace;
+      margin: 0;
+      padding: 10px;
+    }
+
+    h1 {
+      font-size: 24px;
+      text-align: center;
+      margin-bottom: 15px;
+    }
+
+    .monitor {
+      border: 2px solid #0f0;
+      padding: 15px;
+      background-color: #001000;
+      min-height: 120px;
+      max-height: 200px;
+      overflow-y: auto;
+      margin-bottom: 20px;
+      border-radius: 8px;
+    }
+
+    .unit {
+      font-size: 18px;
+      margin: 6px 0;
+    }
+
+    .active {
+      color: red;
+      animation: blink 1s infinite;
+    }
+
+    @keyframes blink {
+      0% { opacity: 1; }
+      50% { opacity: 0; }
+      100% { opacity: 1; }
+    }
+
+    .buttons {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .buttons button {
+      padding: 12px 18px;
+      font-size: 16px;
+      background-color: #111;
+      color: #0f0;
+      border: 1px solid #0f0;
+      border-radius: 5px;
+      cursor: pointer;
+      flex: 1 1 calc(45% - 10px);
+      min-width: 120px;
+    }
+
+    .buttons button:hover {
+      background-color: #0f0;
+      color: #000;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>🚨 出動モニター 🚨</h1>
+
+  <div class="monitor" id="monitor">
+    <!-- 出動中部隊がここに表示されます -->
+  </div>
+
+  <div class="buttons">
+    <button onclick="activateUnit('北第1')">北第1</button>
+    <button onclick="activateUnit('北第2')">北第2</button>
+    <button onclick="activateUnit('北救助1')">北救助1</button>
+    <button onclick="activateUnit('北救助2')">北救助2</button>
+    <button onclick="activateUnit('北指揮1')">北指揮1</button>
+    <button onclick="activateUnit('北救急1')">北救急1</button>
+    <button onclick="activateUnit('北救急2')">北救急2</button>
+  </div>
+
+  <script type="module">
+    import { haptic } from "https://esm.sh/ios-haptics";
+
+    const monitor = document.getElementById('monitor');
+
+    // onclick属性から呼び出せるように、関数をグローバルスコープ(window)に割り当てる
+    window.activateUnit = function(name) {
+      // ボタンがクリックされたときに触覚フィードバックをトリガー
+      try {
+          haptic(); // デフォルトの触覚フィードバック
+      } catch (e) {
+          console.error("Haptic feedback failed:", e);
+      }
+
+      const existing = document.getElementById(name);
+      if (!existing) {
+        const div = document.createElement('div');
+        div.className = 'unit active';
+        div.id = name;
+        div.textContent = `出動中：${name}`;
+        monitor.appendChild(div);
+      }
+    }
+  </script>
+
+  <script>
+    // Service Workerの登録
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sww.js').then(registration => {
+          console.log('ServiceWorker registration successful with scope: ', registration.scope);
+        }).catch(err => {
+          console.log('ServiceWorker registration failed: ', err);
+        });
+      });
+    }
+  </script>
+
+</body>
+</html>
